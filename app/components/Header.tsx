@@ -31,7 +31,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-[var(--border-line)] sticky top-0 z-50 auth-hide" >
+    <header className="bg-white border-b border-[var(--border-line)] sticky top-0 z-50" >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -182,11 +182,11 @@ export default function Header() {
                       </div>
                     </div>
                     <Button variant="outline" size="sm" className="w-full rounded-full py-5 mb-2 bg-transparent" asChild>
-                      <Link href="/dashboard">Dashboard</Link>
+                      <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
                     </Button>
                     {session.user.role === "admin" && (
                       <Button variant="outline" size="sm" className="w-full rounded-full py-5 mb-2 bg-transparent" asChild>
-                        <Link href="/admin">Admin Panel</Link>
+                        <Link href="/admin" onClick={() => setIsMenuOpen(false)}>Admin Panel</Link>
                       </Button>
                     )}
                     <Button variant="outline" size="sm" className="w-full rounded-full py-5 bg-transparent" onClick={handleSignOut}>
@@ -196,10 +196,10 @@ export default function Header() {
                 ) : (
                   <div className="space-y-2">
                     <Button variant="outline" size="sm" className="w-full bg-transparent" asChild>
-                      <Link href="/auth/signin">Sign In</Link>
+                      <Link href="/auth/signin" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
                     </Button>
                     <Button size="sm" className="w-full" asChild>
-                      <Link href="/auth/signup">Sign Up</Link>
+                      <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
                     </Button>
                   </div>
                 )}
