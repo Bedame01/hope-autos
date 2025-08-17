@@ -1,0 +1,51 @@
+import type React from "react"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import Header from "./components/Header"
+// import Footer from "./components/Footer"
+import { AuthProvider } from "./components/AuthProvider"
+import { ThemeProvider } from "./components/ThemeProvider"
+import { Toaster } from "@/components/ui/toaster"
+
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "Hope Autos - Premium Car Dealership",
+  description: "Find your perfect car at Hope Autos. Quality pre-owned and new vehicles with excellent service.",
+  keywords: "cars, dealership, automotive, used cars, new cars, Hope Autos",
+    generator: 'v0.dev'
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <head>
+          {/* <!-- Inter & Inter Tight Font --> */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+
+        {/* Rubik Font */}
+        <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></link>
+
+        {/* <!-- InstrumentSerif Font --> */}
+        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+      </head>
+      <body className={inter.className}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <AuthProvider>
+            <Header />
+            <main className="min-h-screen">{children}</main>
+            {/* <Footer /> */}
+            <Toaster />
+          </AuthProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+  )
+}

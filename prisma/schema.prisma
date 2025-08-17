@@ -1,0 +1,218 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  role          Role      @default(CUSTOMER)
+  phone         String?
+  bio           String?   @db.Text
+  password      String?
+  provider      String?
+  providerId    String?
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  preferences UserPreferences?
+  inquiries   Inquiry[]
+  favorites   FavoriteCar[]
+  sessions    Session[]
+  accounts    Account[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
+}
+
+model UserPreferences {
+  id                     String   @id @default(cuid())
+  userId                 String   @unique
+  
+  // Search Preferences
+  maxPrice               Int?
+  preferredMakes         String[]
+  preferredFuelTypes     String[]
+  preferredBodyTypes     String[]
+  
+  // Notification Preferences
+  emailNotifications     Boolean  @default(true)
+  smsNotifications       Boolean  @default(false)
+  priceAlerts            Boolean  @default(true)
+  newArrivals            Boolean  @default(true)
+  marketingNotifications Boolean  @default(false)
+  
+  // Privacy Settings
+  profileVisible         Boolean  @default(true)
+  showEmail              Boolean  @default(false)
+  showPhone              Boolean  @default(false)
+  
+  // Theme Preferences
+  theme                  String   @default("system") // "light", "dark", "system"
+  
+  // Additional Settings
+  language               String   @default("en")
+  timezone               String   @default("UTC")
+  currency               String   @default("USD")
+  
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  savedSearches SavedSearch[]
+
+  @@map("user_preferences")
+}
+
+model SavedSearch {
+  id                String   @id @default(cuid())
+  userPreferencesId String
+  name              String
+  filters           Json
+  alertsEnabled     Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  userPreferences UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
+
+  @@map("saved_searches")
+}
+
+model Car {
+  id           String      @id @default(cuid())
+  make         String
+  model        String
+  year         Int
+  price        Int
+  mileage      Int
+  color        String
+  fuelType     FuelType
+  transmission Transmission
+  bodyType     BodyType
+  images       String[]
+  description  String      @db.Text
+  features     String[]
+  isAvailable  Boolean     @default(true)
+  isFeatured   Boolean     @default(false)
+  vin          String?     @unique
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  inquiries Inquiry[]
+  favorites FavoriteCar[]
+
+  @@map("cars")
+}
+
+model FavoriteCar {
+  id     String @id @default(cuid())
+  userId String
+  carId  String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  car  Car  @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, carId])
+  @@map("favorite_cars")
+}
+
+model Inquiry {
+  id        String        @id @default(cuid())
+  name      String
+  email     String
+  phone     String?
+  message   String        @db.Text
+  carId     String?
+  userId    String?
+  status    InquiryStatus @default(NEW)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  // Relations
+  car  Car?  @relation(fields: [carId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("inquiries")
+}
+
+// Enums
+enum Role {
+  ADMIN
+  CUSTOMER
+}
+
+enum FuelType {
+  GASOLINE
+  DIESEL
+  ELECTRIC
+  HYBRID
+}
+
+enum Transmission {
+  MANUAL
+  AUTOMATIC
+}
+
+enum BodyType {
+  SEDAN
+  SUV
+  HATCHBACK
+  COUPE
+  TRUCK
+}
+
+enum InquiryStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
