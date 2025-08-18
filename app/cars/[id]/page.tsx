@@ -284,9 +284,9 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="w-full bg-transparent" asChild>
-                  <Link href="tel:5551234567">
+                  <Link href="tel:08133531046">
                     <Phone className="h-4 w-4 mr-2" />
-                    Call (555) 123-4567
+                    Call (234) 8133531046
                   </Link>
                 </Button>
               </div>
@@ -409,7 +409,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
         </div>
       )}
 
-      <div className="border-t border-[var(--border-line)] mt-18 mb-8 pt-8 md:pt-10 text-center px-3">
+      <div className="border-t border-[var(--border-line)] mt-5 mb-8 pt-8 md:pt-10 text-center px-3">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
           <Link href="/privacy" className="hover:text-gray-500 ml-1">

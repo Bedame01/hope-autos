@@ -80,7 +80,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] pb-10">
+    <div className="min-h-screen bg-[var(--background)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h1>
@@ -98,7 +98,7 @@ export default function ContactPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label htmlFor="name" className="block text-sm font-medium text-[var(--foreground)] mb-1">
                     Full Name *
                   </label>
                   <Input
@@ -114,7 +114,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label htmlFor="email" className="block text-sm font-medium text-[var(--foreground)] mb-1">
                     Email Address *
                   </label>
                   <Input
@@ -130,7 +130,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label htmlFor="phone" className="block text-sm font-medium text-[var(--foreground)] mb-1">
                     Phone Number
                   </label>
                   <Input
@@ -145,7 +145,7 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-1">
+                  <label htmlFor="message" className="block text-sm font-medium text-[var(--foreground)] mb-1">
                     Message *
                   </label>
                   <Textarea
@@ -156,7 +156,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     placeholder="Tell us how we can help you..."
                     rows={5}
-                    className="bg-[var(--background)]"
+                    className="bg-transparent"
                   />
                 </div>
 
@@ -241,7 +241,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
+      <div className="border-t border-[var(--border-line)] mt-15 mb-3 pt-8 md:pt-10 text-center px-2">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
           <Link href="/privacy" className="hover:text-gray-500 ml-1">

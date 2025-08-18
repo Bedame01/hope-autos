@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { Car, Phone, Mail, MapPin } from "lucide-react"
 import Image from "next/image"
-import logo from '@/public/icons/logo.svg'
+import logo from '@/public/icons/logo-icon.png'
 
 export default function Footer() {
   return (
@@ -12,8 +12,8 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src={logo} alt='logo' className="size-10 text-blue-600" />
-                <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope Autos</span>
+                <Image src={logo} alt='logo' className="max-sm:size-8 size-10 text-blue-600" />
+                <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
               </Link>
             </div>
             <p className="text-[var(--foreground)] mb-4">

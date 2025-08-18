@@ -1,5 +1,3 @@
-'use client'
-
 import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -11,7 +9,7 @@ import CustomButton from "@/components/ui/CustomButton"
 // import HeroSlider from '@/components/ui/hero-slider'
 import InfiniteScroll from "@/components/ui/InfiniteScroll"
 
-import BlurText from '@/Reactbits/BlurText/BlurText'
+// import BlurText from '@/Reactbits/BlurText/BlurText'
 // import Hero_bg from '@/public/image/White SUV in Desert Landscape.png'
 import hero_bgline from '@/public/elements/hero-line.avif'
 import hero_slider from "@/public/image/slider51.png"
@@ -31,8 +29,11 @@ export default async function HomePage() {
 
         {/* HERO TITLE WRAP */}
         <div className="title-wrap mt-12 md:mt-16">
-          <div className="max-sm:text-[7.6vw]/11 sm:text-[46px]/12 md:text-[50px]/13 lg:text-[58px]/16 font-bold hero-heading flex flex-col justify-center items-center text-center tracking-[-1px]">
-            <BlurText
+          <div className="max-sm:text-[8.2vw]/11.5 sm:text-[48px]/12 md:text-[50px]/13 lg:text-[58px]/16 font-bold hero-heading flex flex-col justify-center items-center text-center tracking-[-1px]">
+            <h1 className="text-blue-600">Buy.Sell.Swap.</h1>
+            <h1 className="text-[var(--foreground)]">Find your perfect Car.</h1>
+            
+            {/* <BlurText
               text="Buy.Sell.Swap."
               delay={120}
               animateBy="letters"
@@ -47,7 +48,7 @@ export default async function HomePage() {
               direction="top"
               onAnimationComplete={()=> {}}
               className="text-blue-600"
-            />
+            /> */}
           </div>
           <div className="title text-center">
             <div className="title-heading">
@@ -82,7 +83,7 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="hero-display w-full md:w-[80%] lg:w-[70%] absolute z-50 bottom-20 lg:bottom-15">
+        <div className="hero-display w-full md:w-[80%] lg:w-[70%] absolute z-50 max-sm:bottom-26 bottom-22 lg:bottom-15">
           <Image 
             src={hero_slider}
             alt="hero-display"

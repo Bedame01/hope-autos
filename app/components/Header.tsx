@@ -15,7 +15,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import CustomButton from "@/components/ui/CustomButton"
 
-import logo from '@/public/icons/logo.svg'
+import logo from '@/public/icons/logo-icon.png'
 import Image from "next/image"
 
 export default function Header() {
@@ -39,8 +39,8 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Image src={logo} alt='logo' className="size-10 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope Autos</span>
+            <Image src={logo} alt='logo' className="max-sm:size-8 size-10 text-blue-600" />
+            <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
           </Link>
 
           {/* Desktop Navigation */}

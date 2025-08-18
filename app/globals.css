@@ -17,8 +17,8 @@ body{
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --color-blue-500: #e7bf0b;
-  --color-blue-600: #e7a90b;
+  /* --color-blue-500: #e7bf0b;
+  --color-blue-600: #e7a90b; */
   --heading-color: oklch(23.929% 0.00003 271.152);
   --text-color: oklch(0.145 0 0);
   --color-white: oklch(0.985 0 0);
@@ -41,7 +41,7 @@ body{
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
-  --border-line: oklch(52.78% 0.00006 271.152 / 0.178);
+  --border-line: oklch(49.97% 0.00006 271.152 / 0.178);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -62,8 +62,8 @@ body{
 }
 
 .dark {
-  --color-blue-500: #0fdb08;
-  --color-blue-600: #16e70e;
+  /* --color-blue-500: #0fdb08;
+  --color-blue-600: #16e70e; */
   --heading-color: oklch(96.715% 0.00011 271.152);
   --text-color: oklch(77.944% 0.00009 271.152);
   --color-white: oklch(22.645% 0.00003 271.152);
@@ -110,6 +110,8 @@ body{
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-blue-500: #e7bf0b;
+  --color-blue-600: #e7a90b;
   /* --color-blue-500: #16e70e;
   --color-blue-600: #16e70e; */
   /* --color-blue-600: var(--color-green-400); */

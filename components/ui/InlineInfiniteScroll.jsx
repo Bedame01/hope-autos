@@ -26,7 +26,7 @@ const InlineInfiniteScroll = () => {
           <div className="logo-content flex items-center"><Image src={icon1} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[43px] sm:w-[46px]' /></div>
         </div>
         <div className="logo-item inline-flex items-center justify-center">
-          <div className="logo-content flex items-center"><Image src={icon2} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[33px] sm:w-[34px]' /></div>
+          <div className="logo-content flex items-center"><Image src={icon2} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[30px] sm:w-[32px]' /></div>
         </div>
         <div className="logo-item inline-flex items-center justify-center">
           <div className="logo-content flex items-center"><Image src={icon3} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[38px] sm:w-[40px]' /></div>
@@ -57,7 +57,7 @@ const InlineInfiniteScroll = () => {
           <div className="logo-content flex items-center"><Image src={icon1} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[43px] sm:w-[46px]' /></div>
         </div>
         <div className="logo-item inline-flex items-center justify-center">
-          <div className="logo-content flex items-center"><Image src={icon2} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[33px] sm:w-[34px]' /></div>
+          <div className="logo-content flex items-center"><Image src={icon2} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[30px] sm:w-[32px]' /></div>
         </div>
         <div className="logo-item inline-flex items-center justify-center">
           <div className="logo-content flex items-center"><Image src={icon3} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[38px] sm:w-[40px]' /></div>
