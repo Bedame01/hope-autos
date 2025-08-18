@@ -282,6 +282,7 @@ export default function EditCarPage() {
                 onChange={(e) => handleChange("description", e.target.value)}
                 placeholder="Describe the vehicle..."
                 rows={4}
+                className="bg-transparent border border-[var(--border-line)]"
               />
             </div>
 
@@ -291,6 +292,7 @@ export default function EditCarPage() {
                 value={formData.features}
                 onChange={(e) => handleChange("features", e.target.value)}
                 placeholder="Backup Camera, Bluetooth, Cruise Control (comma separated)"
+                className="border border-[var(--border-line)] py-2"
               />
               <p className="text-xs text-gray-400 mt-1">Separate features with commas</p>
             </div>

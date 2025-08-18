@@ -83,7 +83,7 @@ export default function AdminDashboard() {
         {statCards.map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.title}>
+            <Card data-aos="zoom-in-left" data-aos-duration="1300" key={stat.title}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Inquiries */}
-      <Card>
+      <Card data-aos="zoom-in-right" data-aos-duration="1300">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Recent Inquiries</CardTitle>
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
       </Card>
 
       {/* Quick Actions */}
-      <Card>
+      <Card data-aos="zoom-in-left" data-aos-duration="1300">
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>

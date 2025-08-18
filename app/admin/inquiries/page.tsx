@@ -76,7 +76,7 @@ export default function AdminInquiriesPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
+        <Card data-aos="zoom-in-up" data-aos-duration="1300">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-blue-600" />
@@ -88,7 +88,7 @@ export default function AdminInquiriesPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card data-aos="zoom-in-down" data-aos-duration="1300">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-orange-600" />
@@ -100,7 +100,7 @@ export default function AdminInquiriesPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card data-aos="zoom-in-left" data-aos-duration="1300">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-green-600" />
@@ -113,7 +113,7 @@ export default function AdminInquiriesPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card data-aos="zoom-in-right" data-aos-duration="1300">
         <CardHeader>
           <CardTitle>All Inquiries</CardTitle>
         </CardHeader>

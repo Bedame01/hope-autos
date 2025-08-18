@@ -199,7 +199,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-medium text-gray-900">Car Photos</h3>
-          <p className="text-sm text-gray-600">Upload up to {maxImages} photos. First image will be the main photo.</p>
+          <p className="text-sm text-[var(--text-color)]">Upload up to {maxImages} photos. First image will be the main photo.</p>
         </div>
         <Badge variant="secondary">
           {images.length} / {maxImages}

@@ -216,7 +216,7 @@ export default function SettingsPage() {
                 onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                 placeholder="Tell us about yourself"
                 rows={3}
-                className="bg-[var(--background)]"
+                className="bg-[var(--background)]/20"
               />
             </div>
             <Button onClick={handleProfileUpdate} disabled={loading}>

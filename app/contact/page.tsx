@@ -91,7 +91,7 @@ export default function ContactPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Form */}
-          <Card>
+          <Card data-aos="zoom-in-left" data-aos-duration="1500">
             <CardHeader>
               <CardTitle>Send us a Message</CardTitle>
             </CardHeader>
@@ -156,7 +156,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     placeholder="Tell us how we can help you..."
                     rows={5}
-                    className="bg-transparent"
+                    className="bg-transparent border border-[var(--border-line)]"
                   />
                 </div>
 
@@ -181,7 +181,7 @@ export default function ContactPage() {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            <Card>
+            <Card data-aos="zoom-in-right" data-aos-duration="1500">
               <CardHeader>
                 <CardTitle>Get in Touch</CardTitle>
               </CardHeader>
@@ -216,7 +216,7 @@ export default function ContactPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-aos="zoom-in-right" data-aos-duration="1500">
               <CardHeader>
                 <CardTitle>Business Hours</CardTitle>
               </CardHeader>

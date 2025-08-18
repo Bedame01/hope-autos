@@ -86,7 +86,7 @@ export default function NewCarPage() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Add New Car</h1>
-          <p className="text-gray-600">Add a new vehicle to your inventory</p>
+          <p className="text-[var(--text-color)]">Add a new vehicle to your inventory</p>
         </div>
       </div>
 
@@ -98,27 +98,29 @@ export default function NewCarPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Make *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Make *</label>
                 <Input
                   required
                   value={formData.make}
                   onChange={(e) => handleChange("make", e.target.value)}
                   placeholder="e.g., Toyota"
+                  className="border border-[var(--border-line)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Model *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Model *</label>
                 <Input
                   required
                   value={formData.model}
                   onChange={(e) => handleChange("model", e.target.value)}
                   placeholder="e.g., Camry"
+                  className="border border-[var(--border-line)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Year *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Year *</label>
                 <Input
                   type="number"
                   required
@@ -126,11 +128,12 @@ export default function NewCarPage() {
                   max={new Date().getFullYear() + 1}
                   value={formData.year}
                   onChange={(e) => handleChange("year", Number.parseInt(e.target.value))}
+                  className="border border-[var(--border-line)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Price *</label>
                 <Input
                   type="number"
                   required
@@ -138,11 +141,12 @@ export default function NewCarPage() {
                   value={formData.price}
                   onChange={(e) => handleChange("price", Number.parseInt(e.target.value))}
                   placeholder="25000"
+                  className="border border-[var(--border-line)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Mileage *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Mileage *</label>
                 <Input
                   type="number"
                   required
@@ -150,21 +154,23 @@ export default function NewCarPage() {
                   value={formData.mileage}
                   onChange={(e) => handleChange("mileage", Number.parseInt(e.target.value))}
                   placeholder="15000"
+                  className="border border-[var(--border-line)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Color *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Color *</label>
                 <Input
                   required
                   value={formData.color}
                   onChange={(e) => handleChange("color", e.target.value)}
                   placeholder="e.g., Silver"
+                  className="border border-[var(--border-line)]"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Fuel Type *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Fuel Type *</label>
                 <Select value={formData.fuelType} onValueChange={(value) => handleChange("fuelType", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select fuel type" />
@@ -179,7 +185,7 @@ export default function NewCarPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Transmission *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Transmission *</label>
                 <Select value={formData.transmission} onValueChange={(value) => handleChange("transmission", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select transmission" />
@@ -192,7 +198,7 @@ export default function NewCarPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Body Type *</label>
+                <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Body Type *</label>
                 <Select value={formData.bodyType} onValueChange={(value) => handleChange("bodyType", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select body type" />
@@ -209,21 +215,23 @@ export default function NewCarPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Description</label>
               <Textarea
                 value={formData.description}
                 onChange={(e) => handleChange("description", e.target.value)}
                 placeholder="Describe the vehicle..."
                 rows={4}
+                className="border border-[var(--border-line)] bg-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Features</label>
+              <label className="block text-sm font-medium text-[var(--foreground)] mb-1">Features</label>
               <Input
                 value={formData.features}
                 onChange={(e) => handleChange("features", e.target.value)}
                 placeholder="Backup Camera, Bluetooth, Cruise Control (comma separated)"
+                className="border border-[var(--border-line)]"
               />
               <p className="text-xs text-gray-500 mt-1">Separate features with commas</p>
             </div>
@@ -243,7 +251,7 @@ export default function NewCarPage() {
                 onChange={(e) => handleChange("isAvailable", e.target.checked)}
                 className="rounded border-gray-300"
               />
-              <label htmlFor="isAvailable" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isAvailable" className="text-sm font-medium text-[var(--foreground)]">
                 Available for sale
               </label>
             </div>

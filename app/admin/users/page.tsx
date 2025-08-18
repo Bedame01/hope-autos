@@ -58,7 +58,7 @@ export default function AdminUsersPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card>
+        <Card data-aos="zoom-in-left" data-aos-duration="1300">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-blue-600" />
@@ -70,7 +70,7 @@ export default function AdminUsersPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card data-aos="zoom-in-right" data-aos-duration="1300">
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-purple-600" />
@@ -84,7 +84,7 @@ export default function AdminUsersPage() {
       </div>
 
       {/* Search */}
-      <Card>
+      <Card data-aos="zoom-in-left" data-aos-duration="1300">
         <CardContent className="p-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -99,7 +99,7 @@ export default function AdminUsersPage() {
       </Card>
 
       {/* Users List */}
-      <Card>
+      <Card data-aos="zoom-in-right" data-aos-duration="1300">
         <CardHeader>
           <CardTitle>All Users ({filteredUsers.length})</CardTitle>
         </CardHeader>

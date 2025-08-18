@@ -84,8 +84,8 @@ export default function AdminCarsPage() {
       </div>
 
       {/* Search */}
-      <Card>
-        <CardContent className="p-4">
+      <Card data-aos="zoom-in" data-aos-duration="1300">
+        <CardContent className="px-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
@@ -99,7 +99,7 @@ export default function AdminCarsPage() {
       </Card>
 
       {/* Cars Table */}
-      <Card>
+      <Card data-aos="zoom-in" data-aos-duration="1300">
         <CardHeader>
           <CardTitle>Cars ({filteredCars.length})</CardTitle>
         </CardHeader>

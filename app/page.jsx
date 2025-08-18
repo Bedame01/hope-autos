@@ -22,14 +22,9 @@ export default async function HomePage() {
     <div className="min-h-screen"> 
       {/* Hero Section */}
       <section className="hero relative flex flex-nowrap flex-col items-center gap-[56px] z-5 w-full h-[780px] overflow-hidden bg-[var(--background)]">
-        {/* <div className="absolute inset-0 z-0">
-          <Image src={Hero_bg} alt="hero-bg" className="object-cover size-full" width={10} height={50} loading="lazy" />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/60 to-background/90"></div>
-        </div> */}
-
         {/* HERO TITLE WRAP */}
         <div className="title-wrap mt-12 md:mt-16">
-          <div className="max-sm:text-[8.2vw]/11.5 sm:text-[48px]/12 md:text-[50px]/13 lg:text-[58px]/16 font-bold hero-heading flex flex-col justify-center items-center text-center tracking-[-1px]">
+          <div data-aos="zoom-i" data-aos-duration="1500" className="max-sm:text-[8.2vw]/11.5 sm:text-[48px]/12 md:text-[50px]/13 lg:text-[58px]/16 font-bold hero-heading flex flex-col justify-center items-center text-center tracking-[-1px]">
             <h1 className="text-blue-600">Buy.Sell.Swap.</h1>
             <h1 className="text-[var(--foreground)]">Find your perfect Car.</h1>
             
@@ -124,7 +119,7 @@ export default async function HomePage() {
           </div>
  
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card>
+            <Card data-aos="fade-up" data-aos-duration="1500">
               <CardContent className="p-6 text-center">
                 <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Quality Guarantee</h3>
@@ -132,7 +127,7 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-aos="fade-up" data-aos-duration="1500">
               <CardContent className="p-6 text-center">
                 <Award className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Best Prices</h3>
@@ -140,7 +135,7 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-aos="fade-up" data-aos-duration="1500">
               <CardContent className="p-6 text-center">
                 <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Expert Team</h3>
@@ -148,7 +143,7 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card data-aos="fade-up" data-aos-duration="1500">
               <CardContent className="p-6 text-center">
                 <Wrench className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Full Service</h3>
@@ -169,7 +164,7 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredCars.map((car) => (
-              <CarCard key={car.id} car={car} />
+              <CarCard data-aos="zoom-in-down" data-aos-duration="1500" key={car.id} car={car} />
             ))}
           </div>
 
@@ -195,10 +190,10 @@ export default async function HomePage() {
             </Button>
             <Button
               size="lg"
-              variant="outline"
+              // variant="outline"
               className="bg-[#fff] text-[#000] hover:bg-[#e0e0e0] px-7 cursor-pointer"
             >
-              <Link href="tel:5551234567">Call Now</Link>
+              <Link href="tel:+2348133531046">Call Now</Link>
             </Button>
           </div>
         </div>

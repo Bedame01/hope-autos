@@ -61,7 +61,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[var(--background)]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Welcome back, {session.user.name}!</h1>
@@ -70,7 +70,7 @@ export default function DashboardPage() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
+          <Card data-aos="zoom-in-right" data-aos-duration="1500">
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <Heart className="h-5 w-5 text-red-500" />
@@ -82,7 +82,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card data-aos="zoom-in-left" data-aos-duration="1500">
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <MessageSquare className="h-5 w-5 text-blue-500" />
@@ -94,13 +94,13 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card data-aos="fade-right" data-aos-duration="1500">
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <Search className="h-5 w-5 text-green-500" />
                 <div>
                   <p className="text-sm text-gray-600">Saved Searches</p>
-                  <p className="text-2xl font-bold">{session.user.preferences?.savedSearches?.length || 0}</p>
+                  <p className="text-2xl font-bold">{(session.user as any).preferences?.savedSearches?.length || 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -108,7 +108,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <Card className="mb-8">
+        <Card data-aos="fade-left" data-aos-duration="1500" className="mb-8">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
           </CardHeader>
@@ -144,7 +144,7 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Favorite Cars */}
-          <Card>
+          <Card data-aos="zoom-in-up" data-aos-duration="1500">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
@@ -187,7 +187,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Recent Inquiries */}
-          <Card>
+          <Card data-aos="zoom-in-down" data-aos-duration="1500">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
