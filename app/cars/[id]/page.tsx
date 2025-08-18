@@ -215,7 +215,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                       className="relative h-20 rounded overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
                       onClick={handleMainImageClick}
                     >
-                      <span className="text-sm font-medium text-[var(--text-color)]">+{images.length - 8} more</span>
+                      <span className="text-sm flex items-center flex-wrap font-medium text-[var(--text-color)]">+{images.length - 8} more</span>
                     </div>
                   )}
                 </div>
@@ -249,27 +249,27 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
                       <Calendar className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Year: <span className="font-medium">{car.year}</span></span>
+                      <span className="text-sm flex items-center flex-wrap">Year: <span className="font-medium">{car.year}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Gauge className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Mileage:<span className="font-medium">{car.mileage.toLocaleString()}</span> miles</span>
+                      <span className="text-sm flex items-center flex-wrap">Mileage:<span className="font-medium">{car.mileage.toLocaleString()}</span> miles</span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Fuel className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Fuel: <span className="font-medium">{car.fuelType}</span></span>
+                      <span className="text-sm flex items-center flex-wrap">Fuel: <span className="font-medium">{car.fuelType}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Settings className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Transmission:<span className="font-medium">{car.transmission}</span></span>
+                      <span className="text-sm flex items-center flex-wrap">Transmission:<span className="font-medium">{car.transmission}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Palette className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Color:<span className="font-medium">{car.color}</span></span>
+                      <span className="text-sm flex items-center flex-wrap">Color:<span className="font-medium">{car.color}</span></span>
                     </div>
                     <div className="flex items-center space-x-2">
                       <CarIcon className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">Body:<span className="font-medium">{car.bodyType}</span></span>
+                      <span className="text-sm flex items-center flex-wrap">Body:<span className="font-medium">{car.bodyType}</span></span>
                     </div>
                   </div>
                 </CardContent>

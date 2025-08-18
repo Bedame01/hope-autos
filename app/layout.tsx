@@ -11,9 +11,9 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Hope Autos - Premium Car Dealership",
+  title: "Hope Autos - Limited",
   description: "Find your perfect car at Hope Autos. Quality pre-owned and new vehicles with excellent service.",
-  keywords: "cars, dealership, automotive, used cars, new cars, Hope Autos",
+  keywords: "cars, dealership, automotive, used cars, new cars, nigeria car, car dealership, hope cars, hope autos limited, Hope Autos",
     generator: 'v0.dev'
 }
 
@@ -29,6 +29,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+        <link rel="icon" type="image/svg+xml" href="/public/icons/logo-icon.png" />
 
         {/* Rubik Font */}
         <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></link>

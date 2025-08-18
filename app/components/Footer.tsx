@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { Car, Phone, Mail, MapPin } from "lucide-react"
+import Image from "next/image"
+import logo from '@/public/icons/logo.svg'
 
 export default function Footer() {
   return (
@@ -9,8 +11,10 @@ export default function Footer() {
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <Car className="h-8 w-8 text-blue-600" />
-              <span className="text-2xl font-bold">Hope Autos</span>
+              <Link href="/" className="flex items-center space-x-2">
+                <Image src={logo} alt='logo' className="size-10 text-blue-600" />
+                <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope Autos</span>
+              </Link>
             </div>
             <p className="text-[var(--foreground)] mb-4">
               Your trusted partner in finding the perfect vehicle. We offer quality cars, exceptional service, and

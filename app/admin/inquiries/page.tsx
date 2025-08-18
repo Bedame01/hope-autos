@@ -72,7 +72,7 @@ export default function AdminInquiriesPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Customer Inquiries</h1>
-        <p className="text-gray-600">Manage customer inquiries and follow-ups</p>
+        <p className="text-[var(--text-color)]">Manage customer inquiries and follow-ups</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -81,7 +81,7 @@ export default function AdminInquiriesPage() {
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-gray-600">Total Inquiries</p>
+                <p className="text-sm text-[var(--text-color)]">Total Inquiries</p>
                 <p className="text-2xl font-bold">{inquiries.length}</p>
               </div>
             </div>
@@ -93,7 +93,7 @@ export default function AdminInquiriesPage() {
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-orange-600" />
               <div>
-                <p className="text-sm text-gray-600">New Inquiries</p>
+                <p className="text-sm text-[var(--text-color)]">New Inquiries</p>
                 <p className="text-2xl font-bold">{inquiries.filter((i) => i.status === "new").length}</p>
               </div>
             </div>
@@ -105,7 +105,7 @@ export default function AdminInquiriesPage() {
             <div className="flex items-center space-x-2">
               <MessageSquare className="h-5 w-5 text-green-600" />
               <div>
-                <p className="text-sm text-gray-600">Closed</p>
+                <p className="text-sm text-[var(--text-color)]">Closed</p>
                 <p className="text-2xl font-bold">{inquiries.filter((i) => i.status === "closed").length}</p>
               </div>
             </div>
@@ -121,14 +121,14 @@ export default function AdminInquiriesPage() {
           {inquiries.length > 0 ? (
             <div className="space-y-4">
               {inquiries.map((inquiry) => (
-                <div key={inquiry.id} className="border rounded-lg p-4">
+                <div key={inquiry.id} className="border rounded-lg p-4 overflow-x-auto">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <h4 className="font-medium text-gray-900">{inquiry.name}</h4>
                         <Badge variant={getStatusColor(inquiry.status)}>{inquiry.status}</Badge>
                       </div>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                      <div className="flex items-center space-x-4 text-sm text-[var(--text-color)] mb-2">
                         <div className="flex items-center space-x-1">
                           <Mail className="h-4 w-4" />
                           <span>{inquiry.email}</span>
@@ -150,12 +150,12 @@ export default function AdminInquiriesPage() {
                       )}
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-gray-500">{new Date(inquiry.createdAt).toLocaleDateString()}</p>
+                      <p className="text-xs text-[var(--text-color)]">{new Date(inquiry.createdAt).toLocaleDateString()}</p>
                     </div>
                   </div>
 
                   <div className="mb-3">
-                    <p className="text-gray-700">{inquiry.message}</p>
+                    <p className="text-gray-700 font-medium">{inquiry.message}</p>
                   </div>
 
                   <div className="flex items-center justify-between">
@@ -196,7 +196,7 @@ export default function AdminInquiriesPage() {
           ) : (
             <div className="text-center py-8">
               <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No inquiries yet</p>
+              <p className="text-[var(--text-color)]">No inquiries yet</p>
             </div>
           )}
         </CardContent>
@@ -205,11 +205,11 @@ export default function AdminInquiriesPage() {
       <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
-          <Link href="/privacy" className="hover:text-gray-500 ml-1">
+          <Link href="/privacy" className="hover:text-[var(--text-color)] ml-1">
             Privacy Policy
           </Link>{" "}
           |
-          <Link href="/terms" className="hover:text-gray-500 ml-1">
+          <Link href="/terms" className="hover:text-[var(--text-color)] ml-1">
             Terms of Service
           </Link>
         </p>

@@ -111,8 +111,8 @@ export default function SignInPage() {
   const hasGoogleProvider = providers?.google
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex items-center flex-col justify-center py-12 px-5 sm:px-8 lg:px-10">
-      <div className="max-w-lg w-full space-y-8">
+    <div className="min-h-screen bg-[var(--background)] flex flex-col justify-center py-12 px-5 sm:px-8 lg:px-10">
+      <div className="max-w-lg w-full space-y-8 mx-auto">
         {/* Header */}
         <div className="text-center">
           {/* <Link href="/" className="flex items-center justify-center space-x-2 mb-6">
@@ -310,7 +310,7 @@ export default function SignInPage() {
         </Card>
       </div>
 
-      <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
+      <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center px-1">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
           <Link href="/privacy" className="hover:text-[var(--text-color)] ml-1">

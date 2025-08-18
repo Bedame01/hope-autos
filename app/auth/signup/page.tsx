@@ -96,14 +96,10 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-lg w-full space-y-8">
+    <div className="min-h-screen bg-[var(--background)] flex justify-center flex-col py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-lg w-full space-y-8 mx-auto">
         {/* Header */}
         <div className="text-center">
-          <Link href="/" className="flex items-center justify-center space-x-2 mb-6">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">Hope Autos</span>
-          </Link>
           <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
           <p className="mt-2 text-sm text-[var(--text-color)]">
             Or{" "}

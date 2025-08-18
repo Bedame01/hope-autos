@@ -15,6 +15,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import CustomButton from "@/components/ui/CustomButton"
 
+import logo from '@/public/icons/logo.svg'
+import Image from "next/image"
+
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { data: session, status } = useSession()
@@ -22,7 +25,7 @@ export default function Header() {
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Inventory", href: "/cars" },
-    { name: "About", href: "/about" },
+    // { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ]
 
@@ -36,8 +39,8 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">Hope Autos</span>
+            <Image src={logo} alt='logo' className="size-10 text-blue-600" />
+            <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope Autos</span>
           </Link>
 
           {/* Desktop Navigation */}
