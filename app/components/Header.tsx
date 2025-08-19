@@ -34,7 +34,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-[var(--border-line)] sticky top-0 z-50" >
+    <header className="bg-white border-b border-[var(--border-line)] sticky top-0 z-60" >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -134,7 +134,7 @@ export default function Header() {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="md:hidden relative z-60">
             <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[var(--primary)] hover:text-blue-600 cursor-pointer">
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -143,7 +143,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden">
+          <div className="md:hidden shadow-lg w-full min-h-screen bg-[var(--background)]/70 fixed top-15 left-0 z-50">
             <div className="px-2 pt-5 pb-10 space-y-1 sm:px-3 bg-white border-t">
               {navigation.map((item) => (
                 <Link

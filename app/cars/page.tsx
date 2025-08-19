@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Search, Filter } from "lucide-react"
 import Footer from "../components/Footer"
+import { set } from "date-fns"
 
 export default function CarsPage() {
   const [cars, setCars] = useState<Car[]>([])

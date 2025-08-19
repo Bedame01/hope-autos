@@ -54,7 +54,7 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
-        <p className="text-gray-600">Manage customer accounts and admin users</p>
+        <p className="text-[var(--text-color)]">Manage customer accounts and admin users</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -63,7 +63,7 @@ export default function AdminUsersPage() {
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-blue-600" />
               <div>
-                <p className="text-sm text-gray-600">Total Customers</p>
+                <p className="text-sm text-[var(--text-color)]">Total Customers</p>
                 <p className="text-2xl font-bold">{customerUsers.length}</p>
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function AdminUsersPage() {
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-purple-600" />
               <div>
-                <p className="text-sm text-gray-600">Admin Users</p>
+                <p className="text-sm text-[var(--text-color)]">Admin Users</p>
                 <p className="text-2xl font-bold">{adminUsers.length}</p>
               </div>
             </div>
@@ -107,13 +107,13 @@ export default function AdminUsersPage() {
           {filteredUsers.length > 0 ? (
             <div className="space-y-4">
               {filteredUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div key={user.id} className="flex items-center overflow-x-auto justify-between p-4 border rounded-lg">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
                       <h4 className="font-medium text-gray-900">{user.name}</h4>
                       <Badge variant={user.role === "admin" ? "default" : "secondary"}>{user.role}</Badge>
                     </div>
-                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center flex-wrap space-x-4 text-sm text-[var(--text-color)]">
                       <div className="flex items-center space-x-1">
                         <Mail className="h-4 w-4" />
                         <span>{user.email}</span>
@@ -127,7 +127,7 @@ export default function AdminUsersPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">Joined {new Date(user.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-400">Joined {new Date(user.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               ))}
@@ -135,7 +135,7 @@ export default function AdminUsersPage() {
           ) : (
             <div className="text-center py-8">
               <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No users found</p>
+              <p className="text-gray-400">No users found</p>
             </div>
           )}
         </CardContent>
@@ -144,11 +144,11 @@ export default function AdminUsersPage() {
       <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
-          <Link href="/privacy" className="hover:text-gray-500 ml-1">
+          <Link href="/privacy" className="hover:text-gray-400 ml-1">
             Privacy Policy
           </Link>{" "}
           |
-          <Link href="/terms" className="hover:text-gray-500 ml-1">
+          <Link href="/terms" className="hover:text-gray-400 ml-1">
             Terms of Service
           </Link>
         </p>

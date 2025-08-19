@@ -91,7 +91,7 @@ export default function ContactPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Contact Form */}
-          <Card data-aos="zoom-in-left" data-aos-duration="1500">
+          <Card>
             <CardHeader>
               <CardTitle>Send us a Message</CardTitle>
             </CardHeader>
@@ -181,7 +181,7 @@ export default function ContactPage() {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            <Card data-aos="zoom-in-right" data-aos-duration="1500">
+            <Card>
               <CardHeader>
                 <CardTitle>Get in Touch</CardTitle>
               </CardHeader>
@@ -216,7 +216,7 @@ export default function ContactPage() {
               </CardContent>
             </Card>
 
-            <Card data-aos="zoom-in-right" data-aos-duration="1500">
+            <Card>
               <CardHeader>
                 <CardTitle>Business Hours</CardTitle>
               </CardHeader>
