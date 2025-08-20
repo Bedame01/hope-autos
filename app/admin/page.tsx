@@ -134,16 +134,16 @@ export default function AdminDashboard() {
                       </Badge>
                     </div>
                     <p className="text-sm text-[var(--text-color)]">{inquiry.email}</p>
-                    <p className="text-sm text-gray-500 mt-1 line-clamp-1">{inquiry.message}</p>
+                    <p className="text-sm text-[var(--foreground)] mt-1 line-clamp-1">{inquiry.message}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">{new Date(inquiry.createdAt).toLocaleDateString()}</p>
+                    <p className="text-xs text-[var(--foreground)]">{new Date(inquiry.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-center py-4">No recent inquiries</p>
+            <p className="text-[var(--foreground)] text-center py-4">No recent inquiries</p>
           )}
         </CardContent>
       </Card>
@@ -171,11 +171,11 @@ export default function AdminDashboard() {
       <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
-          <Link href="/privacy" className="hover:text-gray-500 ml-1">
+          <Link href="/privacy" className="hover:text-[var(--foreground)] ml-1">
             Privacy Policy
           </Link>{" "}
           |
-          <Link href="/terms" className="hover:text-gray-500 ml-1">
+          <Link href="/terms" className="hover:text-[var(--foreground)] ml-1">
             Terms of Service
           </Link>
         </p>

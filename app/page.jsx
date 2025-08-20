@@ -24,7 +24,7 @@ export default async function HomePage() {
       <section className="hero relative flex flex-nowrap flex-col items-center gap-[56px] z-5 w-full h-[780px] overflow-hidden bg-[var(--background)]">
         {/* HERO TITLE WRAP */}
         <div className="title-wrap mt-12 md:mt-16">
-          <div data-aos="zoom-i" data-aos-duration="1500" className="max-sm:text-[8.2vw]/11.5 sm:text-[48px]/12 md:text-[50px]/13 lg:text-[58px]/16 font-bold hero-heading flex flex-col justify-center items-center text-center tracking-[-1px]">
+          <div data-aos="zoom-in" data-aos-duration="1500" className="max-sm:text-[8.2vw]/11.5 sm:text-[48px]/12 md:text-[50px]/13 lg:text-[58px]/16 font-bold hero-heading flex flex-col justify-center items-center text-center tracking-[-1px]">
             <h1 className="text-blue-600">Buy.Sell.Swap.</h1>
             <h1 className="text-[var(--foreground)]">Find your perfect Car.</h1>
             
