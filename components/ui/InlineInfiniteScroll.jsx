@@ -20,7 +20,7 @@ import icon10 from '@/public/icons/j.png';
 const InlineInfiniteScroll = () => {
   return (
     <div className="scroll-container w-[90%] md:w-[65%] overflow-hidden whitespace-nowrap relative flex items-center mx-auto pt-5 pb-8">
-      <div className="scroll-content flex">
+      <div className="scroll-content flex items-center sm:gap-5">
 
         <div className="logo-item inline-flex items-center justify-center">
           <div className="logo-content flex items-center"><Image src={icon1} alt="car-brand-icon" width={10} height={10} className='logo-icon w-[43px] sm:w-[46px]' /></div>

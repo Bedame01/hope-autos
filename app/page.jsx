@@ -1,112 +1,35 @@
 import Link from "next/link"
-import Image from "next/image"
+// import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import CarCard from "./components/CarCard"
 import { getFeaturedCars } from "@/lib/db"
 import { Shield, Award, Users, Wrench } from "lucide-react"
-import CustomButton from "@/components/ui/CustomButton"
-// import HeroSlider from '@/components/ui/hero-slider'
-import InfiniteScroll from "@/components/ui/InfiniteScroll"
-
-// import BlurText from '@/Reactbits/BlurText/BlurText'
-// import Hero_bg from '@/public/image/White SUV in Desert Landscape.png'
-import hero_bgline from '@/public/elements/hero-line.avif'
-import hero_slider from "@/public/image/slider51.png"
 import Footer from "./components/Footer"
+import CustomButton from "@/components/ui/CustomButton"
+import InfiniteScroll from "@/components/ui/InfiniteScroll"
+import Hero from "@/components/ui/Hero/Hero"
 
 export default async function HomePage() {
   const featuredCars = await getFeaturedCars()
 
   return (
-    <div className="min-h-screen"> 
-      {/* Hero Section */}
-      <section className="hero relative flex flex-nowrap flex-col items-center gap-[56px] z-5 w-full h-[780px] overflow-hidden bg-[var(--background)]">
-        {/* HERO TITLE WRAP */}
-        <div className="title-wrap mt-12 md:mt-16">
-          <div data-aos="zoom-in" data-aos-duration="1500" className="max-sm:text-[8.2vw]/11.5 sm:text-[48px]/12 md:text-[50px]/13 lg:text-[58px]/16 font-bold hero-heading flex flex-col justify-center items-center text-center tracking-[-1px]">
-            <h1 className="text-blue-600">Buy.Sell.Swap.</h1>
-            <h1 className="text-[var(--foreground)]">Find your perfect Car.</h1>
-            
-            {/* <BlurText
-              text="Buy.Sell.Swap."
-              delay={120}
-              animateBy="letters"
-              direction="top"
-              onAnimationComplete={()=> {}}
-              className="text-[var(--foreground)]"
-            />
-            <BlurText
-              text="Find your perfect car"
-              delay={120}
-              animateBy="letters"
-              direction="top"
-              onAnimationComplete={()=> {}}
-              className="text-blue-600"
-            /> */}
-          </div>
-          <div className="title text-center">
-            <div className="title-heading">
-              {/* <h1 className="text-5xl/14 md:text-6xl/16 font-bold mb-4 text-center">Find your perfect <br className="hidden md:block"/> Car. Buy</h1> */}
-              <p className="text-lg/6 md:text-xl/8 mb-5 text-color text-center">Your trusted partner in finding the perfect vehicle. We offer quality cars, exceptional service, and competitive prices.</p>
-            </div>
-          </div>
-
-          <div className="hero-btn flex items-center justify-center max-sm:flex-col gap-4 md:gap-6">
-            <CustomButton 
-              containerStyle="btn1 bg-[var(--primary)] text-white text-sm hover:bg-emerald-600 py-3.5 px-6.5 text-nowrap"
-              contentText="Browse Inventory"
-              onClick=''
-              href='/cars'
-            />
-            <CustomButton 
-              containerStyle="btn2 text-black border-white hover:bg-black hover:text-white bg-transparent text-sm py-3.5 px-12 text-nowrap"
-              contentText="Get Quote"
-              onClick=''
-              href='/contact'
-            />
-            {/* <Button size="lg" asChild>
-              <Link href="/cars">Browse Inventory</Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="text-white border-white hover:bg-white hover:text-blue-900 bg-transparent"
-            >
-              <Link href="/contact">Get Quote</Link>
-            </Button> */}
-          </div>
-        </div>
-
-        <div className="hero-display w-full md:w-[80%] lg:w-[70%] absolute z-50 max-sm:bottom-26 bottom-22 lg:bottom-15">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted">
+      <Hero />
+      {/* <section className="hero relative flex flex-nowrap flex-col items-center gap-[56px] z-5 w-full min-h-[93vh] overflow-hidden bg-[var(--background)] rounded-bl-4xl rounded-br-4xl ">
+        <div className="absolute inset-0 z-0">
           <Image 
-            src={hero_slider}
-            alt="hero-display"
-            className="w-full"
-            width={50}
-            height={50}
+            src={heroCount === 0 ? bg1 : heroCount === 1 ? bg2 : heroCount === 2 ? bg3 : bg1}
+            src={bg1}
+            alt="Latest Album Artwork" 
+            className="object-cover size-full" 
+            width={10} 
+            height={50} 
+            loading="lazy" 
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 dark:via-background/60 to-background/90"></div>
         </div>
-
-        {/* HERO IMAGE SLIDER */}
-        {/* <HeroSlider /> */}
-
-        <div className="absolute hero-background">
-          <div className="background-top"></div>
-          <div className="hero-bgline absolute bottom-[24px] h-[22%] left-0 overflow-hidden w-full">
-            <div className="absolute inset-0 rounded-[inherit] top-0 right-0 bottom-0 left-0">
-              <Image 
-                src={hero_bgline}
-                alt="Hero Background Line"
-                className="shape-line"
-                width={2406}
-                height={442}
-                sizes="100vw"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      </section> */}
 
       <InfiniteScroll />
 
@@ -155,10 +78,10 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Cars Section */}
-      <section className="py-16 mb-10 bg-[var(--background-secondary)]">
+      <section className="py-16 mb-10 bg-gradient-to-br from-background via-background to-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Vehicles</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured <span className="heading-text">Vehicles</span></h2>
             <p className="text-lg text-[var(--text-color)]">Check out our handpicked selection of premium vehicles</p>
           </div>
 
@@ -180,7 +103,7 @@ export default async function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-[var(--color-blue-600)] text-[var(--background)]">
+      <section className="py-18 bg-[var(--color-blue-600)] text-[var(--background)]">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-4">Ready to Find Your Next Car?</h2>
           <p className="text-xl mb-8">Contact us today for a personalized consultation and test drive</p>

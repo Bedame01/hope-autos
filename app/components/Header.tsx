@@ -15,11 +15,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import CustomButton from "@/components/ui/CustomButton"
 
-import logo from '@/public/icons/logo-icon.png'
+import logoWhite from '@/public/icons/logo-white.png'
+import logoBlack from '@/public/icons/logo-black.png'
 import Image from "next/image"
+import { useTheme } from "next-themes"
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { theme, setTheme } = useTheme()
   const { data: session, status } = useSession()
 
   const navigation = [
@@ -39,7 +42,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Image src={logo} alt='logo' className="max-sm:size-8 size-10 text-blue-600" />
+            <Image src={theme === "dark" ? logoWhite : logoBlack} alt='logo' className="max-sm:w-9 w-10 h-auto" />
             <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
           </Link>
 
@@ -49,7 +52,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-[var(--primary)] hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+                className="text-[var(--primary)] hover:text-blue-600 px-3 py-2 text-sm font-semi-bold transition-colors"
               >
                 {item.name}
               </Link>
@@ -87,7 +90,7 @@ export default function Header() {
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="w-56 z-70" align="end" forceMount>
                     <div className="flex items-center justify-start gap-2 p-2">
                       <div className="flex flex-col space-y-1 leading-none">
                         <p className="font-medium">{session.user.name}</p>
@@ -144,7 +147,7 @@ export default function Header() {
         {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden shadow-lg w-full min-h-screen bg-[var(--background)]/70 fixed top-15 left-0 z-50">
-            <div className="px-2 pt-5 pb-10 space-y-1 sm:px-3 bg-white border-t">
+            <div className="px-2 pt-5 pb-10 space-y-1 sm:px-3 bg-white border-t border-b border-[var(--border-line)]">
               {navigation.map((item) => (
                 <Link
                   key={item.name}

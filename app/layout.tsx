@@ -39,7 +39,7 @@ export default function RootLayout({
         <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></link>
         <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
       </head>
-      <body className={inter.className}>
+      <body className='bg-gradient-to-br from-background via-background to-muted'>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <Header />

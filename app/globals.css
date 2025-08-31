@@ -3,8 +3,9 @@
 /* @import "tailwindcss/preflight" */
 
 *{
-  font-family: "Rubik", sans-serif;
-  /* font-family: "Inter Tight", sans-serif !important; */
+  /* font-family: "Rubik", sans-serif; */
+  /* font-family: "Rubik", sans-serif; */
+  font-family: "Inter Tight", sans-serif !important;
   font-optical-sizing: auto;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
@@ -13,14 +14,15 @@ body{
   background-color: var(--background) !important;
 }
 
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
   /* --color-blue-500: #e7bf0b;
   --color-blue-600: #e7a90b; */
-  --color-blue-500: #e7bf0b;
-  --color-blue-600: #e7a90b;
+  --hero-gradient1: #fff;
+  --hero-gradient2: #fff0;
+  --color-blue-500: var(--color-orange-600);
+  --color-blue-600: var(--color-orange-500);
   --heading-color: oklch(23.929% 0.00003 271.152);
   --text-color: oklch(0.145 0 0);
   --color-white: oklch(0.985 0 0);
@@ -43,7 +45,7 @@ body{
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
-  --border-line: oklch(49.97% 0.00006 271.152 / 0.178);
+  --border-line: oklch(44.953% 0.00005 271.152 / 0.171);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -66,8 +68,10 @@ body{
 .dark {
   /* --color-blue-500: #0fdb08;
   --color-blue-600: #16e70e; */
-  --color-blue-500: #6be508;
-  --color-blue-600: #8cff2e;
+  --hero-gradient1: #111111;
+  --hero-gradient2: rgba(120, 120, 120, 0.168);
+  --color-blue-500: var(--color-lime-600);
+  --color-blue-600: var(--color-green-400);
   --heading-color: oklch(96.715% 0.00011 271.152);
   --text-color: oklch(77.944% 0.00009 271.152);
   --color-white: oklch(22.645% 0.00003 271.152);
@@ -187,7 +191,7 @@ body{
 
 /* Smooth transitions for theme switching */
 * {
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
 }
 
 /* Focus styles for accessibility */
@@ -408,16 +412,15 @@ body{
 }
 
 
-/* .heading-text{
+.heading-text{
   font-family: "Instrument Serif", serif !important;
-} */
+  /* color: var(--color-blue-600); */
+}
 
-.hero-heading h1:nth-child(1){
-  background: linear-gradient(180deg, var(--color-blue-500), var(--color-blue-600));
-  -webkit-background-clip: text !important;
-  -webkit-text-fill-color: transparent;
-  background-clip: text !important;
-  text-fill-color: transparent;
+@media screen and (max-width: 556px) {
+  .hero-heading{
+    line-height: 42px !important;
+  }
 }
 
 /* .from-background{
@@ -445,27 +448,15 @@ body{
     --tw-gradient-to: rgb(15 15 15 / 0.9) var(--tw-gradient-to-position);
 } */
 
-.hero-background{
-  bottom: 0;
-  flex: none;
-  left: 0;
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-}
-
-.background-top{
-  background: linear-gradient(-180deg, var(--background-secondary) 2.1839080459770113%, var(--bg-muted));
-  flex: none;
-  height: 600px;
-  left: calc(50.00000000000002% - 100% / 2);
-  overflow: hidden;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  z-index: 4;
+.hero-btn2{
+  background-color: var(--background);
+  border: 1px solid var(--border-line);
+  color: var(--foreground);
+  &:hover{
+    background-color: var(--border) !important;
+    /* border: 1px solid #303030; */
+    /* color: #fff; */
+  }
 }
 
 .btn1{
@@ -482,7 +473,7 @@ body{
   border: 1px solid var(--border-line);
   color: var(--foreground);
   &:hover{
-    background-color: var(--border);
+    background-color: var(--border) !important;
     /* border: 1px solid #303030; */
     /* color: #fff; */
   }
@@ -659,7 +650,7 @@ body{
   margin: 0 2px;
   border-radius: 12px;
   transition: all 0.3s ease;
-  cursor: pointer;
+  /* cursor: pointer; */
   flex-shrink: 0;
   text-decoration: none;
   border-radius: 50%;
