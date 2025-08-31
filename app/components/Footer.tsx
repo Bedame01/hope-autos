@@ -1,9 +1,14 @@
 import Link from "next/link"
 import { Car, Phone, Mail, MapPin } from "lucide-react"
 import Image from "next/image"
-import logo from '@/public/icons/logo-icon.png'
+
+import logoWhite from '@/public/icons/logo-white.png'
+import logoBlack from '@/public/icons/logo-black.png'
+import { useTheme } from "next-themes"
 
 export default function Footer() {
+  const { theme, setTheme } = useTheme()
+
   return (
     <footer className="bg-[var(--background)] text-[var(--text-color)] border-t border-[var(--border-line)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -12,7 +17,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src={logo} alt='logo' className="max-sm:size-8 size-10 text-blue-600" />
+                <Image src={theme === "dark" ? logoWhite : logoBlack} alt='logo' className="max-sm:size-8 size-10 text-blue-600" />
                 <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
               </Link>
             </div>
