@@ -172,8 +172,7 @@ body{
 }
 
 .heading-text{
-  font-family: "Instrument Serif", serif !important;
-  /* color: var(--color-blue-600); */
+  font-family: "Alkatra", system-ui !important;
 }
 
 @media screen and (max-width: 556px) {

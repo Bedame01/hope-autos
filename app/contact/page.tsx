@@ -83,7 +83,7 @@ export default function ContactPage() {
     <div className="min-h-screen bg-[var(--background)] pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4 heading-text">Contact Us</h1>
           <p className="text-lg text-[var(--text-color)]">
             Get in touch with our team for any questions or to schedule a test drive
           </p>
