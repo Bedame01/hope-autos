@@ -111,7 +111,7 @@ export default function SignInPage() {
   const hasGoogleProvider = providers?.google
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col justify-center py-12 px-5 sm:px-8 lg:px-10">
+    <div className="min-h-screen bg-[var(--background)] flex flex-col justify-center px-5 sm:px-8 lg:px-10">
       <div className="max-w-lg w-full space-y-8 mx-auto">
         {/* Header */}
         <div className="text-center">
@@ -222,7 +222,7 @@ export default function SignInPage() {
                   Email address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
                   <Input
                     id="email"
                     name="email"
@@ -242,7 +242,7 @@ export default function SignInPage() {
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
                   <Input
                     id="password"
                     name="password"
@@ -280,7 +280,7 @@ export default function SignInPage() {
                 </div>
 
                 <div className="text-sm">
-                  <Link href="/auth/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
+                  <Link href="/api/auth/request-reset" className="font-medium text-blue-600 hover:text-blue-500">
                     Forgot password?
                   </Link>
                 </div>
@@ -310,7 +310,7 @@ export default function SignInPage() {
         </Card>
       </div>
 
-      <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center px-1">
+      {/* <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center px-1">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
           <Link href="/privacy" className="hover:text-[var(--text-color)] ml-1">
@@ -321,7 +321,7 @@ export default function SignInPage() {
             Terms of Service
           </Link>
         </p>
-      </div>
+      </div> */}
 
     </div>
   )

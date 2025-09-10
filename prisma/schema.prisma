@@ -16,7 +16,6 @@ model User {
   name          String
   role          Role      @default(CUSTOMER)
   phone         String?
-  bio           String?   @db.Text
   password      String?
   provider      String?
   providerId    String?
@@ -26,11 +25,11 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  preferences UserPreferences?
-  inquiries   Inquiry[]
-  favorites   FavoriteCar[]
-  sessions    Session[]
-  accounts    Account[]
+  inquiries     Inquiry[]
+  favoriteCars  FavoriteCar[]
+  preferences   UserPreferences?
+  accounts      Account[]
+  sessions      Session[]
 
   @@map("users")
 }
@@ -75,52 +74,39 @@ model VerificationToken {
 }
 
 model UserPreferences {
-  id                     String   @id @default(cuid())
-  userId                 String   @unique
-  
-  // Search Preferences
-  maxPrice               Int?
-  preferredMakes         String[]
-  preferredFuelTypes     String[]
-  preferredBodyTypes     String[]
-  
-  // Notification Preferences
-  emailNotifications     Boolean  @default(true)
-  smsNotifications       Boolean  @default(false)
-  priceAlerts            Boolean  @default(true)
-  newArrivals            Boolean  @default(true)
-  marketingNotifications Boolean  @default(false)
-  
-  // Privacy Settings
-  profileVisible         Boolean  @default(true)
-  showEmail              Boolean  @default(false)
-  showPhone              Boolean  @default(false)
-  
-  // Theme Preferences
-  theme                  String   @default("system") // "light", "dark", "system"
-  
-  // Additional Settings
-  language               String   @default("en")
-  timezone               String   @default("UTC")
-  currency               String   @default("USD")
-  
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  maxPrice            Int?
+  preferredMakes      String[]
+  preferredFuelTypes  String[]
+  emailNotifications  Boolean  @default(true)
+  smsNotifications    Boolean  @default(false)
+  priceAlerts         Boolean  @default(true)
+  newArrivals         Boolean  @default(true)
+  theme               String   @default("light")
+  language            String   @default("en")
+  timezone            String   @default("UTC")
+  currency            String   @default("USD")
+  profileVisibility   String   @default("private")
+  showEmail           Boolean  @default(false)
+  showPhone           Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
-  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   savedSearches SavedSearch[]
 
   @@map("user_preferences")
 }
 
 model SavedSearch {
-  id                String   @id @default(cuid())
+  id              String   @id @default(cuid())
+  name            String
+  filters         Json
+  alertsEnabled   Boolean  @default(false)
   userPreferencesId String
-  name              String
-  filters           Json
-  alertsEnabled     Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   userPreferences UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
 
@@ -128,7 +114,7 @@ model SavedSearch {
 }
 
 model Car {
-  id           String      @id @default(cuid())
+  id           String        @id @default(cuid())
   make         String
   model        String
   year         Int
@@ -139,31 +125,20 @@ model Car {
   transmission Transmission
   bodyType     BodyType
   images       String[]
-  description  String      @db.Text
+  description  String?
   features     String[]
-  isAvailable  Boolean     @default(true)
-  isFeatured   Boolean     @default(false)
-  vin          String?     @unique
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  isAvailable  Boolean       @default(true)
+  isFeatured   Boolean       @default(false)
+  viewCount    Int           @default(0)
+  vin          String?       @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   // Relations
-  inquiries Inquiry[]
-  favorites FavoriteCar[]
+  inquiries    Inquiry[]
+  favoriteCars FavoriteCar[]
 
   @@map("cars")
-}
-
-model FavoriteCar {
-  id     String @id @default(cuid())
-  userId String
-  carId  String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  car  Car  @relation(fields: [carId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, carId])
-  @@map("favorite_cars")
 }
 
 model Inquiry {
@@ -171,7 +146,7 @@ model Inquiry {
   name      String
   email     String
   phone     String?
-  message   String        @db.Text
+  message   String
   carId     String?
   userId    String?
   status    InquiryStatus @default(NEW)
@@ -179,13 +154,26 @@ model Inquiry {
   updatedAt DateTime      @updatedAt
 
   // Relations
-  car  Car?  @relation(fields: [carId], references: [id], onDelete: SetNull)
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  car  Car?  @relation(fields: [carId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
   @@map("inquiries")
 }
 
-// Enums
+model FavoriteCar {
+  id        String   @id @default(cuid())
+  userId    String
+  carId     String
+  createdAt DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  car  Car  @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, carId])
+  @@map("favorite_cars")
+}
+
 enum Role {
   ADMIN
   CUSTOMER
@@ -201,6 +189,7 @@ enum FuelType {
 enum Transmission {
   MANUAL
   AUTOMATIC
+  CVT
 }
 
 enum BodyType {
@@ -209,6 +198,7 @@ enum BodyType {
   HATCHBACK
   COUPE
   TRUCK
+  CONVERTIBLE
 }
 
 enum InquiryStatus {

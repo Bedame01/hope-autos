@@ -42,7 +42,7 @@ export default async function HomePage() {
           </div>
  
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card data-aos="fade-up" data-aos-duration="1500">
+            <Card>
               <CardContent className="p-6 text-center">
                 <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Quality Guarantee</h3>
@@ -50,7 +50,7 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card data-aos="fade-up" data-aos-duration="1500">
+            <Card>
               <CardContent className="p-6 text-center">
                 <Award className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Best Prices</h3>
@@ -58,7 +58,7 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card data-aos="fade-up" data-aos-duration="1500">
+            <Card>
               <CardContent className="p-6 text-center">
                 <Users className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Expert Team</h3>
@@ -66,7 +66,7 @@ export default async function HomePage() {
               </CardContent>
             </Card>
 
-            <Card data-aos="fade-up" data-aos-duration="1500">
+            <Card>
               <CardContent className="p-6 text-center">
                 <Wrench className="h-12 w-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Full Service</h3>
@@ -106,15 +106,15 @@ export default async function HomePage() {
       <section className="py-18 bg-[var(--color-blue-600)] text-[var(--background)]">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold mb-4">Ready to Find Your Next Car?</h2>
-          <p className="text-xl mb-8">Contact us today for a personalized consultation and test drive</p>
-          <div className="space-x-4">
-            <Button size="lg" variant="secondary" className="bg-[#000] text-[#fff] hover:bg-[#252525] cursor-pointer">
+          <p className="text-lg md:text-xl mb-8">Contact us today for a personalized consultation and test drive</p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button size="lg" variant="secondary" className="bg-[#000] text-[#fff] hover:bg-[#252525] cursor-pointer px-15 py-7">
               <Link href="/contact">Contact Us</Link>
             </Button>
             <Button
               size="lg"
               // variant="outline"
-              className="bg-[#fff] text-[#000] hover:bg-[#e0e0e0] px-7 cursor-pointer"
+              className="bg-[#fff] text-[#000] hover:bg-[#e0e0e0] px-16 py-7 cursor-pointer"
             >
               <Link href="tel:+2348133531046">Call Now</Link>
             </Button>

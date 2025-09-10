@@ -1,5 +1,7 @@
+'use client'
+
 import Link from "next/link"
-import { Car, Phone, Mail, MapPin } from "lucide-react"
+import { Phone, Mail, MapPin } from "lucide-react"
 import Image from "next/image"
 
 import logoWhite from '@/public/icons/logo-white.png'
@@ -17,7 +19,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src={theme === "dark" ? logoWhite : logoBlack} alt='logo' className="max-sm:size-8 size-10 text-blue-600" />
+                <Image src={theme === "dark" ? logoWhite : theme === 'light' ? logoBlack : logoWhite} alt='logo' className="max-sm:w-8 w-10 h-auto text-blue-600" />
                 <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
               </Link>
             </div>
@@ -51,18 +53,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/financing" className="text-[var(--text-color)] hover:text-gray-500">
+                <Link href="/faq" className="text-[var(--text-color)] hover:text-gray-500">
                   FAQ
                 </Link>
               </li>
               <li>
-                <Link href="/trade-in" className="text-[var(--text-color)] hover:text-gray-500">
+                <Link href="/contact" className="text-[var(--text-color)] hover:text-gray-500">
                   Contact Us
                 </Link>
               </li>
               <li>
-                <Link href="/service" className="text-[var(--text-color)] hover:text-gray-500">
-                  Service
+                <Link href="/settings" className="text-[var(--text-color)] hover:text-gray-500">
+                  Settings
                 </Link>
               </li>
             </ul>
@@ -73,30 +75,30 @@ export default function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-[var(--foreground)]">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/warranty" className="text-[var(--text-color)] hover:text-gray-500">
-                  Warranty
-                </Link>
+                <p className="text-[var(--text-color)] hover:text-gray-500">
+                  Auto Sales
+                </p>
               </li>
               <li>
-                <Link href="/insurance" className="text-[var(--text-color)] hover:text-gray-500">
-                  Insurance
-                </Link>
+                <p className="text-[var(--text-color)] hover:text-gray-500">
+                  Auto Engineering Pre-Order
+                </p>
               </li>
               <li>
-                <Link href="/maintenance" className="text-[var(--text-color)] hover:text-gray-500">
-                  Maintenance
-                </Link>
+                <p className="text-[var(--text-color)] hover:text-gray-500">
+                  Car Loan
+                </p>
               </li>
               <li>
-                <Link href="/parts" className="text-[var(--text-color)] hover:text-gray-500">
-                  Parts
-                </Link>
+                <p className="text-[var(--text-color)] hover:text-gray-500">
+                  Direct Import
+                </p>
               </li>
             </ul>
           </div>
         </div>
 
-        <div className="border-t border-[var(--border-line)] mt-8 pt-8 text-center">
+        {/* <div className="border-t border-[var(--border-line)] mt-8 pt-8 text-center">
           <p className="text-[var(--text-color)]">
             © {new Date().getFullYear()} Hope Autos. All rights reserved. |
             <Link href="/privacy" className="hover:text-gray-500 ml-1">
@@ -107,6 +109,12 @@ export default function Footer() {
               Terms of Service
             </Link>
           </p>
+        </div> */}
+        <div className="border-t border-[var(--border-line)] mt-8 pt-8 md:pt-10 text-center text-sm sm:text-base">
+          <p className="text-[var(--text-color)] mb-1.5">
+            © {new Date().getFullYear()} Hope Autos Limited. All rights reserved.
+          </p>
+          <p className="text-[var(--text-color)]">No 1 Nigeria Best Vehicle Dealership</p>
         </div>
       </div>
     </footer>

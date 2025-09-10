@@ -3,7 +3,7 @@
 import Image from "next/image"
 import './hero.css'
 
-import heroCar from '@/public/image/car1.avif'
+import heroCar from '@/public/image/SUVs on Mountain Road.png'
 import BlurText from '@/Reactbits/BlurText/BlurText'
 // import CustomButton from "../CustomButton"
 import Link from "next/link"
@@ -14,13 +14,13 @@ const Hero = () => {
         <div className="hero-wrapper">
             {/* HERO TITLE WRAP */}
             <div className="title-wrap">
-                <div className="max-sm:text-[7.7vw]/14 sm:text-[48px]/14 md:text-[50px]/14 lg:text-[58px]/17 font-bold hero-heading flex flex-col justify-center items-center tracking-[-1px] text-center">
+                <div className="max-sm:text-[7.8vw]/14 sm:text-[48px]/14 md:text-[50px]/14 lg:text-[58px]/17 font-bold hero-heading flex flex-col justify-center items-center tracking-[-1px] text-center">
                     {/* <h1 className="text-blue-600">Buy.Sell.Swap.</h1>
                     <h1 className="text-[var(--foreground)]">Find your perfect Car.</h1> */}
                     
                     <BlurText
                     text="Buy.Sell.Swap today &"
-                    delay={110}
+                    delay={80}
                     animateBy="letters"
                     direction="top"
                     onAnimationComplete={()=> {}}
@@ -28,7 +28,7 @@ const Hero = () => {
                     />
                     <BlurText
                     text="Ride like a boss."
-                    delay={110}
+                    delay={80}
                     animateBy="letters"
                     direction="top"
                     onAnimationComplete={()=> {}}

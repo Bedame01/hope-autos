@@ -80,7 +80,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
+    <div className="min-h-screen bg-[var(--background)] pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Contact Us</h1>
@@ -241,17 +241,11 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div className="border-t border-[var(--border-line)] mt-15 mb-3 pt-8 md:pt-10 text-center px-2">
-        <p className="text-[var(--text-color)] text-sm">
-          © {new Date().getFullYear()} Hope Autos. All rights reserved. |
-          <Link href="/privacy" className="hover:text-gray-500 ml-1">
-            Privacy Policy
-          </Link>{" "}
-          |
-          <Link href="/terms" className="hover:text-gray-500 ml-1">
-            Terms of Service
-          </Link>
+      <div className="border-t border-[var(--border-line)] mt-8 pt-8 md:pt-10 text-center text-sm sm:text-base">
+        <p className="text-[var(--text-color)] mb-1.5">
+          © {new Date().getFullYear()} Hope Autos Limited. All rights reserved.
         </p>
+        <p className="text-[var(--text-color)]">No 1 Nigeria Best Vehicle Dealership</p>
       </div>
     </div>
   )

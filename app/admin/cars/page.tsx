@@ -175,17 +175,11 @@ export default function AdminCarsPage() {
         </CardContent>
       </Card>
 
-      <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
-        <p className="text-[var(--text-color)] text-sm">
-          © {new Date().getFullYear()} Hope Autos. All rights reserved. |
-          <Link href="/privacy" className="hover:text-gray-500 ml-1">
-            Privacy Policy
-          </Link>{" "}
-          |
-          <Link href="/terms" className="hover:text-gray-500 ml-1">
-            Terms of Service
-          </Link>
+      <div className="border-t border-[var(--border-line)] mt-8 pt-8 md:pt-10 text-center text-sm sm:text-[15px]">
+        <p className="text-[var(--text-color)] mb-1.5">
+          © {new Date().getFullYear()} Hope Autos Limited. All rights reserved.
         </p>
+        <p className="text-[var(--text-color)]">No 1 Nigeria Best Vehicle Dealership</p>
       </div>
 
     </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { notFound } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
+import { useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -19,9 +20,13 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  Heart,
+  Share2,
+  Eye,
 } from "lucide-react"
 import { getDetailImageUrl, getThumbnailUrl, isCloudinaryUrl, getHeroImageUrl } from "@/lib/cloudinary"
 import type { Car } from "@/lib/types"
+import CarCard from "@/app/components/CarCard"
 
 interface CarDetailPageProps {
   params: {
@@ -29,7 +34,7 @@ interface CarDetailPageProps {
   }
 }
 
-// We'll need to fetch the car data on the client side now
+// Fetch car data on the client side
 async function getCarById(id: string): Promise<Car | null> {
   try {
     const response = await fetch(`/api/cars/${id}`)
@@ -41,11 +46,38 @@ async function getCarById(id: string): Promise<Car | null> {
   }
 }
 
+// Fetch similar cars
+async function getSimilarCars(carId: string, make: string, bodyType: string, priceRange: number): Promise<Car[]> {
+  try {
+    const params = new URLSearchParams({
+      make,
+      bodyType,
+      minPrice: Math.max(0, priceRange - 10000).toString(),
+      maxPrice: (priceRange + 10000).toString(),
+      exclude: carId,
+      limit: "6",
+    })
+
+    const response = await fetch(`/api/cars/similar?${params}`)
+    if (!response.ok) return []
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching similar cars:", error)
+    return []
+  }
+}
+
 export default function CarDetailPage({ params }: CarDetailPageProps) {
+  const { data: session } = useSession()
   const [car, setCar] = useState<Car | null>(null)
+  const [similarCars, setSimilarCars] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
+  const [similarLoading, setSimilarLoading] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isFavorite, setIsFavorite] = useState(false)
+  const [favoriteLoading, setFavoriteLoading] = useState(false)
+  const [viewCount, setViewCount] = useState(0)
 
   const handleThumbnailClick = (index: number) => {
     setCurrentImageIndex(index)
@@ -65,6 +97,48 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1))
+  }
+
+  const handleFavoriteToggle = async () => {
+    if (!session) {
+      // Redirect to login
+      window.location.href = "/auth/signin"
+      return
+    }
+
+    setFavoriteLoading(true)
+    try {
+      const response = await fetch("/api/user/favorites", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ carId: car?.id }),
+      })
+
+      if (response.ok) {
+        setIsFavorite(!isFavorite)
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error)
+    } finally {
+      setFavoriteLoading(false)
+    }
+  }
+
+  const handleShare = async () => {
+    if (navigator.share && car) {
+      try {
+        await navigator.share({
+          title: `${car.year} ${car.make} ${car.model}`,
+          text: `Check out this ${car.year} ${car.make} ${car.model} for $${car.price.toLocaleString()}`,
+          url: window.location.href,
+        })
+      } catch (error) {
+        console.error("Error sharing:", error)
+      }
+    } else {
+      // Fallback to clipboard
+      navigator.clipboard.writeText(window.location.href)
+    }
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -101,21 +175,56 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
     }
   }, [isModalOpen])
 
+  // Check if car is favorited
   useEffect(() => {
-    async function fetchCar() {
+    async function checkFavoriteStatus() {
+      if (session && car) {
+        try {
+          const response = await fetch(`/api/user/favorites/${car.id}`)
+          const data = await response.json()
+          setIsFavorite(data.isFavorite)
+        } catch (error) {
+          console.error("Error checking favorite status:", error)
+        }
+      }
+    }
+    checkFavoriteStatus()
+  }, [session, car])
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
       const carData = await getCarById(params.id)
       setCar(carData)
       setLoading(false)
+
+      if (carData) {
+        // Track view and get view count
+        try {
+          await fetch(`/api/cars/${params.id}/view`, { method: "POST" })
+          const viewResponse = await fetch(`/api/cars/${params.id}/view`)
+          const viewData = await viewResponse.json()
+          setViewCount(viewData.viewCount)
+        } catch (error) {
+          console.error("Error tracking view:", error)
+        }
+
+        // Fetch similar cars
+        setSimilarLoading(true)
+        const similar = await getSimilarCars(carData.id, carData.make, carData.bodyType, carData.price)
+        setSimilarCars(similar)
+        setSimilarLoading(false)
+      }
     }
-    fetchCar()
+    fetchData()
   }, [params.id])
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-[var(--text-color)]">Loading car details...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading car details...</p>
         </div>
       </div>
     )
@@ -143,24 +252,24 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
 
   return (
     <>
-      <div className="min-h-screen bg-[var(--background)]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-15">
+      <div className="min-h-screen bg-background pb-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
           <nav className="mb-8">
-            <ol className="flex items-center space-x-2 text-sm text-[var(--text-color)]">
+            <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
               <li>
-                <Link href="/" className="hover:text-[var(--foreground)]">
+                <Link href="/" className="hover:text-blue-600">
                   Home
                 </Link>
               </li>
               <li>/</li>
               <li>
-                <Link href="/cars" className="hover:text-[var(--foreground)]">
+                <Link href="/cars" className="hover:text-blue-600">
                   Cars
                 </Link>
               </li>
               <li>/</li>
-              <li className="text-[var(--foreground)]">
+              <li className="text-foreground">
                 {car.year} {car.make} {car.model}
               </li>
             </ol>
@@ -170,7 +279,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
             {/* Image Gallery */}
             <div>
               <div
-                className="relative h-96 mb-4 rounded-lg overflow-hidden cursor-pointer hover:opacity-95 transition-opacity"
+                className="relative h-96 mb-4 rounded-lg overflow-hidden cursor-pointer hover:opacity-95 transition-opacity group"
                 onClick={handleMainImageClick}
               >
                 <Image
@@ -181,10 +290,15 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                 />
-                <div className="carImageDisplay absolute inset-0 bg-black opacity-0 hover:opacity-40 transition-all duration-200 flex items-center justify-center">
-                  <div className="opacity-0 hover:opacity-100 transition-opacity duration-200 bg-black text-[var(--foreground)] px-3 py-1 rounded text-sm">
+                <div className="absolute inset-0 hover:bg-background/60 transition-all duration-200 flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-background/50 text-foreground px-3 py-1 rounded text-sm">
                     Click to view full size
                   </div>
+                </div>
+
+                {/* Image counter */}
+                <div className="absolute bottom-4 right-4 bg-background bg-opacity-50 text-foreground px-2 py-1 rounded text-sm">
+                  {currentImageIndex + 1} / {images.length}
                 </div>
               </div>
 
@@ -212,10 +326,10 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   {/* Show more indicator if there are more than 8 images */}
                   {images.length > 8 && (
                     <div
-                      className="relative h-20 rounded overflow-hidden bg-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-300 transition-colors"
+                      className="relative h-20 rounded overflow-hidden bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors"
                       onClick={handleMainImageClick}
                     >
-                      <span className="text-sm flex items-center flex-wrap font-medium text-[var(--text-color)]">+{images.length - 8} more</span>
+                      <span className="text-sm font-medium text-muted-foreground">+{images.length - 8} more</span>
                     </div>
                   )}
                 </div>
@@ -225,9 +339,26 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
             {/* Car Details */}
             <div>
               <div className="mb-6">
-                <h1 className="text-3xl font-bold text-[var(--foreground)] mb-2">
-                  {car.year} {car.make} {car.model}
-                </h1>
+                <div className="flex items-start justify-between mb-2">
+                  <h1 className="text-3xl font-bold text-foreground">
+                    {car.year} {car.make} {car.model}
+                  </h1>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleFavoriteToggle}
+                      disabled={favoriteLoading}
+                      className={isFavorite ? "text-red-500 border-red-500" : ""}
+                    >
+                      <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={handleShare}>
+                      <Share2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="flex items-center space-x-2 mb-4">
                   <Badge variant="secondary">{car.bodyType}</Badge>
                   <Badge variant="outline">{car.fuelType}</Badge>
@@ -236,6 +367,10 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   ) : (
                     <Badge className="bg-red-600">Sold</Badge>
                   )}
+                  <div className="flex items-center text-sm text-muted-foreground ml-auto">
+                    <Eye className="h-4 w-4 mr-1" />
+                    {viewCount} views
+                  </div>
                 </div>
                 <p className="text-4xl font-bold text-blue-600">${car.price.toLocaleString()}</p>
               </div>
@@ -248,28 +383,28 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm flex items-center flex-wrap">Year: <span className="font-medium">{car.year}</span></span>
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Year: {car.year}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Gauge className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm flex items-center flex-wrap">Mileage:<span className="font-medium">{car.mileage.toLocaleString()}</span> miles</span>
+                      <Gauge className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Mileage: {car.mileage.toLocaleString()} miles</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Fuel className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm flex items-center flex-wrap">Fuel: <span className="font-medium">{car.fuelType}</span></span>
+                      <Fuel className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Fuel: {car.fuelType}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Settings className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm flex items-center flex-wrap">Transmission:<span className="font-medium">{car.transmission}</span></span>
+                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Transmission: {car.transmission}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <Palette className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm flex items-center flex-wrap">Color:<span className="font-medium">{car.color}</span></span>
+                      <Palette className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Color: {car.color}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <CarIcon className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm flex items-center flex-wrap">Body:<span className="font-medium">{car.bodyType}</span></span>
+                      <CarIcon className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Body: {car.bodyType}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -284,7 +419,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="w-full bg-transparent" asChild>
-                  <Link href="tel:08133531046">
+                  <Link href="tel:5551234567">
                     <Phone className="h-4 w-4 mr-2" />
                     Call (234) 8133531046
                   </Link>
@@ -300,7 +435,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                 <CardTitle>Description</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-[var(--text-color)] leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed">
                   {car.description || "No description available for this vehicle."}
                 </p>
               </CardContent>
@@ -316,36 +451,88 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                     {car.features.map((feature, index) => (
                       <li key={index} className="flex items-center space-x-2">
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                        <span className="text-[var(--text-color)]">{feature}</span>
+                        <span className="text-muted-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-gray-500">No features listed for this vehicle.</p>
+                  <p className="text-muted-foreground">No features listed for this vehicle.</p>
                 )}
               </CardContent>
             </Card>
           </div>
+
+          {/* Similar Vehicles */}
+          <div className="mt-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-foreground">Similar Vehicles</h2>
+              <Link href="/cars" className="text-blue-600 hover:text-blue-600/80 text-sm font-medium">
+                View All Cars →
+              </Link>
+            </div>
+
+            {similarLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(3)].map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="bg-muted h-48 rounded-lg mb-4"></div>
+                    <div className="space-y-2">
+                      <div className="h-4 bg-muted rounded w-3/4"></div>
+                      <div className="h-4 bg-muted rounded w-1/2"></div>
+                      <div className="h-4 bg-muted rounded w-1/4"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : similarCars.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {similarCars.map((similarCar) => (
+                  <CarCard key={similarCar.id} car={similarCar} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No similar vehicles found.</p>
+                <Link href="/cars" className="text-blue-600 hover:text-blue-600/80 mt-2 inline-block">
+                  Browse all vehicles
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="border-t border-[var(--border-line)] mt-8 pb-5 pt-8 md:pt-10 text-center text-sm sm:text-base">
+          <p className="text-[var(--text-color)] mb-1.5">
+            © {new Date().getFullYear()} Hope Autos Limited. All rights reserved.
+            {/* <Link href="/privacy" className="hover:text-[var(--text-color)] ml-1">
+              Privacy Policy
+            </Link>{" "}
+            |
+            <Link href="/terms" className="hover:text-[var(--text-color)] ml-1">
+              Terms of Service
+            </Link> */}
+          </p>
+          <p className="text-[var(--text-color)]">No 1 Nigeria Best Vehicle Dealership</p>
         </div>
       </div>
 
+
       {/* Full Screen Image Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-background bg-opacity-90 flex items-center justify-center">
           <div className="relative w-full h-full flex items-center justify-center p-4">
             {/* Close Button */}
             <button
               onClick={handleModalClose}
-              className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-[#fff] p-2 rounded-full hover:bg-opacity-75 transition-all"
+              className="absolute top-20 right-4 z-50 hover:bg-foreground/30 text-foreground p-2 rounded-full hover:bg-opacity-75 transition-all"
             >
-              <X className="h-6 w-6 fill-[var(--text-color)]" />
+              <X className="h-6 w-6" />
             </button>
 
             {/* Previous Button */}
             {images.length > 1 && (
               <button
                 onClick={handlePrevImage}
-                className="absolute left-4 z-10 bg-black bg-opacity-50 text-[#fff] p-2 rounded-full hover:bg-opacity-75 transition-all"
+                className="absolute left-4 z-10 bg-background/80 bg-opacity-50 text-blue-600 p-2 rounded-full hover:bg-opacity-75 transition-all"
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
@@ -367,7 +554,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
             {images.length > 1 && (
               <button
                 onClick={handleNextImage}
-                className="absolute right-4 z-10 bg-black bg-opacity-50 text-[#fff] p-2 rounded-full hover:bg-opacity-75 transition-all"
+                className="absolute right-4 z-10 bg-background/80 bg-opacity-50 text-blue-600 p-2 rounded-full hover:bg-opacity-75 transition-all"
               >
                 <ChevronRight className="h-6 w-6" />
               </button>
@@ -375,21 +562,21 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
 
             {/* Image Counter */}
             {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-20 text-[#fff] px-4 py-2 rounded-full">
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-foreground/20 bg-opacity-50 text-foreground px-4 py-2 rounded-full">
                 {currentImageIndex + 1} of {images.length}
               </div>
             )}
 
             {/* Thumbnail Navigation */}
             {images.length > 1 && (
-              <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex space-x-2 max-w-full overflow-x-auto px-4">
+              <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex space-x-2 max-w-full overflow-x-auto px-4 custom-scrollbar">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`relative w-16 h-12 rounded overflow-hidden flex-shrink-0 transition-all ${
                       index === currentImageIndex
-                        ? "ring-2 ring-[#fff] ring-offset-2 ring-offset-black"
+                        ? "ring-2 ring-foreground ring-offset-2 ring-offset-black"
                         : "opacity-60 hover:opacity-100"
                     }`}
                   >
@@ -405,22 +592,9 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
               </div>
             )}
           </div>
-
         </div>
+        
       )}
-
-      <div className="border-t border-[var(--border-line)] mt-5 mb-8 pt-8 md:pt-10 text-center px-3">
-        <p className="text-[var(--text-color)] text-sm">
-          © {new Date().getFullYear()} Hope Autos. All rights reserved. |
-          <Link href="/privacy" className="hover:text-gray-500 ml-1">
-            Privacy Policy
-          </Link>{" "}
-          |
-          <Link href="/terms" className="hover:text-gray-500 ml-1">
-            Terms of Service
-          </Link>
-        </p>
-      </div>
     </>
   )
 }

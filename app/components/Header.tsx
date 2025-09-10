@@ -42,7 +42,7 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Image src={theme === "dark" ? logoWhite : logoBlack} alt='logo' className="max-sm:w-9 w-10 h-auto" />
+            <Image src={theme === "dark" ? logoWhite : theme === 'light' ? logoBlack : logoWhite} alt='logo' className="max-sm:w-9 w-10 h-auto" />
             <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
           </Link>
 
@@ -52,7 +52,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-[var(--primary)] hover:text-blue-600 px-3 py-2 text-sm font-semi-bold transition-colors"
+                className="text-[var(--primary)] hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
               >
                 {item.name}
               </Link>

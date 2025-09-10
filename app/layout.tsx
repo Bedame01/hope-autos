@@ -13,8 +13,8 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "Hope Autos - Limited",
   description: "Find your perfect car at Hope Autos. Quality pre-owned and new vehicles with excellent service.",
-  keywords: "cars, dealership, automotive, used cars, new cars, nigeria car, car dealership, hope cars, hope autos limited, Hope Autos",
-    generator: 'v0.dev'
+  keywords: "hope cars, hope autos limited, Hope Autos, Ride like a boss, cars, dealership, automotive, used cars, new cars, nigeria car, car dealership,"
+    // generator: 'v0.dev'
 }
 
 export default function RootLayout({
@@ -25,19 +25,20 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-          {/* <!-- Inter & Inter Tight Font --> */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
-        <link rel="icon" type="image/svg+xml" href="/public/icons/logo-icon.png" />
+    {/* <!-- Inter & Inter Tight Font --> */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+    {/* Favicon */}
+    <link rel="icon" href="/public/icons/logo-black.png" type="image/png" />
 
-        {/* Rubik Font */}
-        <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></link>
+    {/* Rubik Font */}
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></link>
 
-        {/* <!-- InstrumentSerif Font --> */}
-        <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
-        <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></link>
-        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    {/* <!-- InstrumentSerif Font --> */}
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></link>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
       </head>
       <body className='bg-gradient-to-br from-background via-background to-muted'>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>

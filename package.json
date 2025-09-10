@@ -14,6 +14,8 @@
     "check-oauth": "tsx scripts/check-oauth-setup.ts",
     "prepare-deploy": "tsx scripts/prepare-deployment.ts",
     "fix-oauth-accounts": "tsx scripts/fix-oauth-accounts.ts",
+    "update-preference": "tsx scripts/update-preferences-schema.ts",
+    "update-schema": "tsx scripts/update-schema-with-views.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -74,7 +76,7 @@
     "next": "15.2.4",
     "next-auth": "latest",
     "next-themes": "^0.4.6",
-    "nodemailer": "latest",
+    "nodemailer": "^6.10.1",
     "prisma": "latest",
     "react": "^18.0.0",
     "react-day-picker": "9.8.0",
@@ -92,6 +94,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
+    "@types/nodemailer": "^7.0.1",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "nodemon": "^3.1.10",
@@ -100,5 +103,8 @@
     "tsx": "^4.20.4",
     "tw-animate-css": "1.3.3",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
