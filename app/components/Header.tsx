@@ -17,6 +17,7 @@ import CustomButton from "@/components/ui/CustomButton"
 
 import logoWhite from '@/public/icons/logo-white.png'
 import logoBlack from '@/public/icons/logo-black.png'
+import logoSystem from '@/public/icons/logo-system.png'
 import Image from "next/image"
 import { useTheme } from "next-themes"
 
@@ -42,8 +43,8 @@ export default function Header() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Image src={theme === "dark" ? logoWhite : theme === 'light' ? logoBlack : logoWhite} alt='logo' className="max-sm:w-9 w-10 h-auto" />
-            <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
+            <Image src={theme === "dark" ? logoWhite : theme === 'light' ? logoBlack : logoSystem} alt='logo' className="max-sm:w-7 w-9 h-auto" />
+            <span className="max-sm:text-xl text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600 heading-text">Autos.</span></span>
           </Link>
 
           {/* Desktop Navigation */}

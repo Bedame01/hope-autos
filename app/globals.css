@@ -4,7 +4,6 @@
 
 *{
   /* font-family: "Rubik", sans-serif; */
-  /* font-family: "Rubik", sans-serif; */
   font-family: "Inter Tight", sans-serif !important;
   font-optical-sizing: auto;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
@@ -172,7 +171,7 @@ body{
 }
 
 .heading-text{
-  font-family: "Alkatra", system-ui !important;
+  font-family: "Norican", cursive !important;
 }
 
 @media screen and (max-width: 556px) {

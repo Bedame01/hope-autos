@@ -19,20 +19,20 @@ const Hero = () => {
                     <h1 className="text-[var(--foreground)]">Find your perfect Car.</h1> */}
                     
                     <BlurText
-                    text="Buy.Sell.Swap today &"
-                    delay={80}
-                    animateBy="letters"
-                    direction="top"
-                    onAnimationComplete={()=> {}}
-                    className="text-[var(--foreground)]"
+                        text="Buy.Sell.Swap today &"
+                        delay={80}
+                        animateBy="letters"
+                        direction="top"
+                        onAnimationComplete={()=> {}}
+                        className="text-[var(--foreground)]"
                     />
                     <BlurText
-                    text="Ride like a boss."
-                    delay={80}
-                    animateBy="letters"
-                    direction="top"
-                    onAnimationComplete={()=> {}}
-                    className="text-blue-600"
+                        text="Ride like a boss."
+                        delay={80}
+                        animateBy="letters"
+                        direction="top"
+                        onAnimationComplete={()=> {}}
+                        className="text-blue-600"
                     />
                 </div>
                 <div className="title text-center">

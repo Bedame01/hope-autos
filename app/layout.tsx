@@ -8,6 +8,8 @@ import { AuthProvider } from "./components/AuthProvider"
 import { ThemeProvider } from "./components/ThemeProvider"
 import { Toaster } from "@/components/ui/toaster"
 
+import favicon from '@/public/icons/logo-icon.png'
+
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -30,13 +32,13 @@ export default function RootLayout({
     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
     {/* Favicon */}
-    <link rel="icon" href="/public/icons/logo-black.png" type="image/png" />
+    <link rel="icon" href={favicon.src} type="image/png" />
 
     {/* Rubik Font */}
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></link>
 
     {/* <!-- Alkatra Font --> */}
-    <link href="https://fonts.googleapis.com/css2?family=Alkatra:wght@400..700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Norican&display=swap" rel="stylesheet" />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></link>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
       </head>
