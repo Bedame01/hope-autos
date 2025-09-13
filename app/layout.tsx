@@ -9,6 +9,8 @@ import { ThemeProvider } from "./components/ThemeProvider"
 import { Toaster } from "@/components/ui/toaster"
 
 import favicon from '@/public/icons/logo-icon.png'
+import { CurrencyProvider } from "./contexts/CurrencyContext"
+import { LanguageProvider } from "./contexts/LanguageContext"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -37,7 +39,7 @@ export default function RootLayout({
     {/* Rubik Font */}
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></link>
 
-    {/* <!-- Alkatra Font --> */}
+    {/* <!-- Heading Text Font --> */}
     <link href="https://fonts.googleapis.com/css2?family=Norican&display=swap" rel="stylesheet" />
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></link>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
@@ -45,13 +47,17 @@ export default function RootLayout({
       <body className='bg-gradient-to-br from-background via-background to-muted'>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
-            <Header />
-            <main className="min-h-screen">{children}</main>
-            {/* <Footer /> */}
-            <script>
-              AOS.init();
-            </script>
-            <Toaster />
+            <CurrencyProvider >
+              <LanguageProvider>
+                <Header />
+                <main className="min-h-screen">{children}</main>
+                {/* <Footer /> */}
+                <script>
+                  AOS.init();
+                </script>
+              <Toaster />
+              </LanguageProvider>
+            </CurrencyProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

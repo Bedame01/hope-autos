@@ -15,7 +15,7 @@ interface LanguageContextType {
   formatPrice: (price: number) => string
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
+export const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext)
@@ -26,7 +26,12 @@ export const useLanguage = () => {
 }
 
 // Translation data
-const translations = {
+// Add a type for translation objects with index signature
+type TranslationObject = {
+  [key: string]: string
+}
+
+const translations: Record<Language, TranslationObject> = {
   en: {
     // Navigation
     "nav.home": "Home",
@@ -511,7 +516,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }, [currency])
 
   const t = (key: string): string => {
-    return translations[language][key] || key
+    if (!language || !translations[language]) {
+      console.error("LanguageProvider is missing or language is invalid.");
+      return key;
+    }
+    return (translations[language] as TranslationObject)[key] || key;
   }
 
   const formatPrice = (price: number): string => {

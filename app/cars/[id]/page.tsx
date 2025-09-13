@@ -27,6 +27,7 @@ import {
 import { getDetailImageUrl, getThumbnailUrl, isCloudinaryUrl, getHeroImageUrl } from "@/lib/cloudinary"
 import type { Car } from "@/lib/types"
 import CarCard from "@/app/components/CarCard"
+import { useCurrency } from "@/app/contexts/CurrencyContext"
 
 interface CarDetailPageProps {
   params: {
@@ -69,6 +70,7 @@ async function getSimilarCars(carId: string, make: string, bodyType: string, pri
 
 export default function CarDetailPage({ params }: CarDetailPageProps) {
   const { data: session } = useSession()
+  const { formatPrice } = useCurrency()
   const [car, setCar] = useState<Car | null>(null)
   const [similarCars, setSimilarCars] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
@@ -129,7 +131,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
       try {
         await navigator.share({
           title: `${car.year} ${car.make} ${car.model}`,
-          text: `Check out this ${car.year} ${car.make} ${car.model} for $${car.price.toLocaleString()}`,
+          text: `Check out this ${car.year} ${car.make} ${car.model} for ${formatPrice(car.price)}`,
           url: window.location.href,
         })
       } catch (error) {
@@ -252,7 +254,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
 
   return (
     <>
-      <div className="min-h-screen bg-background pb-4">
+      <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Breadcrumb */}
           <nav className="mb-8">
@@ -372,7 +374,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                     {viewCount} views
                   </div>
                 </div>
-                <p className="text-4xl font-bold text-blue-600">${car.price.toLocaleString()}</p>
+                <p className="text-4xl font-bold text-blue-600">{formatPrice(car.price)}</p>
               </div>
 
               {/* Key Specs */}
@@ -412,13 +414,13 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
 
               {/* Contact Actions */}
               <div className="space-y-4">
-                <Button size="lg" className="w-full btn1" asChild>
+                <Button size="lg" className="w-full py-5.5 bg-blue-600 hover:bg-blue-500" asChild>
                   <Link href={`/contact?car=${car.id}`}>
                     <Mail className="h-4 w-4 mr-2" />
                     Request Information
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="w-full bg-transparent" asChild>
+                <Button size="lg" variant="outline" className="w-full bg-transparent py-5.5" asChild>
                   <Link href="tel:5551234567">
                     <Phone className="h-4 w-4 mr-2" />
                     Call (234) 8133531046
@@ -500,21 +502,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
             )}
           </div>
         </div>
-        <div className="border-t border-[var(--border-line)] mt-8 pb-5 pt-8 md:pt-10 text-center text-sm sm:text-base">
-          <p className="text-[var(--text-color)] mb-1.5">
-            © {new Date().getFullYear()} Hope Autos Limited. All rights reserved.
-            {/* <Link href="/privacy" className="hover:text-[var(--text-color)] ml-1">
-              Privacy Policy
-            </Link>{" "}
-            |
-            <Link href="/terms" className="hover:text-[var(--text-color)] ml-1">
-              Terms of Service
-            </Link> */}
-          </p>
-          <p className="text-[var(--text-color)]">No 1 Nigeria Best Vehicle Dealership</p>
-        </div>
       </div>
-
 
       {/* Full Screen Image Modal */}
       {isModalOpen && (

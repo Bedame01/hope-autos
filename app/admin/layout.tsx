@@ -8,13 +8,14 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LayoutDashboard, Car, Users, MessageSquare, Menu, X, LogOut, Loader2 } from "lucide-react"
+import { LayoutDashboard, Car, Users, MessageSquare, Menu, X, LogOut, Loader2, Settings } from "lucide-react"
 
 const navigation = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Cars", href: "/admin/cars", icon: Car },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
+  { name: "Admin Settings", href: "/admin/settings", icon: Settings },
 ]
 
 export default function AdminLayout({
@@ -77,7 +78,7 @@ export default function AdminLayout({
                     <Link
                       href={item.href}
                       className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isActive ? "bg-blue-100 text-blue-700" : "text-[var(--text-color)] hover:text-white hover:bg-gray-500"
+                        isActive ? "bg-blue-100 text-[#000]" : "text-[var(--text-color)] hover:text-[#000] hover:bg-blue-100"
                       }`}
                       onClick={() => setSidebarOpen(false)}
                     >
@@ -132,7 +133,7 @@ export default function AdminLayout({
                     <Link
                       href={item.href}
                       className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isActive ? "bg-blue-100 text-blue-700" : "text-[var(--text-color)] hover:text-white hover:bg-blue-100"
+                        isActive ? "bg-blue-100 text-[#000]" : "text-[var(--text-color)] hover:text-white hover:bg-blue-100"
                       }`}
                     >
                       <Icon className="h-5 w-5" />

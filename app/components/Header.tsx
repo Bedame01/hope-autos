@@ -44,7 +44,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Image src={theme === "dark" ? logoWhite : theme === 'light' ? logoBlack : logoSystem} alt='logo' className="max-sm:w-7 w-9 h-auto" />
-            <span className="max-sm:text-xl text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600 heading-text">Autos.</span></span>
+            <span className="max-sm:text-xl text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
           </Link>
 
           {/* Desktop Navigation */}
