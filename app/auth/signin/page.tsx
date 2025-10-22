@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import { Loader2 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { signIn, getProviders } from "next-auth/react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -9,9 +10,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Eye, EyeOff, Car, Mail, Lock, Loader2 } from "lucide-react"
-// import Image from "next/image"
-// import google_icon from "@/public/icons/google-login-icon.png"
+import { Eye, EyeOff, Car, Mail, Lock } from "lucide-react"
+import Image from "next/image"
+import google_icon from "@/public/icons/google-login-icon.png"
+import logoBlack from '@/public/icons/logo-black.png'
 
 export default function SignInPage() {
   const router = useRouter()
@@ -111,16 +113,15 @@ export default function SignInPage() {
   const hasGoogleProvider = providers?.google
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex flex-col justify-center px-5 sm:px-8 lg:px-10">
-      <div className="max-w-lg w-full space-y-8 mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-background dark:to-[#1e1f1e] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          {/* <Link href="/" className="flex items-center justify-center space-x-2 mb-6">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">Hope Autos</span>
-          </Link> */}
+          <Link href="/" className="flex justify-center mb-2">
+            <Image src={logoBlack} alt='logo' className="size-12" />
+          </Link>
           <h2 className="text-3xl font-bold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-sm text-[var(--text-color)]">
+          <p className="mt-2 text-sm text-color">
             Or{" "}
             <Link href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
               create a new account
@@ -128,7 +129,7 @@ export default function SignInPage() {
           </p>
         </div>
 
-        <Card className="max-sm:px-1">
+        <Card>
           <CardHeader>
             <CardTitle>Welcome back</CardTitle>
           </CardHeader>
@@ -154,33 +155,18 @@ export default function SignInPage() {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full bg-transparent py-5 cursor-pointer"
+                    className="w-full bg-transparent"
                     onClick={handleGoogleSignIn}
                     disabled={loading || googleLoading}
                   >
                     {googleLoading ? (
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
                     ) : (
-                      // <Image 
-                      //   src={google_icon}
-                      //   alt="google-icon"
-                      //   className="size-5.5 mr-1"
-                      // />
-
-                      <svg width="16" height="16" data-view-component="true">        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" data-view-component="true" className="octicon color-fg-default">
-                        <g clip-path="url(#clip0_643_9687)">
-                          <path d="M8.00018 3.16667C9.18018 3.16667 10.2368 3.57333 11.0702 4.36667L13.3535 2.08333C11.9668 0.793333 10.1568 0 8.00018 0C4.87352 0 2.17018 1.79333 0.853516 4.40667L3.51352 6.47C4.14352 4.57333 5.91352 3.16667 8.00018 3.16667Z" fill="#EA4335"></path>
-                          <path d="M15.66 8.18335C15.66 7.66002 15.61 7.15335 15.5333 6.66669H8V9.67335H12.3133C12.12 10.66 11.56 11.5 10.72 12.0667L13.2967 14.0667C14.8 12.6734 15.66 10.6134 15.66 8.18335Z" fill="#4285F4"></path>
-                          <path d="M3.51 9.53001C3.35 9.04668 3.25667 8.53334 3.25667 8.00001C3.25667 7.46668 3.34667 6.95334 3.51 6.47001L0.85 4.40668C0.306667 5.48668 0 6.70668 0 8.00001C0 9.29334 0.306667 10.5133 0.853333 11.5933L3.51 9.53001Z" fill="#FBBC05"></path>
-                          <path d="M8.0001 16C10.1601 16 11.9768 15.29 13.2968 14.0633L10.7201 12.0633C10.0034 12.5467 9.0801 12.83 8.0001 12.83C5.91343 12.83 4.14343 11.4233 3.5101 9.52667L0.850098 11.59C2.1701 14.2067 4.87343 16 8.0001 16Z" fill="#34A853"></path>
-                        </g>
-                        <defs>
-                          <clipPath id="clip0_643_9687">
-                            <rect width="16" height="16" fill="white"></rect>
-                          </clipPath>
-                        </defs>
-                      </svg>
-                      </svg>
+                      <Image 
+                        src={google_icon}
+                        alt="google-icon"
+                        className="size-5.5 mr-1"
+                      />
                       // <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                       //   <path
                       //     fill="currentColor"
@@ -206,10 +192,10 @@ export default function SignInPage() {
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-[var(--border-line)]" />
+                    <div className="w-full border-t border-gray-300" />
                   </div>
                   <div className="relative flex justify-center text-sm">
-                    <span className="px-2 bg-[var(--background-secondary)] text-[var(--text-color)]">Or continue with email</span>
+                    <span className="px-2 bg-white text-color">Or continue with email</span>
                   </div>
                 </div>
               </>
@@ -218,17 +204,17 @@ export default function SignInPage() {
             {/* Email/Password Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-[var(--foreground)] mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-color mb-1">
                   Email address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     id="email"
                     name="email"
                     type="email"
                     required
-                    className="pl-10 border border-[var(--border-line)] py-5"
+                    className="pl-10"
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -238,17 +224,17 @@ export default function SignInPage() {
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-[var(--foreground)] mb-1">
+                <label htmlFor="password" className="block text-sm font-medium text-color mb-1">
                   Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
                     required
-                    className="pl-10 pr-10 border border-[var(--border-line)] py-5"
+                    className="pl-10 pr-10"
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -256,12 +242,17 @@ export default function SignInPage() {
                   />
                   <button
                     type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-[var(--text-color)]"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-color"
                     onClick={() => setShowPassword(!showPassword)}
                     disabled={loading || googleLoading}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
+                </div>
+                <div className="flex justify-end mt-2">
+                  <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:text-blue-500">
+                    Forgot password?
+                  </Link>
                 </div>
               </div>
 
@@ -278,15 +269,9 @@ export default function SignInPage() {
                     Remember me
                   </label>
                 </div>
-
-                <div className="text-sm">
-                  <Link href="/api/auth/request-reset" className="font-medium text-blue-600 hover:text-blue-500">
-                    Forgot password?
-                  </Link>
-                </div>
               </div>
 
-              <Button type="submit" className="w-full py-5 cursor-pointer" disabled={loading || googleLoading}>
+              <Button type="submit" className="w-full" disabled={loading || googleLoading}>
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -299,7 +284,7 @@ export default function SignInPage() {
             </form>
 
             <div className="text-center">
-              <p className="text-sm text-[var(--text-color)]">
+              <p className="text-sm text-color">
                 Don't have an account?{" "}
                 <Link href="/auth/signup" className="font-medium text-blue-600 hover:text-blue-500">
                   Sign up for free
@@ -309,20 +294,6 @@ export default function SignInPage() {
           </CardContent>
         </Card>
       </div>
-
-      {/* <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center px-1">
-        <p className="text-[var(--text-color)] text-sm">
-          © {new Date().getFullYear()} Hope Autos. All rights reserved. |
-          <Link href="/privacy" className="hover:text-[var(--text-color)] ml-1">
-            Privacy Policy
-          </Link>{" "}
-          |
-          <Link href="/terms" className="hover:text-[var(--text-color)] ml-1">
-            Terms of Service
-          </Link>
-        </p>
-      </div> */}
-
     </div>
   )
 }

@@ -1,9 +1,11 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createUser, getUserByEmail } from "@/lib/db"
+import { prisma } from "@/lib/prisma"
+import bcrypt from "bcryptjs"
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, phone, password } = await request.json()
+    const body = await request.json()
+    const { name, email, password, phone } = body
 
     // Validation
     if (!name || !email || !password) {
@@ -14,26 +16,73 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Password must be at least 6 characters long" }, { status: 400 })
     }
 
-    // Check if user already exists
-    const existingUser = await getUserByEmail(email)
-    if (existingUser) {
-      return NextResponse.json({ error: "User with this email already exists" }, { status: 400 })
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: "Please provide a valid email address" }, { status: 400 })
     }
 
-    // Create new user
-    const user = await createUser({
-      name,
-      email,
-      phone,
-      password,
-      role: "customer",
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
     })
 
-    // Return user without password
+    if (existingUser) {
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 })
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12)
+
+    // Create user with preferences
+    const user = await prisma.user.create({
+      data: {
+        email: email.toLowerCase(),
+        name,
+        phone: phone || null,
+        password: hashedPassword,
+        role: "CUSTOMER",
+        emailVerified: null,
+        preferences: {
+          create: {
+            emailNotifications: true,
+            smsNotifications: false,
+            priceAlerts: true,
+            newArrivals: true,
+            preferredMakes: [],
+            preferredFuelTypes: [],
+            theme: "light",
+            language: "en",
+            timezone: "UTC",
+            currency: "USD",
+          },
+        },
+      },
+      include: {
+        preferences: true,
+      },
+    })
+
+    // Remove password from response
     const { password: _, ...userWithoutPassword } = user
-    return NextResponse.json({ user: userWithoutPassword }, { status: 201 })
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Account created successfully. You can now sign in.",
+        user: userWithoutPassword,
+      },
+      { status: 201 },
+    )
   } catch (error) {
     console.error("Signup error:", error)
-    return NextResponse.json({ error: "Failed to create account" }, { status: 500 })
+
+    if (error instanceof Error) {
+      if (error.message.includes("Unique constraint failed")) {
+        return NextResponse.json({ error: "Email already in use" }, { status: 409 })
+      }
+    }
+
+    return NextResponse.json({ error: "Failed to create account. Please try again." }, { status: 500 })
   }
 }

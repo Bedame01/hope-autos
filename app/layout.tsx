@@ -8,7 +8,7 @@ import { AuthProvider } from "./components/AuthProvider"
 import { ThemeProvider } from "./components/ThemeProvider"
 import { Toaster } from "@/components/ui/toaster"
 
-import favicon from '@/public/icons/logo-icon.png'
+import favicon from '@/public/icons/logo-black.png'
 import { CurrencyProvider } from "./contexts/CurrencyContext"
 import { LanguageProvider } from "./contexts/LanguageContext"
 
@@ -40,7 +40,7 @@ export default function RootLayout({
     <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></link>
 
     {/* <!-- Heading Text Font --> */}
-    <link href="https://fonts.googleapis.com/css2?family=Norican&display=swap" rel="stylesheet" />
+    {/* <link href="https://fonts.googleapis.com/css2?family=Norican&display=swap" rel="stylesheet" /> */}
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet"></link>
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
       </head>

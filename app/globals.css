@@ -3,10 +3,24 @@
 /* @import "tailwindcss/preflight" */
 
 *{
-  /* font-family: "Rubik", sans-serif; */
-  font-family: "Inter Tight", sans-serif !important;
+  font-family: "Rubik", sans-serif !important;
+  /* font-family: "Inter Tight", sans-serif !important; */
   font-optical-sizing: auto;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+@font-face {
+  font-family: 'TestDomaine';
+  src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('truetype');
+  src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('woff');
+  src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('woff2');
+
+}
+@font-face {
+  font-family: 'TestDomaine2';
+  src: url(../public/font/TestDomaineDisplayNarrow-SemiboldItalic-BF66174a221f430.otf) format('truetype');
+  src: url(../public/font/TestDomaineDisplayNarrow-SemiboldItalic-BF66174a221f430.otf) format('woff');
+  src: url(../public/font/TestDomaineDisplayNarrow-SemiboldItalic-BF66174a221f430.otf) format('woff2');
 }
 
 body{
@@ -64,6 +78,7 @@ body{
   --sidebar-border: oklch(37.787% 0.15034 28.551);
   --sidebar-ring: oklch(0.708 0 0);
   --color-gray-900: oklch(23.929% 0.00003 271.152);
+  --gutter: clamp(.4rem, calc(2vw + .2rem), 2.2rem);
 }
 
 .dark {
@@ -71,7 +86,7 @@ body{
   --hero-gradient2: rgba(120, 120, 120, 0.168);
   --color-blue-500: var(--color-green-600);
   --color-blue-600: var(--color-green-400);
-  --color-blue-100: var(--color-green-100) !important;
+  --color-blue-100: oklch(96.2% 0.044 156.743);
   --heading-color: oklch(96.715% 0.00011 271.152);
   --text-color: oklch(77.944% 0.00009 271.152);
   --color-white: oklch(22.645% 0.00003 271.152);
@@ -172,7 +187,7 @@ body{
 }
 
 .heading-text{
-  font-family: "Norican", cursive !important;
+  font-family: 'TestDomaine' !important;
 }
 
 @media screen and (max-width: 556px) {
@@ -205,6 +220,77 @@ body{
 .to-background\/90 {
     --tw-gradient-to: rgb(15 15 15 / 0.9) var(--tw-gradient-to-position);
 } */
+
+/* #MENU TOGGLE ICON */
+.s-header{
+  --header-height: 7.2rem;
+}
+
+.header-menu-toggle {
+  --toggle-block-width: 30px;
+  --toggle-line-width: 20px;
+  --toggle-line-height: 1.5px;
+  /* display: b; */
+  width: var(--toggle-block-width);
+  height: var(--toggle-block-width);
+  /* position: absolute;
+  top: 0;
+  right: 0; */
+}
+.header-menu-toggle.is-clicked{
+  --toggle-line-height: 1.3px !important;
+}
+
+.header-menu-toggle.is-clicked span {
+  background-color: var(--background) !important;
+  transition: 0.1s;
+}
+
+.header-menu-toggle span {
+  display: block;
+  background-color: var(--foreground) !important;
+  width: var(--toggle-line-width);
+  height: var(--toggle-line-height);
+  margin-top: -1px;
+  text-shadow: none;
+  color: transparent;
+  position: absolute;
+  right: calc((var(--toggle-block-width) - var(--toggle-line-width)) / 2);
+  top: 50%;
+  bottom: auto;
+  left: auto;
+  font: 0px / 0 a;
+  transition: 0.5s;
+}
+.header-menu-toggle span::before {
+  top: -8px;
+}
+.header-menu-toggle.is-clicked span::before {
+  top: 0px !important;
+  transform: rotate(135deg) !important;
+}
+
+.header-menu-toggle span::before, .header-menu-toggle span::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  background-color: inherit;
+  position: absolute;
+  left: 0px;
+  transition: 0.5s;
+}
+.header-menu-toggle.is-clicked span::after {
+  bottom: 0px !important;
+  transform: rotate(225deg) !important;
+}
+
+.header-menu-toggle.is-clicked span::before, .header-menu-toggle.is-clicked span::after {
+  background-color: var(--foreground) !important;
+}
+
+.header-menu-toggle span::after {
+  bottom: -8px;
+}
 
 .hero-btn2{
   background-color: var(--background);

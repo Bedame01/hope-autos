@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth"
+import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
@@ -7,38 +7,35 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.email) {
+    if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      include: { preferences: true },
+    const preferences = await prisma.userPreferences.findUnique({
+      where: { userId: session.user.id },
     })
 
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    if (!preferences) {
+      return NextResponse.json({ error: "Preferences not found" }, { status: 404 })
     }
 
     return NextResponse.json({
-      preferences: user.preferences || {
-        emailNotifications: true,
-        smsNotifications: false,
-        priceAlerts: true,
-        newArrivals: true,
-        marketingNotifications: false,
-        maxPrice: 50000,
-        preferredMakes: [],
-        preferredFuelTypes: [],
-        preferredBodyTypes: [],
-        profileVisible: true,
-        showEmail: false,
-        showPhone: false,
-      },
+      id: preferences.id,
+      maxPrice: preferences.maxPrice,
+      preferredMakes: preferences.preferredMakes,
+      preferredFuelTypes: preferences.preferredFuelTypes,
+      emailNotifications: preferences.emailNotifications,
+      smsNotifications: preferences.smsNotifications,
+      priceAlerts: preferences.priceAlerts,
+      newArrivals: preferences.newArrivals,
+      theme: preferences.theme,
+      language: preferences.language,
+      timezone: preferences.timezone,
+      currency: preferences.currency,
     })
   } catch (error) {
-    console.error("Error fetching preferences:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Error fetching user preferences:", error)
+    return NextResponse.json({ error: "Failed to fetch preferences" }, { status: 500 })
   }
 }
 
@@ -46,58 +43,45 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
-    if (!session?.user?.email) {
+    if (!session || !session.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
     const body = await request.json()
-    const preferences = body.preferences || body
 
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-    })
-
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
-    }
-
-    // Update or create preferences
-    const updatedPreferences = await prisma.userPreferences.upsert({
-      where: { userId: user.id },
-      update: {
-        emailNotifications: preferences.emailNotifications,
-        smsNotifications: preferences.smsNotifications,
-        priceAlerts: preferences.priceAlerts,
-        newArrivals: preferences.newArrivals,
-        marketingNotifications: preferences.marketingNotifications,
-        maxPrice: preferences.maxPrice,
-        preferredMakes: preferences.preferredMakes,
-        preferredFuelTypes: preferences.preferredFuelTypes,
-        preferredBodyTypes: preferences.preferredBodyTypes,
-        profileVisible: preferences.profileVisible,
-        showEmail: preferences.showEmail,
-        showPhone: preferences.showPhone,
-      },
-      create: {
-        userId: user.id,
-        emailNotifications: preferences.emailNotifications ?? true,
-        smsNotifications: preferences.smsNotifications ?? false,
-        priceAlerts: preferences.priceAlerts ?? true,
-        newArrivals: preferences.newArrivals ?? true,
-        marketingNotifications: preferences.marketingNotifications ?? false,
-        maxPrice: preferences.maxPrice ?? 50000,
-        preferredMakes: preferences.preferredMakes ?? [],
-        preferredFuelTypes: preferences.preferredFuelTypes ?? [],
-        preferredBodyTypes: preferences.preferredBodyTypes ?? [],
-        profileVisible: preferences.profileVisible ?? true,
-        showEmail: preferences.showEmail ?? false,
-        showPhone: preferences.showPhone ?? false,
+    const updated = await prisma.userPreferences.update({
+      where: { userId: session.user.id },
+      data: {
+        maxPrice: body.maxPrice,
+        preferredMakes: body.preferredMakes,
+        preferredFuelTypes: body.preferredFuelTypes,
+        emailNotifications: body.emailNotifications,
+        smsNotifications: body.smsNotifications,
+        priceAlerts: body.priceAlerts,
+        newArrivals: body.newArrivals,
+        theme: body.theme,
+        language: body.language,
+        timezone: body.timezone,
+        currency: body.currency,
       },
     })
 
-    return NextResponse.json({ preferences: updatedPreferences })
+    return NextResponse.json({
+      id: updated.id,
+      maxPrice: updated.maxPrice,
+      preferredMakes: updated.preferredMakes,
+      preferredFuelTypes: updated.preferredFuelTypes,
+      emailNotifications: updated.emailNotifications,
+      smsNotifications: updated.smsNotifications,
+      priceAlerts: updated.priceAlerts,
+      newArrivals: updated.newArrivals,
+      theme: updated.theme,
+      language: updated.language,
+      timezone: updated.timezone,
+      currency: updated.currency,
+    })
   } catch (error) {
-    console.error("Error updating preferences:", error)
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+    console.error("Error updating user preferences:", error)
+    return NextResponse.json({ error: "Failed to update preferences" }, { status: 500 })
   }
 }

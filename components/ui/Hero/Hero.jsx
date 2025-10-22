@@ -14,10 +14,34 @@ const Hero = () => {
         <div className="hero-wrapper">
             {/* HERO TITLE WRAP */}
             <div className="title-wrap">
-                <div className="max-sm:text-[7.8vw]/14 sm:text-[48px]/14 md:text-[50px]/14 lg:text-[58px]/17 font-bold hero-heading flex flex-col justify-center items-center tracking-[-1px] text-center">
-                    {/* <h1 className="text-blue-600">Buy.Sell.Swap.</h1>
-                    <h1 className="text-[var(--foreground)]">Find your perfect Car.</h1> */}
-                    
+                <div className="hero-title1 max-sm:text-[10vw]/27 font-bold hero-heading hidden flex-col justify-center items-center tracking-[-1px] text-center">
+                    <BlurText
+                        text="Buy.Sell.Swap"
+                        delay={80}
+                        animateBy="letters"
+                        direction="top"
+                        onAnimationComplete={()=> {}}
+                        className="text-[var(--foreground)]"
+                    />
+                    <BlurText
+                        text="today and"
+                        delay={80}
+                        animateBy="letters"
+                        direction="top"
+                        onAnimationComplete={()=> {}}
+                        className="text-[var(--foreground)]"
+                    />
+                    <BlurText
+                        text="Ride like a boss."
+                        delay={80}
+                        animateBy="letters"
+                        direction="top"
+                        onAnimationComplete={()=> {}}
+                        className="text-blue-600"
+                    />
+                </div>
+                {/* HERO HEADING TEXT 2 */}
+                <div className="hero-title2 hidden max-sm:text-[7.3vw]/14 sm:text-[48px]/14 md:text-[50px]/14 lg:text-[58px]/17 font-bold hero-heading flex-col justify-center items-center tracking-[-1px] text-center">
                     <BlurText
                         text="Buy.Sell.Swap today &"
                         delay={80}
@@ -44,7 +68,7 @@ const Hero = () => {
 
                 <div className="hero-btn flex items-center justify-center max-sm:flex-col gap-4 md:gap-6">
                     <Link 
-                        className="flex items-center btn1 rounded-2xl bg-[var(--primary)] text-white text-sm hover:bg-emerald-600 py-3.5 px-6.5 text-nowrap font-semibold"
+                        className="flex items-center btn1 rounded-lg bg-[var(--primary)] text-white text-sm hover:bg-emerald-600 py-3.5 px-6.5 text-nowrap font-semibold"
                         href='/cars'
                     >
                         Browse Inventory
@@ -56,7 +80,7 @@ const Hero = () => {
                         </svg>
                     </Link>
                     <Link 
-                        className="flex items-center font-semibold hero-btn2 rounded-2xl border-white text-sm py-3.5 px-12 text-nowrap"
+                        className="flex items-center font-semibold hero-btn2 rounded-lg border-white text-sm py-3.5 px-12.5 text-nowrap"
                         href='/contact'
                     >
                         Get Quote

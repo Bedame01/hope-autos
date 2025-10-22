@@ -15,7 +15,7 @@ const buildKeyframes = (from, steps) => {
 };
 
 const BlurText = ({
-  text = '',
+  text = ``,
   delay = 200,
   className = '',
   animateBy = 'words',

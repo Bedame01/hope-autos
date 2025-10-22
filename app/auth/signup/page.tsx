@@ -13,6 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, Car, Mail, Lock, User, Phone } from "lucide-react"
 import Image from "next/image"
 import google_icon from "@/public/icons/google-login-icon.png"
+import logoBlack from '@/public/icons/logo-black.png'
 
 export default function SignUpPage() {
   const router = useRouter()
@@ -96,10 +97,13 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--background)] flex justify-center flex-col py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 dark:from-background dark:to-[#1e1f1e] flex justify-center flex-col py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg w-full space-y-8 mx-auto">
         {/* Header */}
         <div className="text-center">
+          <Link href="/" className="flex justify-center">
+            <Image src={logoBlack} alt='logo' className="size-12" />
+          </Link>
           <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
           <p className="mt-2 text-sm text-[var(--text-color)]">
             Or{" "}
@@ -313,7 +317,7 @@ export default function SignUpPage() {
         </Card>
       </div>
 
-      <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
+      {/* <div className="border-t border-[var(--border-line)] mt-18 mb-3 pt-8 md:pt-10 text-center">
         <p className="text-[var(--text-color)] text-sm">
           © {new Date().getFullYear()} Hope Autos. All rights reserved. |
           <Link href="/privacy" className="hover:text-[var(--text-color)] ml-1">
@@ -324,7 +328,7 @@ export default function SignUpPage() {
             Terms of Service
           </Link>
         </p>
-      </div>
+      </div> */}
 
     </div>
   )

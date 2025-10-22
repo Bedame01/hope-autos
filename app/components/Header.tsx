@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
-import { Menu, X, Car, User, LogOut, Settings, Heart } from "lucide-react"
+import { User, LogOut, Settings, Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,21 +14,41 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import CustomButton from "@/components/ui/CustomButton"
+import MenuToggle from '@/components/ui/menuToggle'
+import { ThemeToggle } from "@/components/theme-toggle"
 
-import logoWhite from '@/public/icons/logo-white.png'
 import logoBlack from '@/public/icons/logo-black.png'
-import logoSystem from '@/public/icons/logo-system.png'
+// import logoWhite from '@/public/icons/logo-white.png'
+// import logoSystem from '@/public/icons/logo-system.png'
 import Image from "next/image"
 import { useTheme } from "next-themes"
+import { usePathname } from "next/navigation"
 
 export default function Header() {
+  const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { theme, setTheme } = useTheme()
   const { data: session, status } = useSession()
+  const [scrolled, setScrolled] = useState(false);
+  const SCROLL_THRESHOLD = 70; // Adjust the scroll height at which header toggles to black
+
+  useEffect(() => {
+    const onScroll = () => {
+      setScrolled(window.scrollY > SCROLL_THRESHOLD);
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Don't render Header on the sign in / sign up pages
+  if (pathname === "/auth/signin" || pathname === "/auth/signup") {
+    return null
+  }
 
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Inventory", href: "/cars" },
+    { name: "FAQ", href: "/faq" },
     // { name: "About", href: "/about" },
     { name: "Contact", href: "/contact" },
   ]
@@ -38,22 +58,22 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-[var(--border-line)] sticky top-0 z-60" >
+    <header className={`bg-white border-b border-[var(--border-line)] sticky top-0 z-50 ${scrolled ? 'backdrop-blur supports-[backdrop-filter]:bg-background/65' : ''}`} >
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <Image src={theme === "dark" ? logoWhite : theme === 'light' ? logoBlack : logoSystem} alt='logo' className="max-sm:w-7 w-9 h-auto" />
-            <span className="max-sm:text-xl text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
+            <Image src={logoBlack} alt='logo' className="w-6 h-auto" />
+            <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-5 lg:space-x-8">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-[var(--primary)] hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
+                className={`hover:text-blue-600 px-1 lg:px-3 py-2 text-sm font-medium transition-colors ${pathname === item.href ? 'text-blue-600' : 'text-[var(--primary)]'}`}
               >
                 {item.name}
               </Link>
@@ -135,13 +155,16 @@ export default function Header() {
                 </Button>
               </div>
             )}
+            <ThemeToggle />
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden relative z-60">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[var(--primary)] hover:text-blue-600 cursor-pointer">
+          <div className="md:hidden relative z-60 flex items-center space-x-2">
+            {/* <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[var(--primary)] hover:text-blue-600 cursor-pointer">
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
+            </button> */}
+            <ThemeToggle />
+            <MenuToggle isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
           </div>
         </div>
 
@@ -153,7 +176,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="text-[var(--primary)] hover:text-blue-600 block px-3 py-2 text-base font-medium"
+                  className={`hover:text-blue-600 block px-3 py-2 text-base font-medium ${pathname === item.href ? 'text-blue-600' : 'text-[var(--primary)]'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}

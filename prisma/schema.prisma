@@ -13,40 +13,41 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
-  name          String
-  role          Role      @default(CUSTOMER)
-  phone         String?
+  name          String?
   password      String?
+  phone         String?
+  image         String?
+  role          Role      @default(CUSTOMER)
+  emailVerified DateTime?
   provider      String?
   providerId    String?
-  emailVerified Boolean   @default(false)
-  image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  inquiries     Inquiry[]
-  favoriteCars  FavoriteCar[]
-  preferences   UserPreferences?
-  accounts      Account[]
-  sessions      Session[]
+  accounts              Account[]
+  sessions              Session[]
+  preferences           UserPreferences?
+  inquiries             Inquiry[]
+  favoriteCars          FavoriteCar[]
+  passwordResetToken    PasswordResetToken?
 
   @@map("users")
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -70,28 +71,40 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-  @@map("verificationtokens")
+  @@map("verification_tokens")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
 }
 
 model UserPreferences {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  maxPrice            Int?
-  preferredMakes      String[]
-  preferredFuelTypes  String[]
-  emailNotifications  Boolean  @default(true)
-  smsNotifications    Boolean  @default(false)
-  priceAlerts         Boolean  @default(true)
-  newArrivals         Boolean  @default(true)
-  theme               String   @default("light")
-  language            String   @default("en")
-  timezone            String   @default("UTC")
-  currency            String   @default("USD")
-  profileVisibility   String   @default("private")
-  showEmail           Boolean  @default(false)
-  showPhone           Boolean  @default(false)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  maxPrice              Int?
+  preferredMakes        String[] @default([])
+  preferredFuelTypes    String[] @default([])
+  emailNotifications    Boolean  @default(true)
+  smsNotifications      Boolean  @default(false)
+  priceAlerts           Boolean  @default(true)
+  newArrivals           Boolean  @default(true)
+  theme                 String   @default("light")
+  language              String   @default("en")
+  timezone              String   @default("UTC")
+  currency              String   @default("USD")
+  profileVisibility     String   @default("private")
+  showEmail             Boolean  @default(false)
+  showPhone             Boolean  @default(false)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   savedSearches SavedSearch[]
@@ -100,13 +113,13 @@ model UserPreferences {
 }
 
 model SavedSearch {
-  id              String   @id @default(cuid())
-  name            String
-  filters         Json
-  alertsEnabled   Boolean  @default(false)
-  userPreferencesId String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                   String   @id @default(cuid())
+  name                 String
+  filters              Json
+  alertsEnabled        Boolean  @default(false)
+  userPreferencesId    String
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
   userPreferences UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
 
@@ -124,9 +137,9 @@ model Car {
   fuelType     FuelType
   transmission Transmission
   bodyType     BodyType
-  images       String[]
-  description  String?
-  features     String[]
+  images       String[]      @default([])
+  description  String?       @db.Text
+  features     String[]      @default([])
   isAvailable  Boolean       @default(true)
   isFeatured   Boolean       @default(false)
   viewCount    Int           @default(0)
@@ -137,8 +150,21 @@ model Car {
   // Relations
   inquiries    Inquiry[]
   favoriteCars FavoriteCar[]
+  carViews     CarView[]
 
   @@map("cars")
+}
+
+model CarView {
+  id        String   @id @default(cuid())
+  carId     String
+  userId    String?
+  ipAddress String?
+  viewedAt  DateTime @default(now())
+
+  car Car @relation(fields: [carId], references: [id], onDelete: Cascade)
+
+  @@map("car_views")
 }
 
 model Inquiry {
@@ -146,7 +172,7 @@ model Inquiry {
   name      String
   email     String
   phone     String?
-  message   String
+  message   String        @db.Text
   carId     String?
   userId    String?
   status    InquiryStatus @default(NEW)
@@ -154,8 +180,8 @@ model Inquiry {
   updatedAt DateTime      @updatedAt
 
   // Relations
-  car  Car?  @relation(fields: [carId], references: [id])
-  user User? @relation(fields: [userId], references: [id])
+  car  Car?  @relation(fields: [carId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@map("inquiries")
 }
@@ -172,6 +198,14 @@ model FavoriteCar {
 
   @@unique([userId, carId])
   @@map("favorite_cars")
+}
+
+model AdminSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+
+  @@map("admin_settings")
 }
 
 enum Role {

@@ -19,7 +19,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src={theme === "dark" ? logoWhite : theme === 'light' ? logoBlack : logoWhite} alt='logo' className="max-sm:w-8 w-10 h-auto text-blue-600" />
+                <Image src={logoBlack} alt='logo' className="w-6 h-auto" />
                 <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
               </Link>
             </div>

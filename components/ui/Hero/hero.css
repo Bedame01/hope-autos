@@ -86,6 +86,23 @@ section.hero {
     z-index: 4 !important;
 }
 
+@media screen and (max-width: 500px) {
+    div.hero-title1{
+        display: flex !important;
+    }
+}
+@media screen and (min-width: 400px) {
+    div.hero-title1{
+        font-size: 9vw !important;
+        line-height: 50px !important;
+    }
+}
+@media screen and (min-width: 500px) {
+    div.hero-title2{
+        display: flex !important;
+    }
+}
+
 @media screen and (max-width: 809.98px) {
     section.hero{
         gap: 32px;

@@ -7,7 +7,7 @@ import type { Prisma } from "@prisma/client"
 export async function getUserByEmail(email: string): Promise<User | null> {
   try {
     const user = await prisma.user.findUnique({
-      where: { email },
+      where: { email: email.toLowerCase() },
       include: {
         preferences: {
           include: {
@@ -22,14 +22,14 @@ export async function getUserByEmail(email: string): Promise<User | null> {
     return {
       id: user.id,
       email: user.email,
-      name: user.name,
+      name: user.name || "",
       role: user.role.toLowerCase() as "admin" | "customer",
-      phone: user.phone ?? undefined,
-      password: user.password ?? undefined,
-      provider: user.provider ?? undefined,
-      providerId: user.providerId ?? undefined,
-      emailVerified: user.emailVerified,
-      image: user.image ?? undefined,
+      phone: user.phone || undefined,
+      password: user.password || undefined,
+      provider: user.provider || undefined,
+      providerId: user.providerId || undefined,
+      emailVerified: user.emailVerified?.toISOString() || undefined,
+      image: user.image || undefined,
       preferences: user.preferences
         ? {
             savedSearches: user.preferences.savedSearches.map((search) => ({
@@ -39,14 +39,14 @@ export async function getUserByEmail(email: string): Promise<User | null> {
               alertsEnabled: search.alertsEnabled,
               createdAt: search.createdAt.toISOString(),
             })),
-            favoriteCarIds: [], // Will be populated separately
+            favoriteCarIds: [],
             notifications: {
               email: user.preferences.emailNotifications,
               sms: user.preferences.smsNotifications,
               priceAlerts: user.preferences.priceAlerts,
               newArrivals: user.preferences.newArrivals,
             },
-            maxPrice: user.preferences.maxPrice ?? undefined,
+            maxPrice: user.preferences.maxPrice || undefined,
             preferredMakes: user.preferences.preferredMakes,
             preferredFuelTypes: user.preferences.preferredFuelTypes,
           }
@@ -78,14 +78,14 @@ export async function getUserById(id: string): Promise<User | null> {
     return {
       id: user.id,
       email: user.email,
-      name: user.name,
+      name: user.name || "",
       role: user.role.toLowerCase() as "admin" | "customer",
-      phone: user.phone ?? undefined,
-      password: user.password ?? undefined,
-      provider: user.provider ?? undefined,
-      providerId: user.providerId ?? undefined,
-      emailVerified: user.emailVerified,
-      image: user.image ?? undefined,
+      phone: user.phone || undefined,
+      password: user.password || undefined,
+      provider: user.provider || undefined,
+      providerId: user.providerId || undefined,
+      emailVerified: user.emailVerified?.toISOString() || undefined,
+      image: user.image || undefined,
       preferences: user.preferences
         ? {
             savedSearches: user.preferences.savedSearches.map((search) => ({
@@ -95,14 +95,14 @@ export async function getUserById(id: string): Promise<User | null> {
               alertsEnabled: search.alertsEnabled,
               createdAt: search.createdAt.toISOString(),
             })),
-            favoriteCarIds: [], // Will be populated separately
+            favoriteCarIds: [],
             notifications: {
               email: user.preferences.emailNotifications,
               sms: user.preferences.smsNotifications,
               priceAlerts: user.preferences.priceAlerts,
               newArrivals: user.preferences.newArrivals,
             },
-            maxPrice: user.preferences.maxPrice ?? undefined,
+            maxPrice: user.preferences.maxPrice || undefined,
             preferredMakes: user.preferences.preferredMakes,
             preferredFuelTypes: user.preferences.preferredFuelTypes,
           }
@@ -130,14 +130,14 @@ export async function createUser(userData: {
 
     const user = await prisma.user.create({
       data: {
-        email: userData.email,
+        email: userData.email.toLowerCase(),
         name: userData.name,
         role: (userData.role?.toUpperCase() as "ADMIN" | "CUSTOMER") || "CUSTOMER",
-        phone: userData.phone,
-        password: hashedPassword,
-        provider: userData.provider,
-        providerId: userData.providerId,
-        emailVerified: userData.provider ? true : false,
+        phone: userData.phone || null,
+        password: hashedPassword || null,
+        provider: userData.provider || null,
+        providerId: userData.providerId || null,
+        emailVerified: userData.provider ? new Date() : null,
         preferences: {
           create: {
             emailNotifications: true,
@@ -146,6 +146,10 @@ export async function createUser(userData: {
             newArrivals: true,
             preferredMakes: [],
             preferredFuelTypes: [],
+            theme: "light",
+            language: "en",
+            timezone: "UTC",
+            currency: "USD",
           },
         },
       },
@@ -161,66 +165,14 @@ export async function createUser(userData: {
     return {
       id: user.id,
       email: user.email,
-      name: user.name,
+      name: user.name || "",
       role: user.role.toLowerCase() as "admin" | "customer",
-      phone: user.phone ?? undefined,
-      password: user.password ?? undefined,
-      provider: user.provider ?? undefined,
-      providerId: user.providerId ?? undefined,
-      emailVerified: user.emailVerified,
-      image: user.image ?? undefined,
-      preferences: {
-        savedSearches: [],
-        favoriteCarIds: [],
-        notifications: {
-          email: user.preferences!.emailNotifications,
-          sms: user.preferences!.smsNotifications,
-          priceAlerts: user.preferences!.priceAlerts,
-          newArrivals: user.preferences!.newArrivals,
-        },
-        maxPrice: user.preferences!.maxPrice ?? undefined,
-        preferredMakes: user.preferences!.preferredMakes,
-        preferredFuelTypes: user.preferences!.preferredFuelTypes,
-      },
-      createdAt: user.createdAt.toISOString(),
-      updatedAt: user.updatedAt.toISOString(),
-    }
-  } catch (error) {
-    console.error("Error creating user:", error)
-    throw new Error("Failed to create user")
-  }
-}
-
-export async function updateUser(id: string, userData: Partial<User>): Promise<User | null> {
-  try {
-    const user = await prisma.user.update({
-      where: { id },
-      data: {
-        name: userData.name,
-        phone: userData.phone,
-        emailVerified: userData.emailVerified,
-        image: userData.image,
-      },
-      include: {
-        preferences: {
-          include: {
-            savedSearches: true,
-          },
-        },
-      },
-    })
-
-    return {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role.toLowerCase() as "admin" | "customer",
-      phone: user.phone,
-      password: user.password,
-      provider: user.provider,
-      providerId: user.providerId,
-      emailVerified: user.emailVerified,
-      image: user.image ?? undefined,
+      phone: user.phone || undefined,
+      password: user.password || undefined,
+      provider: user.provider || undefined,
+      providerId: user.providerId || undefined,
+      emailVerified: user.emailVerified?.toISOString() || undefined,
+      image: user.image || undefined,
       preferences: user.preferences
         ? {
             savedSearches: user.preferences.savedSearches.map((search) => ({
@@ -237,7 +189,67 @@ export async function updateUser(id: string, userData: Partial<User>): Promise<U
               priceAlerts: user.preferences.priceAlerts,
               newArrivals: user.preferences.newArrivals,
             },
-            maxPrice: user.preferences.maxPrice ?? undefined,
+            maxPrice: user.preferences.maxPrice || undefined,
+            preferredMakes: user.preferences.preferredMakes,
+            preferredFuelTypes: user.preferences.preferredFuelTypes,
+          }
+        : undefined,
+      createdAt: user.createdAt.toISOString(),
+      updatedAt: user.updatedAt.toISOString(),
+    }
+  } catch (error) {
+    console.error("Error creating user:", error)
+    throw new Error("Failed to create user")
+  }
+}
+
+export async function updateUser(id: string, userData: Partial<User>): Promise<User | null> {
+  try {
+    const user = await prisma.user.update({
+      where: { id },
+      data: {
+        name: userData.name,
+        phone: userData.phone,
+        emailVerified: userData.emailVerified ? new Date(userData.emailVerified) : undefined,
+        image: userData.image,
+      },
+      include: {
+        preferences: {
+          include: {
+            savedSearches: true,
+          },
+        },
+      },
+    })
+
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name || "",
+      role: user.role.toLowerCase() as "admin" | "customer",
+      phone: user.phone || undefined,
+      password: user.password || undefined,
+      provider: user.provider || undefined,
+      providerId: user.providerId || undefined,
+      emailVerified: user.emailVerified?.toISOString() || undefined,
+      image: user.image || undefined,
+      preferences: user.preferences
+        ? {
+            savedSearches: user.preferences.savedSearches.map((search) => ({
+              id: search.id,
+              name: search.name,
+              filters: search.filters as any,
+              alertsEnabled: search.alertsEnabled,
+              createdAt: search.createdAt.toISOString(),
+            })),
+            favoriteCarIds: [],
+            notifications: {
+              email: user.preferences.emailNotifications,
+              sms: user.preferences.smsNotifications,
+              priceAlerts: user.preferences.priceAlerts,
+              newArrivals: user.preferences.newArrivals,
+            },
+            maxPrice: user.preferences.maxPrice || undefined,
             preferredMakes: user.preferences.preferredMakes,
             preferredFuelTypes: user.preferences.preferredFuelTypes,
           }
@@ -259,7 +271,7 @@ export async function getCars(filters?: any): Promise<Car[]> {
     }
 
     if (filters) {
-      if (filters.make) {
+      if (filters.make && filters.make !== "Any") {
         where.make = {
           contains: filters.make,
           mode: "insensitive",
@@ -271,10 +283,10 @@ export async function getCars(filters?: any): Promise<Car[]> {
       if (filters.maxPrice) {
         where.price = { ...where.price, lte: filters.maxPrice }
       }
-      if (filters.fuelType) {
+      if (filters.fuelType && filters.fuelType !== "Any") {
         where.fuelType = filters.fuelType.toUpperCase()
       }
-      if (filters.bodyType) {
+      if (filters.bodyType && filters.bodyType !== "Any") {
         where.bodyType = filters.bodyType.toUpperCase()
       }
     }
@@ -296,7 +308,7 @@ export async function getCars(filters?: any): Promise<Car[]> {
       transmission: (car.transmission.charAt(0) + car.transmission.slice(1).toLowerCase()) as any,
       bodyType: (car.bodyType.charAt(0) + car.bodyType.slice(1).toLowerCase()) as any,
       images: car.images,
-      description: car.description,
+      description: car.description || "",
       features: car.features,
       isAvailable: car.isAvailable,
       createdAt: car.createdAt.toISOString(),
@@ -328,7 +340,7 @@ export async function getCarById(id: string): Promise<Car | null> {
       transmission: (car.transmission.charAt(0) + car.transmission.slice(1).toLowerCase()) as any,
       bodyType: (car.bodyType.charAt(0) + car.bodyType.slice(1).toLowerCase()) as any,
       images: car.images,
-      description: car.description,
+      description: car.description || "",
       features: car.features,
       isAvailable: car.isAvailable,
       createdAt: car.createdAt.toISOString(),
@@ -344,7 +356,7 @@ export async function getFeaturedCars(): Promise<Car[]> {
   try {
     const cars = await prisma.car.findMany({
       where: {
-        isAvailable: true
+        isAvailable: true,
         // isFeatured: true,
       },
       take: 6,
@@ -363,7 +375,7 @@ export async function getFeaturedCars(): Promise<Car[]> {
       transmission: (car.transmission.charAt(0) + car.transmission.slice(1).toLowerCase()) as any,
       bodyType: (car.bodyType.charAt(0) + car.bodyType.slice(1).toLowerCase()) as any,
       images: car.images,
-      description: car.description,
+      description: car.description || "",
       features: car.features,
       isAvailable: car.isAvailable,
       createdAt: car.createdAt.toISOString(),
@@ -394,7 +406,7 @@ export async function getFavoriteCarsByUserId(userId: string): Promise<Car[]> {
       transmission: (fav.car.transmission.charAt(0) + fav.car.transmission.slice(1).toLowerCase()) as any,
       bodyType: (fav.car.bodyType.charAt(0) + fav.car.bodyType.slice(1).toLowerCase()) as any,
       images: fav.car.images,
-      description: fav.car.description,
+      description: fav.car.description || "",
       features: fav.car.features,
       isAvailable: fav.car.isAvailable,
       createdAt: fav.car.createdAt.toISOString(),
@@ -463,10 +475,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         id: inquiry.id,
         name: inquiry.name,
         email: inquiry.email,
-        phone: inquiry.phone,
+        phone: inquiry.phone || undefined,
         message: inquiry.message,
-        carId: inquiry.carId,
-        userId: inquiry.userId,
+        carId: inquiry.carId || undefined,
+        userId: inquiry.userId || undefined,
         status: inquiry.status.toLowerCase() as any,
         car: inquiry.car
           ? {
@@ -482,7 +494,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
                 inquiry.car.transmission.slice(1).toLowerCase()) as any,
               bodyType: (inquiry.car.bodyType.charAt(0) + inquiry.car.bodyType.slice(1).toLowerCase()) as any,
               images: inquiry.car.images,
-              description: inquiry.car.description,
+              description: inquiry.car.description || "",
               features: inquiry.car.features,
               isAvailable: inquiry.car.isAvailable,
               createdAt: inquiry.car.createdAt.toISOString(),
@@ -517,10 +529,10 @@ export async function getAllInquiries(): Promise<Inquiry[]> {
       id: inquiry.id,
       name: inquiry.name,
       email: inquiry.email,
-      phone: inquiry.phone,
+      phone: inquiry.phone || undefined,
       message: inquiry.message,
-      carId: inquiry.carId,
-      userId: inquiry.userId,
+      carId: inquiry.carId || undefined,
+      userId: inquiry.userId || undefined,
       status: inquiry.status.toLowerCase() as any,
       car: inquiry.car
         ? {
@@ -535,7 +547,7 @@ export async function getAllInquiries(): Promise<Inquiry[]> {
             transmission: (inquiry.car.transmission.charAt(0) + inquiry.car.transmission.slice(1).toLowerCase()) as any,
             bodyType: (inquiry.car.bodyType.charAt(0) + inquiry.car.bodyType.slice(1).toLowerCase()) as any,
             images: inquiry.car.images,
-            description: inquiry.car.description,
+            description: inquiry.car.description || "",
             features: inquiry.car.features,
             isAvailable: inquiry.car.isAvailable,
             createdAt: inquiry.car.createdAt.toISOString(),
@@ -580,14 +592,14 @@ export async function getAllUsers(): Promise<User[]> {
     return users.map((user) => ({
       id: user.id,
       email: user.email,
-      name: user.name,
+      name: user.name || "",
       role: user.role.toLowerCase() as "admin" | "customer",
-      phone: user.phone,
-      password: user.password,
-      provider: user.provider,
-      providerId: user.providerId,
-      emailVerified: user.emailVerified,
-      image: user.image,
+      phone: user.phone || undefined,
+      password: user.password || undefined,
+      provider: user.provider || undefined,
+      providerId: user.providerId || undefined,
+      emailVerified: user.emailVerified?.toISOString() || undefined,
+      image: user.image || undefined,
       preferences: user.preferences
         ? {
             savedSearches: user.preferences.savedSearches.map((search) => ({
@@ -604,7 +616,7 @@ export async function getAllUsers(): Promise<User[]> {
               priceAlerts: user.preferences.priceAlerts,
               newArrivals: user.preferences.newArrivals,
             },
-            maxPrice: user.preferences.maxPrice ?? undefined,
+            maxPrice: user.preferences.maxPrice || undefined,
             preferredMakes: user.preferences.preferredMakes,
             preferredFuelTypes: user.preferences.preferredFuelTypes,
           }
@@ -650,7 +662,7 @@ export async function addCar(carData: Omit<Car, "id" | "createdAt" | "updatedAt"
       transmission: (car.transmission.charAt(0) + car.transmission.slice(1).toLowerCase()) as any,
       bodyType: (car.bodyType.charAt(0) + car.bodyType.slice(1).toLowerCase()) as any,
       images: car.images,
-      description: car.description,
+      description: car.description || "",
       features: car.features,
       isAvailable: car.isAvailable,
       createdAt: car.createdAt.toISOString(),
@@ -695,7 +707,7 @@ export async function updateCar(id: string, carData: Partial<Car>): Promise<Car 
       transmission: (car.transmission.charAt(0) + car.transmission.slice(1).toLowerCase()) as any,
       bodyType: (car.bodyType.charAt(0) + car.bodyType.slice(1).toLowerCase()) as any,
       images: car.images,
-      description: car.description,
+      description: car.description || "",
       features: car.features,
       isAvailable: car.isAvailable,
       createdAt: car.createdAt.toISOString(),
@@ -746,10 +758,10 @@ export async function createInquiry(inquiryData: {
       id: inquiry.id,
       name: inquiry.name,
       email: inquiry.email,
-      phone: inquiry.phone,
+      phone: inquiry.phone || undefined,
       message: inquiry.message,
-      carId: inquiry.carId,
-      userId: inquiry.userId,
+      carId: inquiry.carId || undefined,
+      userId: inquiry.userId || undefined,
       status: inquiry.status.toLowerCase() as any,
       car: inquiry.car
         ? {
@@ -764,7 +776,7 @@ export async function createInquiry(inquiryData: {
             transmission: (inquiry.car.transmission.charAt(0) + inquiry.car.transmission.slice(1).toLowerCase()) as any,
             bodyType: (inquiry.car.bodyType.charAt(0) + inquiry.car.bodyType.slice(1).toLowerCase()) as any,
             images: inquiry.car.images,
-            description: inquiry.car.description,
+            description: inquiry.car.description || "",
             features: inquiry.car.features,
             isAvailable: inquiry.car.isAvailable,
             createdAt: inquiry.car.createdAt.toISOString(),

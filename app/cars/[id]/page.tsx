@@ -35,7 +35,6 @@ interface CarDetailPageProps {
   }
 }
 
-// Fetch car data on the client side
 async function getCarById(id: string): Promise<Car | null> {
   try {
     const response = await fetch(`/api/cars/${id}`)
@@ -47,15 +46,10 @@ async function getCarById(id: string): Promise<Car | null> {
   }
 }
 
-// Fetch similar cars
-async function getSimilarCars(carId: string, make: string, bodyType: string, priceRange: number): Promise<Car[]> {
+async function getSimilarCars(carId: string): Promise<Car[]> {
   try {
     const params = new URLSearchParams({
-      make,
-      bodyType,
-      minPrice: Math.max(0, priceRange - 10000).toString(),
-      maxPrice: (priceRange + 10000).toString(),
-      exclude: carId,
+      carId,
       limit: "6",
     })
 
@@ -103,7 +97,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
 
   const handleFavoriteToggle = async () => {
     if (!session) {
-      // Redirect to login
       window.location.href = "/auth/signin"
       return
     }
@@ -138,14 +131,12 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
         console.error("Error sharing:", error)
       }
     } else {
-      // Fallback to clipboard
       navigator.clipboard.writeText(window.location.href)
     }
   }
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (!isModalOpen) return
-
     switch (e.key) {
       case "Escape":
         handleModalClose()
@@ -164,20 +155,17 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
     return () => document.removeEventListener("keydown", handleKeyDown)
   }, [isModalOpen])
 
-  // Prevent body scroll when modal is open
   useEffect(() => {
     if (isModalOpen) {
       document.body.style.overflow = "hidden"
     } else {
       document.body.style.overflow = "unset"
     }
-
     return () => {
       document.body.style.overflow = "unset"
     }
   }, [isModalOpen])
 
-  // Check if car is favorited
   useEffect(() => {
     async function checkFavoriteStatus() {
       if (session && car) {
@@ -201,7 +189,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
       setLoading(false)
 
       if (carData) {
-        // Track view and get view count
         try {
           await fetch(`/api/cars/${params.id}/view`, { method: "POST" })
           const viewResponse = await fetch(`/api/cars/${params.id}/view`)
@@ -211,9 +198,8 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
           console.error("Error tracking view:", error)
         }
 
-        // Fetch similar cars
         setSimilarLoading(true)
-        const similar = await getSimilarCars(carData.id, carData.make, carData.bodyType, carData.price)
+        const similar = await getSimilarCars(carData.id)
         setSimilarCars(similar)
         setSimilarLoading(false)
       }
@@ -225,7 +211,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600text-blue-600 mx-auto"></div>
           <p className="mt-4 text-muted-foreground">Loading car details...</p>
         </div>
       </div>
@@ -256,7 +242,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
     <>
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Breadcrumb */}
           <nav className="mb-8">
             <ol className="flex items-center space-x-2 text-sm text-muted-foreground">
               <li>
@@ -278,7 +263,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
           </nav>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Image Gallery */}
             <div>
               <div
                 className="relative h-96 mb-4 rounded-lg overflow-hidden cursor-pointer hover:opacity-95 transition-opacity group"
@@ -292,19 +276,17 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   priority
                 />
-                <div className="absolute inset-0 hover:bg-background/60 transition-all duration-200 flex items-center justify-center">
+                <div className="absolute inset-0 bg-background/0 hover:bg-background/50 transition-all duration-200 flex items-center justify-center">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-background/50 text-foreground px-3 py-1 rounded text-sm">
                     Click to view full size
                   </div>
                 </div>
 
-                {/* Image counter */}
-                <div className="absolute bottom-4 right-4 bg-background bg-opacity-50 text-foreground px-2 py-1 rounded text-sm">
+                <div className="absolute bottom-4 right-4 bg-background/50 text-foreground px-2 py-1 rounded text-sm">
                   {currentImageIndex + 1} / {images.length}
                 </div>
               </div>
 
-              {/* Thumbnail Gallery */}
               {images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
                   {images.slice(0, 8).map((image, index) => (
@@ -325,7 +307,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                     </div>
                   ))}
 
-                  {/* Show more indicator if there are more than 8 images */}
                   {images.length > 8 && (
                     <div
                       className="relative h-20 rounded overflow-hidden bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors"
@@ -338,7 +319,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
               )}
             </div>
 
-            {/* Car Details */}
             <div>
               <div className="mb-6">
                 <div className="flex items-start justify-between mb-2">
@@ -377,7 +357,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                 <p className="text-4xl font-bold text-blue-600">{formatPrice(car.price)}</p>
               </div>
 
-              {/* Key Specs */}
               <Card className="mb-6">
                 <CardHeader>
                   <CardTitle>Key Specifications</CardTitle>
@@ -412,15 +391,14 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                 </CardContent>
               </Card>
 
-              {/* Contact Actions */}
               <div className="space-y-4">
-                <Button size="lg" className="w-full py-5.5 bg-blue-600 hover:bg-blue-500" asChild>
+                <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-500 py-5" asChild>
                   <Link href={`/contact?car=${car.id}`}>
                     <Mail className="h-4 w-4 mr-2" />
                     Request Information
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="w-full bg-transparent py-5.5" asChild>
+                <Button size="lg" variant="outline" className="w-full bg-transparent" asChild>
                   <Link href="tel:5551234567">
                     <Phone className="h-4 w-4 mr-2" />
                     Call (234) 8133531046
@@ -430,7 +408,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
             </div>
           </div>
 
-          {/* Description and Features */}
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card>
               <CardHeader>
@@ -452,7 +429,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   <ul className="space-y-2">
                     {car.features.map((feature, index) => (
                       <li key={index} className="flex items-center space-x-2">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                        <div className="w-2 h-2 bg-blue-600 text-blue-600 rounded-full"></div>
                         <span className="text-muted-foreground">{feature}</span>
                       </li>
                     ))}
@@ -464,7 +441,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
             </Card>
           </div>
 
-          {/* Similar Vehicles */}
           <div className="mt-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-foreground">Similar Vehicles</h2>
@@ -504,29 +480,25 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
         </div>
       </div>
 
-      {/* Full Screen Image Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-background bg-opacity-90 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 bg-background flex items-center justify-center">
           <div className="relative w-full h-full flex items-center justify-center p-4">
-            {/* Close Button */}
             <button
               onClick={handleModalClose}
-              className="absolute top-20 right-4 z-50 hover:bg-foreground/30 text-foreground p-2 rounded-full hover:bg-opacity-75 transition-all"
+              className="absolute top-8 right-4 z-10 bg-background/50 text-foreground p-2 rounded-full hover:bg-background/75 transition-all"
             >
               <X className="h-6 w-6" />
             </button>
 
-            {/* Previous Button */}
             {images.length > 1 && (
               <button
                 onClick={handlePrevImage}
-                className="absolute left-4 z-10 bg-background/80 bg-opacity-50 text-blue-600 p-2 rounded-full hover:bg-opacity-75 transition-all"
+                className="absolute left-4 z-10 bg-background/50 text-foreground p-2 rounded-full hover:bg-opacity-75 transition-all"
               >
                 <ChevronLeft className="h-6 w-6" />
               </button>
             )}
 
-            {/* Main Image */}
             <div className="relative max-w-6xl max-h-full">
               <Image
                 src={getModalImageUrl(images[currentImageIndex]) || "/placeholder.svg"}
@@ -538,33 +510,30 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
               />
             </div>
 
-            {/* Next Button */}
             {images.length > 1 && (
               <button
                 onClick={handleNextImage}
-                className="absolute right-4 z-10 bg-background/80 bg-opacity-50 text-blue-600 p-2 rounded-full hover:bg-opacity-75 transition-all"
+                className="absolute right-4 z-10 bg-background/50 text-foreground p-2 rounded-full hover:bg-opacity-75 transition-all"
               >
                 <ChevronRight className="h-6 w-6" />
               </button>
             )}
 
-            {/* Image Counter */}
             {images.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-foreground/20 bg-opacity-50 text-foreground px-4 py-2 rounded-full">
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-background/50 text-foreground px-4 py-2 rounded-full">
                 {currentImageIndex + 1} of {images.length}
               </div>
             )}
 
-            {/* Thumbnail Navigation */}
             {images.length > 1 && (
-              <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex space-x-2 max-w-full overflow-x-auto px-4 custom-scrollbar">
+              <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex space-x-2 max-w-full overflow-x-auto px-4">
                 {images.map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentImageIndex(index)}
                     className={`relative w-16 h-12 rounded overflow-hidden flex-shrink-0 transition-all ${
                       index === currentImageIndex
-                        ? "ring-2 ring-foreground ring-offset-2 ring-offset-black"
+                        ? "ring-2 ring-blue-600 ring-offset-2 ring-offset-black"
                         : "opacity-60 hover:opacity-100"
                     }`}
                   >
@@ -581,7 +550,6 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
             )}
           </div>
         </div>
-        
       )}
     </>
   )
