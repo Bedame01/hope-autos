@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         react: ForgotPasswordEmail({
           name: user.name || "User",
           resetUrl,
-        }),
+        } as any),
       })
 
       console.log(`Password reset email sent to ${user.email}`)

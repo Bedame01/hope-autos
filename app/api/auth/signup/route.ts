@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { emailService } from "@/lib/email-service"
 import bcrypt from "bcryptjs"
 
 export async function POST(request: NextRequest) {
@@ -34,6 +35,7 @@ export async function POST(request: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
+
     // Create user with preferences
     const user = await prisma.user.create({
       data: {
@@ -61,6 +63,11 @@ export async function POST(request: NextRequest) {
       include: {
         preferences: true,
       },
+    })
+
+    // Send welcome email (non-blocking, but you can await if you want to handle errors)
+    emailService.sendWelcomeEmail(user.email).catch((err) => {
+      console.error("Failed to send welcome email:", err)
     })
 
     // Remove password from response

@@ -1,8 +1,13 @@
 import { Resend } from "resend"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+if (!process.env.RESEND_API_KEY) {
+  console.warn("⚠️  RESEND_API_KEY is not set. Email service will not work.")
+}
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@hope-autos.com"
-const COMPANY_NAME = "Hope Autos"
+export const resend = new Resend(process.env.RESEND_API_KEY || "")
 
-export { resend, FROM_EMAIL, COMPANY_NAME }
+export const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev"
+
+export const isEmailServiceConfigured = () => {
+  return !!process.env.RESEND_API_KEY && process.env.RESEND_API_KEY !== ""
+}

@@ -61,6 +61,7 @@ export const authOptions: NextAuthOptions = {
                 response_type: "code",
               },
             },
+            allowDangerousEmailAccountLinking: true,
           }),
         ]
       : []),
@@ -95,12 +96,22 @@ export const authOptions: NextAuthOptions = {
     },
 
     async signIn({ user, account, profile, email, credentials }) {
-      // Allow OAuth sign-ins
-      if (account?.provider === "google") {
-        try {
+      try {
+        // Allow credentials sign-in
+        if (account?.provider === "credentials") {
+          return true
+        }
+
+        // Handle Google OAuth sign-in
+        if (account?.provider === "google") {
+          if (!user.email) {
+            console.error("No email from Google OAuth")
+            return "/auth/error?error=no_email"
+          }
+
           // Check if user already exists with this email
           const existingUser = await prisma.user.findUnique({
-            where: { email: user.email! },
+            where: { email: user.email },
           })
 
           if (existingUser) {
@@ -129,29 +140,21 @@ export const authOptions: NextAuthOptions = {
                   session_state: account.session_state,
                 },
               })
-
-              // Update user profile with Google info if needed
-              await prisma.user.update({
-                where: { id: existingUser.id },
-                data: {
-                  image: user.image || existingUser.image,
-                  emailVerified: true,
-                },
-              })
             }
 
-            // Return true to allow sign in
             return true
-          } else {
-            // Create new user for Google OAuth
+          }
+
+          // Create new user for Google OAuth
+          try {
             await prisma.user.create({
               data: {
-                email: user.email!,
-                name: user.name!,
+                email: user.email,
+                name: user.name || "User",
                 role: "CUSTOMER",
                 provider: account.provider,
                 providerId: account.providerAccountId,
-                emailVerified: true,
+                emailVerified: new Date(),
                 image: user.image,
                 preferences: {
                   create: {
@@ -161,25 +164,27 @@ export const authOptions: NextAuthOptions = {
                     newArrivals: true,
                     preferredMakes: [],
                     preferredFuelTypes: [],
+                    theme: "light",
+                    language: "en",
+                    timezone: "UTC",
+                    currency: "USD",
                   },
                 },
               },
             })
+          } catch (createError) {
+            console.error("Error creating user from Google OAuth:", createError)
+            return "/auth/error?error=user_creation_failed"
           }
 
           return true
-        } catch (error) {
-          console.error("Google OAuth sign-in error:", error)
-          return false
         }
-      }
 
-      // Allow credentials sign-in
-      if (account?.provider === "credentials") {
         return true
+      } catch (error) {
+        console.error("Sign in callback error:", error)
+        return "/auth/error?error=signin_failed"
       }
-
-      return true
     },
   },
 

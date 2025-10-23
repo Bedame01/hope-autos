@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Car, Shield, ArrowLeft, LogOut } from "lucide-react"
+import logoBlack from '@/public/icons/logo-black.png'
+import Image from "next/image"
 
 export default function UnauthorizedPage() {
   const { data: session } = useSession()
@@ -15,13 +17,12 @@ export default function UnauthorizedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen from-purple-50 to-blue-50 dark:from-background dark:to-[#1e1f1e] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <Link href="/" className="flex items-center justify-center space-x-2 mb-6">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">Hope Autos</span>
+          <Link href="/" className="flex justify-center mb-2">
+            <Image src={logoBlack} alt='logo' className="size-12" />
           </Link>
         </div>
 

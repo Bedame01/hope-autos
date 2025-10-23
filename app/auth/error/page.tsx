@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Car, AlertTriangle, ArrowLeft } from "lucide-react"
+import logoBlack from '@/public/icons/logo-black.png'
+import Image from "next/image"
 
 const errorMessages = {
   Configuration: "There is a problem with the server configuration.",
@@ -56,13 +58,12 @@ export default function AuthErrorPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen from-purple-50 to-blue-50 dark:from-background dark:to-[#1e1f1e] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">
-          <Link href="/" className="flex items-center justify-center space-x-2 mb-6">
-            <Car className="h-8 w-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">Hope Autos</span>
+          <Link href="/" className="flex justify-center mb-2">
+            <Image src={logoBlack} alt='logo' className="size-12" />
           </Link>
         </div>
 
@@ -70,7 +71,7 @@ export default function AuthErrorPage() {
           <CardHeader>
             <div className="flex items-center space-x-2">
               <AlertTriangle className="h-5 w-5 text-red-500" />
-              <CardTitle className="text-red-900">{getErrorTitle(error)}</CardTitle>
+              <CardTitle className="text-red-800">{getErrorTitle(error)}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -103,7 +104,7 @@ export default function AuthErrorPage() {
             </div>
 
             <div className="text-center">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-color">
                 Need help?{" "}
                 <Link href="/contact" className="font-medium text-blue-600 hover:text-blue-500">
                   Contact Support
