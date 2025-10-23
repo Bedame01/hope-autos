@@ -73,7 +73,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className={`hover:text-blue-600 px-1 lg:px-3 py-2 text-sm font-medium transition-colors ${pathname === item.href ? 'text-blue-600' : 'text-[var(--primary)]'}`}
+                className={`hover:text-blue-600 px-1 lg:px-3 py-2 text-sm font-medium transition-colors ${pathname === item.href ? 'text-blue-600 text-base' : 'text-[var(--primary)]'}`}
               >
                 {item.name}
               </Link>
@@ -176,7 +176,7 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`hover:text-blue-600 block px-3 py-2 text-base font-medium ${pathname === item.href ? 'text-blue-600' : 'text-[var(--primary)]'}`}
+                  className={`hover:text-blue-600 block px-3 py-2 text-base font-medium ${pathname === item.href ? 'text-blue-600 text-lg' : 'text-[var(--primary)]'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
