@@ -3,7 +3,7 @@
 import Image from "next/image"
 import './hero.css'
 
-import heroCar from '@/public/image/herocar2.jpg'
+import heroCar from '@/public/image/herocar5.jpg'
 import BlurText from '@/Reactbits/BlurText/BlurText'
 // import CustomButton from "../CustomButton"
 import Link from "next/link"
@@ -68,7 +68,7 @@ const Hero = () => {
 
                 <div className="hero-btn flex items-center justify-center max-sm:flex-col gap-4 md:gap-6">
                     <Link 
-                        className="flex items-center btn1 rounded-lg bg-[var(--primary)] text-white text-sm hover:bg-emerald-600 py-3.5 px-6.5 text-nowrap font-semibold"
+                        className="flex items-center btn1 rounded-lg bg-[var(--primary)] text-white text-sm hover:bg-emerald-600 py-4 px-6.5 text-nowrap font-semibold"
                         href='/cars'
                     >
                         Browse Inventory
@@ -80,7 +80,7 @@ const Hero = () => {
                         </svg>
                     </Link>
                     <Link 
-                        className="flex items-center font-semibold hero-btn2 rounded-lg border-white text-sm py-3.5 px-12.5 text-nowrap"
+                        className="flex items-center font-semibold hero-btn2 rounded-lg border-white text-sm py-4 px-12.5 text-nowrap"
                         href='/contact'
                     >
                         Get Quote

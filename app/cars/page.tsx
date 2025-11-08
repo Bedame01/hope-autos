@@ -130,7 +130,7 @@ export default function CarsPage() {
         </div>
 
         {/* Search Bar */}
-        <Card className="mb-6 py-2">
+        {/* <Card className="mb-6 py-2">
           <CardContent className="">
             <div className="search-input-container">
               <div className="relative">
@@ -157,7 +157,7 @@ export default function CarsPage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Filters */}
         <Card className="mb-8">

@@ -58,7 +58,7 @@ export default function Header() {
   }
 
   return (
-    <header className={`bg-white border-b border-[var(--border-line)] sticky top-0 z-50 ${scrolled ? 'backdrop-blur supports-[backdrop-filter]:bg-background/65' : ''}`} >
+    <header className={`bg-white border-b border-[var(--border-line)] sticky top-0 z-50 `}>
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -169,9 +169,9 @@ export default function Header() {
         </div>
 
         {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden shadow-lg w-full min-h-screen bg-[var(--background)]/70 fixed top-15 left-0 z-50">
-            <div className="px-2 pt-5 pb-10 space-y-1 sm:px-3 bg-white border-t border-b border-[var(--border-line)]">
+        {/* {isMenuOpen && ( */}
+          <div className={`md:hidden shadow-lg w-full min-h-screen bg-[var(--background)]/70 fixed top-15 left-0 z-45 ${isMenuOpen ? 'top-0' : 'top-[-150%]'}`}>
+            <div className={`tranform px-2 pt-5 pb-10 space-y-1 sm:px-3 bg-white border-t border-b border-[var(--border-line)] ${isMenuOpen ? 'translate-y-0' : '-translate-y-[150%]'}`}>
               {navigation.map((item) => (
                 <Link
                   key={item.name}
@@ -236,7 +236,7 @@ export default function Header() {
               </div>
             </div>
           </div>
-        )}
+        {/* )} */}
       </nav>
     </header>
   )

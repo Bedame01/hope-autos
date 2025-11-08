@@ -222,6 +222,10 @@ body{
 } */
 
 /* #MENU TOGGLE ICON */
+header *{
+  transition: all .3s ease !important;
+}
+
 .s-header{
   --header-height: 7.2rem;
 }
