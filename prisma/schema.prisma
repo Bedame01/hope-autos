@@ -144,6 +144,7 @@ model Car {
   isFeatured   Boolean       @default(false)
   viewCount    Int           @default(0)
   vin          String?       @unique
+  creationRequestId String?  @unique
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 

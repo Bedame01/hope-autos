@@ -264,11 +264,9 @@ export async function updateUser(id: string, userData: Partial<User>): Promise<U
 }
 
 // Car functions
-export async function getCars(filters?: any): Promise<Car[]> {
+export async function getCars(filters?: any, includeUnavailable = false): Promise<Car[]> {
   try {
-    const where: Prisma.CarWhereInput = {
-      isAvailable: true,
-    }
+    const where: Prisma.CarWhereInput = includeUnavailable ? {} : { isAvailable: true }
 
     if (filters) {
       if (filters.make && filters.make !== "Any") {
@@ -630,10 +628,24 @@ export async function getAllUsers(): Promise<User[]> {
   }
 }
 
-export async function addCar(carData: Omit<Car, "id" | "createdAt" | "updatedAt">): Promise<Car> {
+export async function addCar(
+  carData: Omit<Car, "id" | "createdAt" | "updatedAt">,
+  creationRequestId?: string,
+): Promise<Car> {
   try {
+    if (creationRequestId) {
+      const existingCar = await prisma.car.findUnique({
+        where: { creationRequestId },
+      })
+
+      if (existingCar) {
+        return formatCar(existingCar)
+      }
+    }
+
     const car = await prisma.car.create({
       data: {
+        creationRequestId,
         make: carData.make,
         model: carData.model,
         year: carData.year,
@@ -650,27 +662,41 @@ export async function addCar(carData: Omit<Car, "id" | "createdAt" | "updatedAt"
       },
     })
 
-    return {
-      id: car.id,
-      make: car.make,
-      model: car.model,
-      year: car.year,
-      price: car.price,
-      mileage: car.mileage,
-      color: car.color,
-      fuelType: (car.fuelType.charAt(0) + car.fuelType.slice(1).toLowerCase()) as any,
-      transmission: (car.transmission.charAt(0) + car.transmission.slice(1).toLowerCase()) as any,
-      bodyType: (car.bodyType.charAt(0) + car.bodyType.slice(1).toLowerCase()) as any,
-      images: car.images,
-      description: car.description || "",
-      features: car.features,
-      isAvailable: car.isAvailable,
-      createdAt: car.createdAt.toISOString(),
-      updatedAt: car.updatedAt.toISOString(),
-    }
+    return formatCar(car)
   } catch (error) {
+    if (creationRequestId) {
+      const existingCar = await prisma.car.findUnique({
+        where: { creationRequestId },
+      })
+
+      if (existingCar) {
+        return formatCar(existingCar)
+      }
+    }
+
     console.error("Error adding car:", error)
     throw new Error("Failed to add car")
+  }
+}
+
+function formatCar(car: Prisma.CarGetPayload<{}>): Car {
+  return {
+    id: car.id,
+    make: car.make,
+    model: car.model,
+    year: car.year,
+    price: car.price,
+    mileage: car.mileage,
+    color: car.color,
+    fuelType: (car.fuelType.charAt(0) + car.fuelType.slice(1).toLowerCase()) as any,
+    transmission: (car.transmission.charAt(0) + car.transmission.slice(1).toLowerCase()) as any,
+    bodyType: (car.bodyType.charAt(0) + car.bodyType.slice(1).toLowerCase()) as any,
+    images: car.images,
+    description: car.description || "",
+    features: car.features,
+    isAvailable: car.isAvailable,
+    createdAt: car.createdAt.toISOString(),
+    updatedAt: car.updatedAt.toISOString(),
   }
 }
 

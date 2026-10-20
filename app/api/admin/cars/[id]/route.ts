@@ -1,9 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getCarById, updateCar, deleteCar } from "@/lib/db"
+import { isAdminRequest } from "@/lib/admin-auth"
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await isAdminRequest())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
-    const car = await getCarById(params.id)
+    const { id } = await params
+    const car = await getCarById(id)
 
     if (!car) {
       return NextResponse.json({ error: "Car not found" }, { status: 404 })
@@ -16,10 +22,15 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await isAdminRequest())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
+    const { id } = await params
     const carData = await request.json()
-    const updatedCar = await updateCar(params.id, carData)
+    const updatedCar = await updateCar(id, carData)
 
     if (!updatedCar) {
       return NextResponse.json({ error: "Car not found" }, { status: 404 })
@@ -32,9 +43,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await isAdminRequest())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
-    const success = await deleteCar(params.id)
+    const { id } = await params
+    const success = await deleteCar(id)
 
     if (!success) {
       return NextResponse.json({ error: "Car not found" }, { status: 404 })

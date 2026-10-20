@@ -12,6 +12,7 @@ import { ArrowLeft, Loader2, DollarSign } from "lucide-react"
 import Link from "next/link"
 import type { Car } from "@/lib/types"
 import ImageUpload from "../../components/ImageUpload"
+import VehicleQrControls from "../../components/VehicleQrControls"
 import { useCurrency } from "@/app/contexts/CurrencyContext"
 
 export default function EditCarPage() {
@@ -147,6 +148,8 @@ export default function EditCarPage() {
           </p>
         </div>
       </div>
+
+      <VehicleQrControls car={car} />
 
       <Card>
         <CardHeader>

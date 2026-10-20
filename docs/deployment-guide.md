@@ -119,6 +119,7 @@ vercel
 DATABASE_URL = your-production-database-url
 NEXTAUTH_SECRET = your-super-secret-key
 NEXTAUTH_URL = https://your-app-name.vercel.app
+NEXT_PUBLIC_BASE_URL = https://your-production-domain.example
 GOOGLE_CLIENT_ID = your-google-client-id (optional)
 GOOGLE_CLIENT_SECRET = your-google-client-secret (optional)
 CLOUDINARY_CLOUD_NAME = your-cloud-name (optional)
@@ -127,6 +128,12 @@ CLOUDINARY_API_SECRET = your-api-secret (optional)
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = your-cloud-name (optional)
 NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET = hope-autos-cars (optional)
 \`\`\`
+
+`NEXT_PUBLIC_BASE_URL` must be the canonical public site origin (HTTPS in production, without a path or query). Vehicle QR codes use this value with the permanent database vehicle ID; there is intentionally no localhost or preview-URL fallback.
+
+The QR retry protection adds a nullable unique `creationRequestId` column to the existing `cars` table. Apply the additive schema update with the project's existing Prisma deployment workflow (`npx prisma db push` or `pnpm exec prisma db push`) before deploying the new application code. A safe PostgreSQL-only SQL version is provided in [`../prisma/add-car-creation-request-id.sql`](../prisma/add-car-creation-request-id.sql); it adds the nullable column and unique index without altering existing vehicle records.
+
+For the complete QR deployment procedure, admin workflow, customer verification, security checks, and troubleshooting, see [Vehicle QR Codes: Setup and Operations](./VEHICLE_QR_SETUP.md).
 
 ### Step 4: Database Migration
 After deployment, run database migrations:

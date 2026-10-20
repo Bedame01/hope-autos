@@ -3,8 +3,7 @@
 /* @import "tailwindcss/preflight" */
 
 *{
-  font-family: "Rubik", sans-serif !important;
-  /* font-family: "Inter Tight", sans-serif !important; */
+  font-family: "ClashDisplay", sans-serif !important;
   font-optical-sizing: auto;
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
@@ -14,17 +13,183 @@
   src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('truetype');
   src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('woff');
   src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('woff2');
-
 }
+
 @font-face {
-  font-family: 'TestDomaine2';
-  src: url(../public/font/TestDomaineDisplayNarrow-SemiboldItalic-BF66174a221f430.otf) format('truetype');
-  src: url(../public/font/TestDomaineDisplayNarrow-SemiboldItalic-BF66174a221f430.otf) format('woff');
-  src: url(../public/font/TestDomaineDisplayNarrow-SemiboldItalic-BF66174a221f430.otf) format('woff2');
+  font-family: 'ClashDisplay';
+  src: url(../public/font/ClashDisplay-Variable.ttf) format("ttf");
+  src: url(../public/font/ClashDisplay-Variable.ttf) format("woff");
+  src: url(../public/font/ClashDisplay-Variable.ttf) format("woff2");
 }
 
 body{
   background-color: var(--background) !important;
+}
+
+.vehicle-qr-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 1rem;
+  background: rgb(0 0 0 / 60%);
+}
+
+.vehicle-qr-dialog {
+  width: min(100%, 42rem);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  border-radius: 0.75rem;
+  background: white;
+  padding: 1.5rem;
+  color: #111827;
+}
+
+.vehicle-qr-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.vehicle-qr-printable {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: #fff;
+  padding: 1rem;
+  text-align: center;
+}
+
+.vehicle-qr-logo {
+  width: 3rem;
+  height: 3rem;
+  object-fit: contain;
+}
+
+.vehicle-qr-brand {
+  color: #1d4ed8;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.vehicle-qr-printable h1 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.vehicle-qr-image {
+  display: block;
+  width: min(100%, 18rem);
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.vehicle-qr-image-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.vehicle-qr-instruction {
+  margin: 0.25rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.vehicle-qr-url {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: #4b5563;
+  font-size: 0.7rem;
+}
+
+.vehicle-qr-screen-actions {
+  margin-top: 1rem;
+}
+
+@media print {
+  @page {
+    size: 4in 6in;
+    margin: 0;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .vehicle-qr-backdrop,
+  .vehicle-qr-dialog,
+  .vehicle-qr-dialog * {
+    visibility: visible !important;
+  }
+
+  .vehicle-qr-backdrop {
+    position: static;
+    display: block;
+    overflow: visible;
+    padding: 0;
+    background: #fff;
+  }
+
+  .vehicle-qr-dialog {
+    position: static;
+    width: 4in;
+    max-height: none;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+
+  .vehicle-qr-dialog-header,
+  .vehicle-qr-screen-actions {
+    display: none !important;
+  }
+
+  .vehicle-qr-printable {
+    box-sizing: border-box;
+    width: 4in;
+    height: 6in;
+    justify-content: center;
+    gap: 0.2in;
+    border: 0;
+    border-radius: 0;
+    padding: 0.35in;
+  }
+
+  .vehicle-qr-logo {
+    width: 0.6in;
+    height: 0.6in;
+  }
+
+  .vehicle-qr-printable h1 {
+    font-size: 19pt;
+  }
+
+  .vehicle-qr-image {
+    width: 3in;
+    height: 3in;
+  }
+
+  .vehicle-qr-instruction {
+    font-size: 15pt;
+  }
+
+  .vehicle-qr-url {
+    font-size: 7pt;
+  }
 }
 
 @custom-variant dark (&:is(.dark *));

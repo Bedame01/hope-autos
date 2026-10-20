@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,12 +11,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ArrowLeft, DollarSign } from "lucide-react"
 import Link from "next/link"
 import ImageUpload from "../components/ImageUpload"
+import VehicleQrControls from "../components/VehicleQrControls"
 import { useCurrency } from "@/app/contexts/CurrencyContext"
+import type { Car } from "@/lib/types"
 
 export default function NewCarPage() {
   const router = useRouter()
   const { currency, getCurrencySymbol, formatPrice } = useCurrency()
   const [loading, setLoading] = useState(false)
+  const [createdCar, setCreatedCar] = useState<Car | null>(null)
+  const idempotencyKey = useRef<string | null>(null)
   const [formData, setFormData] = useState({
     make: "",
     model: "",
@@ -38,6 +42,12 @@ export default function NewCarPage() {
     setLoading(true)
 
     try {
+      const storageKey = "hope-autos-car-create-key"
+      const requestKey =
+        idempotencyKey.current || sessionStorage.getItem(storageKey) || crypto.randomUUID()
+      idempotencyKey.current = requestKey
+      sessionStorage.setItem(storageKey, requestKey)
+
       const carData = {
         ...formData,
         features: formData.features
@@ -51,12 +61,16 @@ export default function NewCarPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Idempotency-Key": requestKey,
         },
         body: JSON.stringify(carData),
       })
 
       if (response.ok) {
-        router.push("/admin/cars")
+        const savedCar: Car = await response.json()
+        sessionStorage.removeItem(storageKey)
+        idempotencyKey.current = null
+        setCreatedCar(savedCar)
       } else {
         const error = await response.json()
         alert(error.error || "Failed to add car")
@@ -93,7 +107,22 @@ export default function NewCarPage() {
         </div>
       </div>
 
-      <Card>
+      {createdCar ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Vehicle saved successfully</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-muted-foreground">
+              {createdCar.year} {createdCar.make} {createdCar.model} is in your inventory. Its QR code can be retried if generation fails.
+            </p>
+            <VehicleQrControls car={createdCar} autoOpen />
+            <Button type="button" variant="outline" onClick={() => router.push("/admin/cars")}>
+              Back to inventory
+            </Button>
+          </CardContent>
+        </Card>
+      ) : <Card>
         <CardHeader>
           <CardTitle>Car Details</CardTitle>
         </CardHeader>
@@ -285,7 +314,7 @@ export default function NewCarPage() {
             </div>
           </form>
         </CardContent>
-      </Card>
+      </Card>}
     </div>
   )
 }

@@ -1,9 +1,14 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getCars, addCar } from "@/lib/db"
+import { isAdminRequest } from "@/lib/admin-auth"
 
 export async function GET() {
+  if (!(await isAdminRequest())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
-    const cars = await getCars()
+    const cars = await getCars(undefined, true)
     return NextResponse.json(cars)
   } catch (error) {
     console.error("Error fetching cars:", error)
@@ -12,8 +17,17 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  if (!(await isAdminRequest())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const carData = await request.json()
+    const idempotencyKey = request.headers.get("Idempotency-Key")
+
+    if (!idempotencyKey || !/^[a-z0-9-]{16,64}$/i.test(idempotencyKey)) {
+      return NextResponse.json({ error: "A valid Idempotency-Key header is required" }, { status: 400 })
+    }
 
     // Validate required fields
     const requiredFields = [
@@ -33,7 +47,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const newCar = await addCar(carData)
+    const newCar = await addCar(carData, idempotencyKey)
     return NextResponse.json(newCar, { status: 201 })
   } catch (error) {
     console.error("Error adding car:", error)

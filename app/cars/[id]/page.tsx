@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { notFound } from "next/navigation"
+import { notFound, useParams } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
@@ -29,20 +29,19 @@ import type { Car } from "@/lib/types"
 import CarCard from "@/app/components/CarCard"
 import { useCurrency } from "@/app/contexts/CurrencyContext"
 
-interface CarDetailPageProps {
-  params: {
-    id: string
-  }
-}
-
-async function getCarById(id: string): Promise<Car | null> {
+async function getCarById(id: string): Promise<{ car: Car | null; error: string | null }> {
   try {
     const response = await fetch(`/api/cars/${id}`)
-    if (!response.ok) return null
-    return await response.json()
+    if (response.status === 400 || response.status === 404) {
+      return { car: null, error: null }
+    }
+    if (!response.ok) {
+      return { car: null, error: "Unable to load this vehicle. Please try again." }
+    }
+    return { car: await response.json(), error: null }
   } catch (error) {
     console.error("Error fetching car:", error)
-    return null
+    return { car: null, error: "Unable to load this vehicle. Check your connection and try again." }
   }
 }
 
@@ -62,10 +61,12 @@ async function getSimilarCars(carId: string): Promise<Car[]> {
   }
 }
 
-export default function CarDetailPage({ params }: CarDetailPageProps) {
+export default function CarDetailPage() {
+  const params = useParams<{ id: string }>()
   const { data: session } = useSession()
   const { formatPrice } = useCurrency()
   const [car, setCar] = useState<Car | null>(null)
+  const [loadError, setLoadError] = useState("")
   const [similarCars, setSimilarCars] = useState<Car[]>([])
   const [loading, setLoading] = useState(true)
   const [similarLoading, setSimilarLoading] = useState(false)
@@ -184,11 +185,12 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
   useEffect(() => {
     async function fetchData() {
       setLoading(true)
-      const carData = await getCarById(params.id)
-      setCar(carData)
+      const result = await getCarById(params.id)
+      setCar(result.car)
+      setLoadError(result.error || "")
       setLoading(false)
 
-      if (carData) {
+      if (result.car) {
         try {
           await fetch(`/api/cars/${params.id}/view`, { method: "POST" })
           const viewResponse = await fetch(`/api/cars/${params.id}/view`)
@@ -199,7 +201,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
         }
 
         setSimilarLoading(true)
-        const similar = await getSimilarCars(carData.id)
+        const similar = await getSimilarCars(result.car.id)
         setSimilarCars(similar)
         setSimilarLoading(false)
       }
@@ -211,8 +213,21 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600text-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-muted-foreground">Loading car details...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="max-w-md text-center" role="alert">
+          <p className="text-lg text-muted-foreground">{loadError}</p>
+          <Button className="mt-4" onClick={() => window.location.reload()}>
+            Try again
+          </Button>
         </div>
       </div>
     )
@@ -399,7 +414,7 @@ export default function CarDetailPage({ params }: CarDetailPageProps) {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="w-full bg-transparent" asChild>
-                  <Link href="tel:5551234567">
+                  <Link href="tel:+2348133531046">
                     <Phone className="h-4 w-4 mr-2" />
                     Call (234) 8133531046
                   </Link>

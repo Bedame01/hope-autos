@@ -16,11 +16,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import CustomButton from "@/components/ui/CustomButton"
 import MenuToggle from '@/components/ui/menuToggle'
 import { ThemeToggle } from "@/components/theme-toggle"
-
-import logoBlack from '@/public/icons/logo-black.png'
-// import logoWhite from '@/public/icons/logo-white.png'
-// import logoSystem from '@/public/icons/logo-system.png'
-import Image from "next/image"
+import { ThemeLogo } from '@/components/Theme-logo'
+// import Image from "next/image"
 import { useTheme } from "next-themes"
 import { usePathname } from "next/navigation"
 
@@ -62,9 +59,8 @@ export default function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Image src={logoBlack} alt='logo' className="w-6 h-auto" />
-            <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
+          <Link href="/" className="md:w-1/3! md:mx-auto flex justify-center items-center">
+            <ThemeLogo className="w-16" />
           </Link>
 
           {/* Desktop Navigation */}

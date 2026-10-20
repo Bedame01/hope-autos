@@ -108,4 +108,4 @@
 4. Plan future feature releases
 5. Scale based on usage patterns
 
-**Your live app:** `https://your-app-name.vercel.app`
+**Your live app:** `https://hope-autos.vercel.app`

@@ -1,11 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { Moon, Sun, Monitor } from "lucide-react"
+// import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
@@ -17,62 +16,27 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="outline" size="icon" disabled>
-        <Sun className="size-[1.2rem] max-sm:size-4 opacity-50" />
-        <span className="sr-only">Loading theme toggle</span>
+      <Button variant="ghost" size="icon" className="size-9 hover:bg-foreground/10 dark:hover:bg-foreground/10">
+        {/* <Sun className="size-4.5" /> */}
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Clear-Day--Streamline-Outlined-Material" height="24" width="24" className="size-5.5 fill-foreground">
+          <path fill="inherit" d="M11.25 4.75V1h1.5v3.75h-1.5Zm6.4 2.65 -1.05 -1.05 2.65 -2.675 1.05 1.075 -2.65 2.65Zm1.6 5.35v-1.5H23v1.5h-3.75ZM11.25 23v-3.75h1.5V23h-1.5Zm-4.925 -15.625L3.7 4.75l1.05 -1.05 2.65 2.65 -1.075 1.025Zm12.95 12.925 -2.675 -2.65 1.025 -1.025 2.7 2.6 -1.05 1.075ZM1 12.75v-1.5h3.75v1.5H1Zm3.775 7.55L3.7 19.25l2.625 -2.625 0.55 0.5 0.55 0.525 -2.65 2.65ZM12 18c-1.66665 0 -3.08335 -0.58335 -4.25 -1.75 -1.16665 -1.16665 -1.75 -2.58335 -1.75 -4.25 0 -1.66665 0.58335 -3.08335 1.75 -4.25 1.16665 -1.16665 2.58335 -1.75 4.25 -1.75 1.66665 0 3.08335 0.58335 4.25 1.75 1.16665 1.16665 1.75 2.58335 1.75 4.25 0 1.66665 -0.58335 3.08335 -1.75 4.25 -1.16665 1.16665 -2.58335 1.75 -4.25 1.75Zm0 -1.5c1.25 0 2.3125 -0.4375 3.1875 -1.3125S16.5 13.25 16.5 12s-0.4375 -2.3125 -1.3125 -3.1875S13.25 7.5 12 7.5s-2.3125 0.4375 -3.1875 1.3125S7.5 10.75 7.5 12s0.4375 2.3125 1.3125 3.1875S10.75 16.5 12 16.5Z" stroke-width="0.5"></path>
+        </svg>
+        <span className="sr-only">Toggle theme</span>
       </Button>
     )
   }
 
-  const getThemeIcon = () => {
-    switch (theme) {
-      case "dark":
-        return <Moon className="size-[1.2rem] max-sm:size-4 transition-all" />
-      case "light":
-        return <Sun className="size-[1.2rem] max-sm:size-4 transition-all" />
-      default:
-        return <Monitor className="size-[1.2rem] max-sm:size-4 transition-all" />
-    }
-  }
-
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          size="icon"
-          className="relative border-border hover:bg-accent hover:text-accent-foreground bg-transparent rounded-lg"
-        >
-          {getThemeIcon()}
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-40 bg-popover border-border" sideOffset={5}>
-        <DropdownMenuItem
-          onClick={() => setTheme("light")}
-          className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-        >
-          <Sun className="mr-2 size-4" />
-          <span>Light</span>
-          {theme === "light" && <span className="ml-auto text-xs">✓</span>}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setTheme("dark")}
-          className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-        >
-          <Moon className="mr-2 size-4" />
-          <span>Dark</span>
-          {theme === "dark" && <span className="ml-auto text-xs">✓</span>}
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setTheme("system")}
-          className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-        >
-          <Monitor className="mr-2 size-4" />
-          <span>System</span>
-          {theme === "system" && <span className="ml-auto text-xs">✓</span>}
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Button variant="ghost" size="icon" onClick={() => setTheme(theme === "dark" ? "light" : "dark")} className="hover:bg-foreground/10 dark:hover:bg-foreground/10">
+      {theme === "dark" ? 
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Dark-Mode--Streamline-Outlined-Material" height="24" width="24" className="size-5.5 fill-foreground">
+          <path fill="inherit" d="M12 21c-2.5 0 -4.625 -0.875 -6.375 -2.625S3 14.5 3 12s0.875 -4.625 2.625 -6.375S9.5 3 12 3c0.13335 0 0.275 0.004165 0.425 0.0125 0.15 0.008335 0.34165 0.020835 0.575 0.0375 -0.6 0.533335 -1.06665 1.191665 -1.4 1.975 -0.33335 0.78335 -0.5 1.60835 -0.5 2.475 0 1.5 0.525 2.775 1.575 3.825 1.05 1.05 2.325 1.575 3.825 1.575 0.86665 0 1.69165 -0.15415 2.475 -0.4625S20.41665 11.7 20.95 11.15c0.01665 0.2 0.02915 0.3625 0.0375 0.4875S21 11.88335 21 12c0 2.5 -0.875 4.625 -2.625 6.375S14.5 21 12 21Zm0 -1.5c1.81665 0 3.4 -0.5625 4.75 -1.6875s2.19165 -2.44585 2.525 -3.9625c-0.41665 0.18335 -0.8639 0.32085 -1.34175 0.4125 -0.47765 0.09165 -0.9554 0.1375 -1.43325 0.1375 -1.9115 0 -3.53935 -0.67215 -4.8835 -2.0165C10.27215 11.03935 9.6 9.4115 9.6 7.5c0 -0.4 0.04165 -0.82915 0.125 -1.2875 0.08335 -0.45835 0.23335 -0.97915 0.45 -1.5625 -1.63335 0.45 -2.9875 1.3625 -4.0625 2.7375C5.0375 8.7625 4.5 10.3 4.5 12c0 2.08335 0.72915 3.85415 2.1875 5.3125C8.14585 18.77085 9.91665 19.5 12 19.5Z" stroke-width="0.5"></path>
+        </svg> : 
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" id="Clear-Day--Streamline-Outlined-Material" height="24" width="24" className="size-5.5 fill-foreground">
+          <path fill="inherit" d="M11.25 4.75V1h1.5v3.75h-1.5Zm6.4 2.65 -1.05 -1.05 2.65 -2.675 1.05 1.075 -2.65 2.65Zm1.6 5.35v-1.5H23v1.5h-3.75ZM11.25 23v-3.75h1.5V23h-1.5Zm-4.925 -15.625L3.7 4.75l1.05 -1.05 2.65 2.65 -1.075 1.025Zm12.95 12.925 -2.675 -2.65 1.025 -1.025 2.7 2.6 -1.05 1.075ZM1 12.75v-1.5h3.75v1.5H1Zm3.775 7.55L3.7 19.25l2.625 -2.625 0.55 0.5 0.55 0.525 -2.65 2.65ZM12 18c-1.66665 0 -3.08335 -0.58335 -4.25 -1.75 -1.16665 -1.16665 -1.75 -2.58335 -1.75 -4.25 0 -1.66665 0.58335 -3.08335 1.75 -4.25 1.16665 -1.16665 2.58335 -1.75 4.25 -1.75 1.66665 0 3.08335 0.58335 4.25 1.75 1.16665 1.16665 1.75 2.58335 1.75 4.25 0 1.66665 -0.58335 3.08335 -1.75 4.25 -1.16665 1.16665 -2.58335 1.75 -4.25 1.75Zm0 -1.5c1.25 0 2.3125 -0.4375 3.1875 -1.3125S16.5 13.25 16.5 12s-0.4375 -2.3125 -1.3125 -3.1875S13.25 7.5 12 7.5s-2.3125 0.4375 -3.1875 1.3125S7.5 10.75 7.5 12s0.4375 2.3125 1.3125 3.1875S10.75 16.5 12 16.5Z" stroke-width="0.5"></path>
+        </svg>
+      }
+      <span className="sr-only">Toggle theme</span>
+    </Button>
   )
 }
