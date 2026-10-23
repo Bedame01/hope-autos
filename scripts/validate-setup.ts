@@ -11,7 +11,16 @@ config({ path: ".env.local" })
 
 const requiredEnvVars = ["DATABASE_URL", "NEXTAUTH_SECRET", "NEXTAUTH_URL"]
 
-const optionalEnvVars = ["GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET", "CLOUDINARY_API_KEY", "RESEND_API_KEY"]
+const optionalEnvVars = [
+  "GOOGLE_CLIENT_ID",
+  "GOOGLE_CLIENT_SECRET",
+  "CLOUDINARY_API_KEY",
+  "SMTP_HOST",
+  "SMTP_PORT",
+  "SMTP_USER",
+  "SMTP_PASSWORD",
+  "SMTP_FROM_EMAIL",
+]
 
 function validateSetup() {
   console.log("🔍 Validating setup configuration...")

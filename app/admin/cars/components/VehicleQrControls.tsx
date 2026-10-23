@@ -65,7 +65,7 @@ export default function VehicleQrControls({ car, autoOpen = false }: VehicleQrCo
 
   return (
     <>
-      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
+      <Button type="button" variant="outline" className="rounded-full" onClick={() => setOpen(true)}>
         <QrCode className="mr-2 h-4 w-4" />
         View QR code
       </Button>

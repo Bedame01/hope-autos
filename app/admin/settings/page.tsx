@@ -1,17 +1,15 @@
 "use client"
 
-import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Settings, Globe, DollarSign, Save, Check } from "lucide-react"
+import { Settings, Globe, DollarSign } from "lucide-react"
 import CurrencySettings from "../components/CurrencySettings"
 import useLanguage from "../../../hooks/useLanguage" // Declare the useLanguage hook
+import { useCurrency } from "@/app/contexts/CurrencyContext"
 
 export default function AdminSettingsPage() {
-  const { t, language, currency, setLanguage, setCurrency, formatPrice } = useLanguage()
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
+  const { language, currency } = useLanguage()
+  const { exchangeRate } = useCurrency()
 
   const languages = [
     { code: "en", name: "English", flag: "🇺🇸" },
@@ -21,74 +19,48 @@ export default function AdminSettingsPage() {
     { code: "zh", name: "中文", flag: "🇨🇳" },
   ]
 
-  const handleSave = async () => {
-    setSaving(true)
-
-    try {
-      // Save to API (you can implement this endpoint)
-      await fetch("/api/admin/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ language, currency }),
-      })
-
-      setSaved(true)
-      setTimeout(() => setSaved(false), 3000)
-    } catch (error) {
-      console.error("Error saving settings:", error)
-    } finally {
-      setSaving(false)
-    }
-  }
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center space-x-4">
-        <Settings className="h-8 w-8 text-primary" />
+    <div className="space-y-7">
+      <div className="flex items-center gap-4">
+        <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/10">
+          <Settings className="h-6 w-6 text-blue-600" />
+        </span>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Admin Settings</h1>
-          <p className="text-muted-foreground">Manage site currency and display settings</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Preferences</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Admin settings</h1>
+          <p className="mt-1 text-sm text-muted-foreground sm:text-base">Manage currency, language, and display settings.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Currency Settings */}
   <CurrencySettings />
 
-        {/* Additional Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Additional Settings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">More settings will be available here in future updates.</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Current Settings Summary */}
-      <Card>
+      <Card className="rounded-3xl border-border/80 shadow-sm">
         <CardHeader>
           <CardTitle>Current Settings</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-              <div className="flex items-center space-x-2">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/40 p-4">
+              <div className="flex items-center gap-2">
                 <Globe className="h-4 w-4 text-blue-600" />
                 <span className="text-blue-600">Language:</span>
               </div>
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="max-w-[60%] rounded-full">
                 {languages.find((l) => l.code === language)?.flag} {languages.find((l) => l.code === language)?.name}
               </Badge>
             </div>
 
-            <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-              <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/40 p-4">
+              <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-blue-600" />
                 <span className="text-blue-600">Currency:</span>
               </div>
-              <Badge variant="secondary">
+              <Badge variant="secondary" className="max-w-[60%] rounded-full">
                 {[
                   { code: "USD", name: "US Dollar", symbol: "$", flag: "🇺🇸" },
                   { code: "NGN", name: "Nigerian Naira", symbol: "₦", flag: "🇳🇳" }
@@ -102,30 +74,19 @@ export default function AdminSettingsPage() {
               </Badge>
             </div>
           </div>
+          <div className="mt-4 rounded-2xl border border-blue-600/15 bg-blue-600/5 p-4">
+            <p className="text-sm font-semibold text-foreground">Live USD price preview</p>
+            <p className="mt-1 text-sm leading-6 text-muted-foreground">
+              Vehicle editing recalculates the USD equivalent as the price changes, using the current reference rate of{" "}
+              <span className="font-medium text-foreground">
+                1 USD = ₦{exchangeRate.toLocaleString("en-NG")}
+              </span>
+              .
+            </p>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Save Button */}
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving} className="min-w-32">
-          {saving ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Saving...
-            </>
-          ) : saved ? (
-            <>
-              <Check className="h-4 w-4 mr-2" />
-              Saved!
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4 mr-2" />
-              {t("common.save")}
-            </>
-          )}
-        </Button>
-      </div>
     </div>
   )
 }

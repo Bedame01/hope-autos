@@ -41,8 +41,8 @@ NEXTAUTH_SECRET="your-generated-secret-here"
 
 #### Step 4: Test OAuth Setup
 \`\`\`bash
-npx ts-node scripts/diagnose-issues.ts
-npx ts-node scripts/verify-setup.ts
+pnpm diagnose-issue
+pnpm verify-setup
 \`\`\`
 
 ---
@@ -50,41 +50,40 @@ npx ts-node scripts/verify-setup.ts
 ## Issue 2: Email Delivery System Not Working
 
 ### Root Causes
-1. ❌ RESEND_API_KEY not set
-2. ❌ Invalid Resend email address
+1. ❌ SMTP settings are missing or incorrect
+2. ❌ Sender address is not authorized by the provider
 3. ❌ Email templates have errors
 4. ❌ Environment variables not loaded
 
 ### Solution
 
-#### Step 1: Get Resend API Key
-1. Go to [Resend.com](https://resend.com)
-2. Sign up for free account
-3. Go to API Keys in dashboard
-4. Copy your API key
+#### Step 1: Get SMTP Credentials
+Ask your email provider for the SMTP hostname, port, username, password, and authorized sender address.
 
 #### Step 2: Configure .env.local
 \`\`\`bash
-RESEND_API_KEY="re_your_key_here"
-RESEND_FROM_EMAIL="noreply@hopeautos.com"
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_SECURE="false"
+SMTP_USER="your-smtp-username"
+SMTP_PASSWORD="your-smtp-password"
+SMTP_FROM_EMAIL="Hope Autos <noreply@example.com>"
 NEXT_PUBLIC_BASE_URL="http://localhost:3000"
 \`\`\`
 
-#### Step 3: Verify Sender Email
-1. In Resend dashboard, go to Senders
-2. Add your sender email: `noreply@hopeautos.com`
-3. Verify the email (Resend sends verification link)
-4. Use same email in RESEND_FROM_EMAIL
+#### Step 3: Verify SMTP Access
+1. Confirm outbound SMTP is allowed from the app host.
+2. Use port `465` with `SMTP_SECURE=true` for implicit TLS, or port `587` with `SMTP_SECURE=false` for STARTTLS.
+3. Use a sender address authorized by your provider.
 
 #### Step 4: Test Email Service
 \`\`\`bash
-npx ts-node scripts/verify-setup.ts
+pnpm verify-setup
 \`\`\`
 
 #### Step 5: Check Email Logs
 The application will create logs in the console. Check for:
-- ✅ "Email service working correctly"
-- ✅ "Message ID: " with an ID
+- ✅ "SMTP server connection and authentication successful"
 
 ---
 
@@ -94,7 +93,7 @@ The application will create logs in the console. Check for:
 - [ ] Node.js 18+
 - [ ] PostgreSQL database
 - [ ] Google Cloud project
-- [ ] Resend account
+- [ ] SMTP email provider
 - [ ] Cloudinary account (for images)
 
 ### Environment Configuration
@@ -103,8 +102,7 @@ The application will create logs in the console. Check for:
 - [ ] Set `NEXTAUTH_SECRET` (generate new)
 - [ ] Set `NEXTAUTH_URL` (http://localhost:3000 for dev)
 - [ ] Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`
-- [ ] Set `RESEND_API_KEY`
-- [ ] Set `RESEND_FROM_EMAIL`
+- [ ] Set SMTP host, port, username, password, and sender address
 - [ ] Set `NEXT_PUBLIC_BASE_URL`
 
 ### Database Setup
@@ -119,9 +117,8 @@ The application will create logs in the console. Check for:
 - [ ] Test login at `/auth/signin`
 
 ### Email Setup
-- [ ] Create Resend account
-- [ ] Get API key
-- [ ] Verify sender email
+- [ ] Obtain SMTP credentials
+- [ ] Verify SMTP connection and sender address
 - [ ] Test email sending
 
 ### Verification
@@ -155,21 +152,21 @@ A: Ensure:
 ### Email Issues
 
 **Q: "Email service not configured" warning**
-A: Set RESEND_API_KEY in .env.local
+A: Set all required SMTP settings in .env.local
 
 **Q: "Failed to send email" error**
 A: Check:
-1. RESEND_API_KEY is valid
-2. RESEND_FROM_EMAIL is verified in Resend dashboard
+1. SMTP host, port, and credentials are valid
+2. SMTP_FROM_EMAIL is authorized by your provider
 3. Email is in correct format
 4. Recipient email is valid
 
 **Q: Emails not arriving**
 A: Check:
 1. Recipient email spam folder
-2. Sender email is verified in Resend
+2. Sender email is authorized by your provider
 3. Email domain is not blocked
-4. API rate limits (Resend free tier has limits)
+4. Provider sending limits or account restrictions
 
 ---
 
@@ -187,19 +184,10 @@ A: Check:
 3. Check console for email service logs
 4. Welcome email should be sent
 
-### Test Resend Delivery
-Use the test recipient to verify email delivery:
+### Test SMTP Delivery
+Verify the SMTP connection and then send a campaign to a controlled subscriber:
 \`\`\`bash
-npx ts-node -e "
-import { Resend } from 'resend'
-const resend = new Resend(process.env.RESEND_API_KEY)
-resend.emails.send({
-  from: process.env.RESEND_FROM_EMAIL,
-  to: 'delivered@resend.dev',
-  subject: 'Test',
-  html: '<p>Test</p>'
-}).then(console.log)
-"
+pnpm verify-setup
 \`\`\`
 
 ---
@@ -210,7 +198,7 @@ resend.emails.send({
 1. [ ] All environment variables set in hosting platform
 2. [ ] Database connection string points to production DB
 3. [ ] Google OAuth credentials configured for production domain
-4. [ ] Resend sender email verified for production domain
+4. [ ] SMTP sender address authorized for production domain
 5. [ ] NEXTAUTH_SECRET set to secure random value
 6. [ ] NODE_ENV set to "production"
 
@@ -226,8 +214,12 @@ NEXTAUTH_SECRET=<random-secure-secret>
 NEXTAUTH_URL=https://yourdomain.com
 GOOGLE_CLIENT_ID=<prod-google-id>
 GOOGLE_CLIENT_SECRET=<prod-google-secret>
-RESEND_API_KEY=<your-resend-key>
-RESEND_FROM_EMAIL=noreply@yourdomain.com
+SMTP_HOST=<your-smtp-host>
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=<your-smtp-username>
+SMTP_PASSWORD=<your-smtp-password>
+SMTP_FROM_EMAIL="Hope Autos <noreply@yourdomain.com>"
 NEXT_PUBLIC_BASE_URL=https://yourdomain.com
 CLOUDINARY_API_KEY=<your-key>
 CLOUDINARY_API_SECRET=<your-secret>

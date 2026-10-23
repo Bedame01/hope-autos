@@ -1,3 +1,6 @@
+import * as React from "react"
+import { Body, Button, Container, Head, Heading, Html, Link, Preview, Section, Text } from "@react-email/components"
+
 interface CarPreview {
   id: string
   make: string
@@ -16,88 +19,46 @@ interface NewArrivalEmailProps {
   currency: string
 }
 
-export const NewArrivalEmail = ({ name, cars, currency }: NewArrivalEmailProps) => {
-  const formatPrice = (price: number) => {
-    if (currency === "NGN") {
-      return `₦${price.toLocaleString()}`
-    }
-    return `$${(price / 100).toLocaleString()}`
-  }
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+
+export function NewArrivalEmail({ name, cars, currency }: NewArrivalEmailProps) {
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat(currency === "NGN" ? "en-NG" : "en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    }).format(price)
 
   return (
-    <div style={{ fontFamily: "Arial, sans-serif", maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
-      <div style={{ textAlign: "center", marginBottom: "30px" }}>
-        <h1 style={{ color: "#2563eb", fontSize: "28px", margin: "0" }}>🚗 New Vehicles Just In!</h1>
-      </div>
-
-      <div style={{ backgroundColor: "#f3f4f6", padding: "20px", borderRadius: "8px", marginBottom: "20px" }}>
-        <p style={{ fontSize: "16px", color: "#374151", margin: "0" }}>
-          Hi {name}, check out {cars.length} brand new vehicles that just arrived at Hope Autos!
-        </p>
-      </div>
-
-      {cars.map((car, index) => (
-        <div
-          key={car.id}
-          style={{
-            backgroundColor: "#ffffff",
-            border: "1px solid #e5e7eb",
-            borderRadius: "8px",
-            padding: "15px",
-            marginBottom: "15px",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: "10px" }}>
-            <div>
-              <h3 style={{ margin: "0 0 5px 0", color: "#1f2937" }}>
-                {car.year} {car.make} {car.model}
-              </h3>
-              <p style={{ margin: "0", color: "#6b7280", fontSize: "14px" }}>
-                {car.fuelType} • {car.transmission} • {car.bodyType}
-              </p>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <p style={{ margin: "0", color: "#2563eb", fontWeight: "bold", fontSize: "18px" }}>
-                {formatPrice(car.price)}
-              </p>
-              <p style={{ margin: "5px 0 0 0", color: "#6b7280", fontSize: "12px" }}>
-                {car.mileage.toLocaleString()} km
-              </p>
-            </div>
-          </div>
-        </div>
-      ))}
-
-      <div style={{ textAlign: "center", marginBottom: "20px" }}>
-        <a
-          href={`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/cars`}
-          style={{
-            display: "inline-block",
-            backgroundColor: "#2563eb",
-            color: "#ffffff",
-            padding: "12px 30px",
-            borderRadius: "6px",
-            textDecoration: "none",
-            fontWeight: "bold",
-            fontSize: "16px",
-          }}
-        >
-          Browse All Vehicles
-        </a>
-      </div>
-
-      <div style={{ fontSize: "12px", color: "#6b7280", textAlign: "center" }}>
-        <p>Hope Autos | Your Trusted Auto Dealership</p>
-        <p>
-          Don't want to receive these emails?{" "}
-          <a
-            href={`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/settings`}
-            style={{ color: "#2563eb" }}
-          >
-            Update your preferences
-          </a>
-        </p>
-      </div>
-    </div>
+    <Html>
+      <Head />
+      <Preview>{`${cars.length} new vehicles just arrived at Hope Autos.`}</Preview>
+      <Body style={{ backgroundColor: "#f3f4f6", fontFamily: "Arial, sans-serif", margin: 0, padding: "32px 0" }}>
+        <Container style={{ backgroundColor: "#ffffff", borderRadius: "12px", margin: "0 auto", maxWidth: "600px", padding: "32px" }}>
+          <Heading style={{ color: "#2563eb", fontSize: "26px" }}>New vehicles just arrived</Heading>
+          <Text style={{ color: "#374151", fontSize: "16px" }}>Hi {name}, take a look at our latest inventory:</Text>
+          {cars.map((car) => (
+            <Section key={car.id} style={{ border: "1px solid #e5e7eb", borderRadius: "8px", marginBottom: "12px", padding: "16px" }}>
+              <Heading as="h2" style={{ color: "#1f2937", fontSize: "18px", margin: "0 0 8px" }}>
+                {`${car.year} ${car.make} ${car.model}`}
+              </Heading>
+              <Text style={{ color: "#6b7280", fontSize: "14px" }}>
+                {`${car.fuelType} · ${car.transmission} · ${car.bodyType} · ${car.mileage.toLocaleString()} km`}
+              </Text>
+              <Text style={{ color: "#2563eb", fontSize: "18px", fontWeight: "bold" }}>{formatPrice(car.price)}</Text>
+              <Link href={`${baseUrl}/cars/${car.id}`} style={{ color: "#2563eb" }}>View vehicle</Link>
+            </Section>
+          ))}
+          <Section style={{ padding: "16px 0", textAlign: "center" }}>
+            <Button href={`${baseUrl}/cars`} style={{ backgroundColor: "#2563eb", borderRadius: "6px", color: "#ffffff", padding: "12px 24px", textDecoration: "none" }}>
+              Browse all vehicles
+            </Button>
+          </Section>
+          <Text style={{ color: "#6b7280", fontSize: "12px", textAlign: "center" }}>
+            Hope Autos | <Link href={`${baseUrl}/settings`} style={{ color: "#2563eb" }}>Manage email preferences</Link>
+          </Text>
+        </Container>
+      </Body>
+    </Html>
   )
 }

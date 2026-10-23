@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma"
-import { resend, FROM_EMAIL, isEmailServiceConfigured } from "@/lib/email"
+import { isEmailServiceConfigured, sendEmail } from "@/lib/email"
 import { WelcomeEmail } from "@/app/emails/welcome-email"
 import { ForgotPasswordEmail } from "@/app/emails/forgot-password-email"
 import { PriceAlertEmail } from "@/app/emails/price-alert-email"
@@ -21,19 +21,13 @@ export const emailService = {
         return { success: false, error: "User not found" }
       }
 
-      const result = await resend.emails.send({
-        from: FROM_EMAIL,
+      const result = await sendEmail({
         to: user.email,
         subject: "Welcome to Hope Autos",
         react: WelcomeEmail({ name: user.name || "User", email: user.email }),
       })
 
-      if (result.error) {
-        console.error("Error sending welcome email:", result.error)
-        return { success: false, error: result.error.message }
-      }
-
-      return { success: true, messageId: result.data?.id }
+      return { success: true, messageId: result.messageId }
     } catch (error) {
       console.error("Error in sendWelcomeEmail:", error)
       return { success: false, error: String(error) }
@@ -57,19 +51,13 @@ export const emailService = {
 
       const resetLink = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/reset-password?token=${resetToken}`
 
-      const result = await resend.emails.send({
-        from: FROM_EMAIL,
+      const result = await sendEmail({
         to: user.email,
         subject: "Password Reset Request - Hope Autos",
         react: ForgotPasswordEmail({ name: user.name || "User", resetLink }),
       })
 
-      if (result.error) {
-        console.error("Error sending password reset email:", result.error)
-        return { success: false, error: result.error.message }
-      }
-
-      return { success: true, messageId: result.data?.id }
+      return { success: true, messageId: result.messageId }
     } catch (error) {
       console.error("Error in sendPasswordResetEmail:", error)
       return { success: false, error: String(error) }
@@ -121,8 +109,7 @@ export const emailService = {
         }
 
         try {
-          const result = await resend.emails.send({
-            from: FROM_EMAIL,
+          await sendEmail({
             to: fav.user.email,
             subject: `Price Drop Alert! ${car.year} ${car.make} ${car.model}`,
             react: PriceAlertEmail({
@@ -138,12 +125,7 @@ export const emailService = {
             }),
           })
 
-          if (result.error) {
-            console.error(`Failed to send price alert to ${fav.user.email}:`, result.error)
-            failed++
-          } else {
-            sent++
-          }
+          sent++
         } catch (error) {
           console.error(`Exception sending price alert to ${fav.user.email}:`, error)
           failed++
@@ -196,8 +178,7 @@ export const emailService = {
 
       for (const user of users) {
         try {
-          const result = await resend.emails.send({
-            from: FROM_EMAIL,
+          await sendEmail({
             to: user.email,
             subject: `🚗 New Vehicles Arrived at Hope Autos - ${cars.length} New Cars!`,
             react: NewArrivalEmail({
@@ -217,12 +198,7 @@ export const emailService = {
             }),
           })
 
-          if (result.error) {
-            console.error(`Failed to send new arrivals to ${user.email}:`, result.error)
-            failed++
-          } else {
-            sent++
-          }
+          sent++
         } catch (error) {
           console.error(`Exception sending new arrivals to ${user.email}:`, error)
           failed++

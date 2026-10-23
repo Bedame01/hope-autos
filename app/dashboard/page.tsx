@@ -1,372 +1,205 @@
 "use client"
 
+import { useCallback, useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { ArrowRight, Heart, Loader2, MessageSquare, RefreshCw } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Heart, MessageSquare, Search, Settings, Car, TrendingUp, Clock } from "lucide-react"
-import type { Car as CarType, Inquiry } from "@/lib/types"
-
-interface DashboardStats {
-  favoriteCount: number
-  activeInquiries: number
-  savedSearches: number
-  recentlyViewed: number
-}
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import type { Car, Inquiry } from "@/lib/types"
+import CarCard from "@/app/components/CarCard"
 
 export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
-  const [favoritesCars, setFavoriteCars] = useState<CarType[]>([])
-  const [userInquiries, setUserInquiries] = useState<Inquiry[]>([])
-  const [stats, setStats] = useState<DashboardStats>({
-    favoriteCount: 0,
-    activeInquiries: 0,
-    savedSearches: 0,
-    recentlyViewed: 0,
-  })
+  const [favoriteCars, setFavoriteCars] = useState<Car[]>([])
+  const [inquiries, setInquiries] = useState<Inquiry[]>([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState("")
+
+  const refreshData = useCallback(async (background = false) => {
+    if (background) setRefreshing(true)
+    else setLoading(true)
+    setError("")
+
+    try {
+      const [favoritesResponse, inquiriesResponse] = await Promise.all([
+        fetch("/api/user/favorites", { cache: "no-store" }),
+        fetch("/api/user/inquiries", { cache: "no-store" }),
+      ])
+      const [favoritesData, inquiriesData] = await Promise.all([
+        favoritesResponse.json(),
+        inquiriesResponse.json(),
+      ])
+
+      if (!favoritesResponse.ok) throw new Error(favoritesData.error || "Unable to load favorites.")
+      if (!inquiriesResponse.ok) throw new Error(inquiriesData.error || "Unable to load inquiries.")
+
+      setFavoriteCars(favoritesData)
+      setInquiries(inquiriesData)
+    } catch (loadError) {
+      console.error("Error loading dashboard data:", loadError)
+      setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard data.")
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }, [])
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/auth/signin")
+      router.push("/auth/signin?callbackUrl=/dashboard")
     } else if (status === "authenticated") {
-      fetchUserData()
+      void refreshData()
     }
-  }, [status, router])
+  }, [status, router, refreshData])
 
-  const fetchUserData = async () => {
-    try {
-      // Fetch favorite cars
-      const favoritesResponse = await fetch(`/api/user/favorites`)
-      if (favoritesResponse.ok) {
-        const favorites = await favoritesResponse.json()
-        setFavoriteCars(favorites)
-      }
-
-      // Fetch user inquiries
-      const inquiriesResponse = await fetch(`/api/user/inquiries`)
-      if (inquiriesResponse.ok) {
-        const inquiries = await inquiriesResponse.json()
-        setUserInquiries(inquiries)
-      }
-
-      // Calculate stats
-      const activeInquiriesCount = userInquiries.filter((i) => i.status !== "closed").length
-      const savedSearchesCount = session?.user?.preferences?.savedSearches?.length || 0
-
-      setStats({
-        favoriteCount: favoritesCars.length,
-        activeInquiries: activeInquiriesCount,
-        savedSearches: savedSearchesCount,
-        recentlyViewed: 0, // This would come from a separate API
-      })
-    } catch (error) {
-      console.error("Error fetching user data:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Refresh data every 30 seconds for real-time updates
   useEffect(() => {
-    if (status === "authenticated") {
-      const interval = setInterval(fetchUserData, 30000)
-      return () => clearInterval(interval)
-    }
-  }, [status])
+    if (status !== "authenticated") return
+    const handleFocus = () => void refreshData(true)
+    window.addEventListener("focus", handleFocus)
+    return () => window.removeEventListener("focus", handleFocus)
+  }, [status, refreshData])
 
   if (status === "loading" || loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
+      <main className="flex min-h-[60vh] flex-col items-center justify-center bg-muted/20 px-4">
+        <Loader2 className="mb-3 h-8 w-8 animate-spin text-blue-600" />
+        <p className="text-sm text-muted-foreground">Loading your dashboard...</p>
+      </main>
     )
   }
 
-  if (!session) {
-    return null
-  }
+  if (!session) return null
+
+  const activeInquiries = inquiries.filter((inquiry) => inquiry.status !== "closed").length
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">Welcome back, {session.user.name}!</h1>
-          <p className="text-muted-foreground">Manage your car shopping experience</p>
+    <main className="min-h-screen bg-muted/20 px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Your Hope Autos</p>
+            <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+              Welcome back{session.user.name ? `, ${session.user.name.split(" ")[0]}` : ""}
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+              Your saved vehicles and conversations, all in one place.
+            </p>
+          </div>
+          <Button variant="outline" className="w-fit rounded-full" onClick={() => void refreshData(true)} disabled={refreshing}>
+            {refreshing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+            Refresh
+          </Button>
         </div>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Heart className="h-5 w-5 text-red-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Favorite Cars</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.favoriteCount}</p>
-                </div>
+        {error && (
+          <div className="flex flex-col gap-3 rounded-2xl border border-destructive/20 bg-destructive/5 p-4 text-sm text-destructive sm:flex-row sm:items-center sm:justify-between">
+            <p role="alert">{error}</p>
+            <Button variant="outline" size="sm" onClick={() => void refreshData()} className="w-fit rounded-full">
+              Try again
+            </Button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Card className="rounded-3xl border-border/80 shadow-sm">
+            <CardContent className="flex items-center gap-4 p-5 sm:p-6">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600">
+                <Heart className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-sm text-muted-foreground">Favorite vehicles</p>
+                <p className="text-2xl font-semibold tracking-tight text-foreground">{favoriteCars.length}</p>
               </div>
             </CardContent>
           </Card>
-
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <MessageSquare className="h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Active Inquiries</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.activeInquiries}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Search className="h-5 w-5 text-green-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Saved Searches</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.savedSearches}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <TrendingUp className="h-5 w-5 text-purple-500" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Recently Viewed</p>
-                  <p className="text-2xl font-bold text-foreground">{stats.recentlyViewed}</p>
-                </div>
+          <Card className="rounded-3xl border-border/80 shadow-sm">
+            <CardContent className="flex items-center gap-4 p-5 sm:p-6">
+              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-600/10 text-blue-600">
+                <MessageSquare className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-sm text-muted-foreground">Open inquiries</p>
+                <p className="text-2xl font-semibold tracking-tight text-foreground">{activeInquiries}</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Quick Actions */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <Button asChild className="h-12">
-                <Link href="/cars">
-                  <Car className="h-4 w-4 mr-2" />
-                  Browse Cars
-                </Link>
-              </Button>
-              <Button variant="outline" asChild className="h-12 bg-transparent">
-                <Link href="/favorites">
-                  <Heart className="h-4 w-4 mr-2" />
-                  View Favorites
-                </Link>
-              </Button>
-              <Button variant="outline" asChild className="h-12 bg-transparent">
-                <Link href="/contact">
-                  <MessageSquare className="h-4 w-4 mr-2" />
-                  Contact Us
-                </Link>
-              </Button>
-              <Button variant="outline" asChild className="h-12 bg-transparent">
-                <Link href="/settings">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Settings
-                </Link>
-              </Button>
+        <section aria-labelledby="favorites-title">
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Saved for later</p>
+              <h2 id="favorites-title" className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Your favorites</h2>
             </div>
-          </CardContent>
-        </Card>
+            <Button variant="ghost" size="sm" asChild className="shrink-0 rounded-full">
+              <Link href="/favorites">View all <ArrowRight className="ml-1 h-4 w-4" /></Link>
+            </Button>
+          </div>
+          {favoriteCars.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              {favoriteCars.slice(0, 3).map((car) => <CarCard key={car.id} car={car} />)}
+            </div>
+          ) : (
+            <Card className="rounded-3xl border-dashed border-border bg-card shadow-none">
+              <CardContent className="px-6 py-10 text-center">
+                <Heart className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                <p className="font-medium text-foreground">No saved vehicles yet</p>
+                <p className="mt-1 text-sm text-muted-foreground">Tap the heart on a listing to add it here.</p>
+                <Button asChild className="mt-5 rounded-full px-5"><Link href="/cars">Browse inventory</Link></Button>
+              </CardContent>
+            </Card>
+          )}
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Favorite Cars */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-2">
-                  <Heart className="h-5 w-5 text-red-500" />
-                  <span>Favorite Cars</span>
-                  {stats.favoriteCount > 0 && <Badge variant="secondary">{stats.favoriteCount}</Badge>}
-                </CardTitle>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/favorites">View All</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {favoritesCars.length > 0 ? (
-                <div className="space-y-4">
-                  {favoritesCars.slice(0, 3).map((car) => (
-                    <div
-                      key={car.id}
-                      className="flex items-center space-x-4 p-3 border rounded-lg hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="w-16 h-12 bg-muted rounded flex-shrink-0 overflow-hidden">
-                        {car.images && car.images[0] && (
-                          <img
-                            src={car.images[0] || "/placeholder.svg"}
-                            alt={`${car.make} ${car.model}`}
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-sm text-foreground">
-                          {car.year} {car.make} {car.model}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">${car.price.toLocaleString()}</p>
-                        <div className="flex items-center space-x-2 mt-1">
-                          <Badge variant="outline" className="text-xs">
-                            {car.fuelType}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {car.bodyType}
+        <section aria-labelledby="inquiries-title">
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div>
+              <p className="mb-1 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">Stay in touch</p>
+              <h2 id="inquiries-title" className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">Recent inquiries</h2>
+            </div>
+            <Button variant="outline" size="sm" asChild className="shrink-0 rounded-full">
+              <Link href="/contact">Contact us</Link>
+            </Button>
+          </div>
+          <Card className="rounded-3xl border-border/80 shadow-sm">
+            <CardContent className="p-4 sm:p-6">
+              {inquiries.length > 0 ? (
+                <div className="divide-y divide-border">
+                  {inquiries.slice(0, 4).map((inquiry) => (
+                    <article key={inquiry.id} className="flex flex-col gap-2 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <div className="mb-1 flex flex-wrap items-center gap-2">
+                          <h3 className="font-medium text-foreground">
+                            {inquiry.car ? `${inquiry.car.year} ${inquiry.car.make} ${inquiry.car.model}` : "General inquiry"}
+                          </h3>
+                          <Badge variant={inquiry.status === "new" ? "default" : inquiry.status === "contacted" ? "secondary" : "outline"} className="rounded-full capitalize">
+                            {inquiry.status}
                           </Badge>
                         </div>
+                        <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">{inquiry.message}</p>
                       </div>
-                      <Button size="sm" variant="outline" asChild>
-                        <Link href={`/cars/${car.id}`}>View</Link>
-                      </Button>
-                    </div>
+                      <time className="shrink-0 text-xs text-muted-foreground" dateTime={inquiry.createdAt}>
+                        {new Date(inquiry.createdAt).toLocaleDateString()}
+                      </time>
+                    </article>
                   ))}
-                  {favoritesCars.length > 3 && (
-                    <div className="text-center pt-2">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href="/favorites">View {favoritesCars.length - 3} more favorites</Link>
-                      </Button>
-                    </div>
-                  )}
                 </div>
               ) : (
-                <div className="text-center py-8">
-                  <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No favorite cars yet</p>
-                  <Button className="mt-4" asChild>
-                    <Link href="/cars">Browse Cars</Link>
-                  </Button>
+                <div className="py-6 text-center">
+                  <MessageSquare className="mx-auto mb-3 h-8 w-8 text-muted-foreground" />
+                  <p className="font-medium text-foreground">No inquiries yet</p>
+                  <p className="mt-1 text-sm text-muted-foreground">Questions about a car? We’re happy to help.</p>
                 </div>
               )}
             </CardContent>
           </Card>
-
-          {/* Recent Inquiries */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center space-x-2">
-                  <MessageSquare className="h-5 w-5 text-blue-500" />
-                  <span>Recent Inquiries</span>
-                  {stats.activeInquiries > 0 && <Badge variant="secondary">{stats.activeInquiries} active</Badge>}
-                </CardTitle>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href="/inquiries">View All</Link>
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {userInquiries.length > 0 ? (
-                <div className="space-y-4">
-                  {userInquiries.slice(0, 3).map((inquiry) => (
-                    <div key={inquiry.id} className="p-3 border rounded-lg hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between mb-2">
-                        <Badge
-                          variant={
-                            inquiry.status === "new"
-                              ? "default"
-                              : inquiry.status === "contacted"
-                                ? "secondary"
-                                : "outline"
-                          }
-                        >
-                          {inquiry.status}
-                        </Badge>
-                        <div className="flex items-center text-xs text-muted-foreground">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {new Date(inquiry.createdAt).toLocaleDateString()}
-                        </div>
-                      </div>
-                      {inquiry.car && (
-                        <p className="text-sm font-medium mb-1 text-foreground">
-                          {inquiry.car.year} {inquiry.car.make} {inquiry.car.model}
-                        </p>
-                      )}
-                      <p className="text-sm text-muted-foreground line-clamp-2">{inquiry.message}</p>
-                    </div>
-                  ))}
-                  {userInquiries.length > 3 && (
-                    <div className="text-center pt-2">
-                      <Button variant="ghost" size="sm" asChild>
-                        <Link href="/inquiries">View {userInquiries.length - 3} more inquiries</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-8">
-                  <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No inquiries yet</p>
-                  <Button className="mt-4" asChild>
-                    <Link href="/contact">Contact Us</Link>
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Activity */}
-        <Card className="mt-8">
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Clock className="h-5 w-5 text-orange-500" />
-              <span>Recent Activity</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {favoritesCars.slice(0, 2).map((car) => (
-                <div key={`fav-${car.id}`} className="flex items-center space-x-3 text-sm">
-                  <Heart className="h-4 w-4 text-red-500" />
-                  <span className="text-muted-foreground">
-                    Added{" "}
-                    <Link href={`/cars/${car.id}`} className="text-primary hover:underline">
-                      {car.year} {car.make} {car.model}
-                    </Link>{" "}
-                    to favorites
-                  </span>
-                </div>
-              ))}
-              {userInquiries.slice(0, 2).map((inquiry) => (
-                <div key={`inq-${inquiry.id}`} className="flex items-center space-x-3 text-sm">
-                  <MessageSquare className="h-4 w-4 text-blue-500" />
-                  <span className="text-muted-foreground">
-                    Sent inquiry about{" "}
-                    {inquiry.car && (
-                      <Link href={`/cars/${inquiry.car.id}`} className="text-primary hover:underline">
-                        {inquiry.car.year} {inquiry.car.make} {inquiry.car.model}
-                      </Link>
-                    )}
-                  </span>
-                </div>
-              ))}
-              {favoritesCars.length === 0 && userInquiries.length === 0 && (
-                <p className="text-muted-foreground text-center py-4">No recent activity</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+        </section>
       </div>
-    </div>
+    </main>
   )
 }

@@ -53,8 +53,13 @@ async function getSimilarCars(carId: string): Promise<Car[]> {
     })
 
     const response = await fetch(`/api/cars/similar?${params}`)
-    if (!response.ok) return []
-    return await response.json()
+    if (!response.ok) {
+      const data = await response.json()
+      throw new Error(data.error || "Unable to load similar vehicles")
+    }
+    const data = await response.json()
+    if (!Array.isArray(data)) throw new Error("Similar vehicle response was invalid")
+    return data
   } catch (error) {
     console.error("Error fetching similar cars:", error)
     return []
@@ -110,9 +115,9 @@ export default function CarDetailPage() {
         body: JSON.stringify({ carId: car?.id }),
       })
 
-      if (response.ok) {
-        setIsFavorite(!isFavorite)
-      }
+      const result: { error?: string } = await response.json()
+      if (!response.ok) throw new Error(result.error || "Unable to update favorites.")
+      setIsFavorite(!isFavorite)
     } catch (error) {
       console.error("Error toggling favorite:", error)
     } finally {
@@ -172,8 +177,9 @@ export default function CarDetailPage() {
       if (session && car) {
         try {
           const response = await fetch(`/api/user/favorites/${car.id}`)
-          const data = await response.json()
-          setIsFavorite(data.isFavorite)
+          const data: { isFavorite?: boolean; error?: string } = await response.json()
+          if (!response.ok) throw new Error(data.error || "Unable to check favorite status.")
+          setIsFavorite(Boolean(data.isFavorite))
         } catch (error) {
           console.error("Error checking favorite status:", error)
         }
@@ -279,8 +285,10 @@ export default function CarDetailPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div>
-              <div
-                className="relative h-96 mb-4 rounded-lg overflow-hidden cursor-pointer hover:opacity-95 transition-opacity group"
+              <button
+                type="button"
+                aria-label={`View larger image of ${car.year} ${car.make} ${car.model}`}
+                className="group relative mb-4 block h-72 w-full overflow-hidden rounded-3xl bg-muted text-left transition-opacity hover:opacity-95 sm:h-96"
                 onClick={handleMainImageClick}
               >
                 <Image
@@ -292,7 +300,7 @@ export default function CarDetailPage() {
                   priority
                 />
                 <div className="absolute inset-0 bg-background/0 hover:bg-background/50 transition-all duration-200 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-background/50 text-foreground px-3 py-1 rounded text-sm">
+                  <div className="rounded-full bg-background/75 px-4 py-2 text-sm text-foreground opacity-0 shadow-sm backdrop-blur transition-opacity duration-200 group-hover:opacity-100">
                     Click to view full size
                   </div>
                 </div>
@@ -300,14 +308,16 @@ export default function CarDetailPage() {
                 <div className="absolute bottom-4 right-4 bg-background/50 text-foreground px-2 py-1 rounded text-sm">
                   {currentImageIndex + 1} / {images.length}
                 </div>
-              </div>
+              </button>
 
               {images.length > 1 && (
                 <div className="grid grid-cols-4 gap-2">
                   {images.slice(0, 8).map((image, index) => (
-                    <div
+                    <button
+                      type="button"
                       key={index}
-                      className={`relative h-20 rounded overflow-hidden cursor-pointer transition-all duration-200 ${
+                      aria-label={`Show image ${index + 1} of ${car.make} ${car.model}`}
+                      className={`relative h-16 overflow-hidden rounded-xl transition-all duration-200 sm:h-20 ${
                         index === currentImageIndex ? "ring-2 ring-blue-600 ring-offset-2" : "hover:opacity-75"
                       }`}
                       onClick={() => handleThumbnailClick(index)}
@@ -319,16 +329,18 @@ export default function CarDetailPage() {
                         className="object-cover"
                         sizes="(max-width: 768px) 25vw, 200px"
                       />
-                    </div>
+                    </button>
                   ))}
 
                   {images.length > 8 && (
-                    <div
+                    <button
+                      type="button"
+                      aria-label={`View ${images.length - 8} more vehicle images`}
                       className="relative h-20 rounded overflow-hidden bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors"
                       onClick={handleMainImageClick}
                     >
                       <span className="text-sm font-medium text-muted-foreground">+{images.length - 8} more</span>
-                    </div>
+                    </button>
                   )}
                 </div>
               )}
@@ -336,84 +348,95 @@ export default function CarDetailPage() {
 
             <div>
               <div className="mb-6">
-                <div className="flex items-start justify-between mb-2">
-                  <h1 className="text-3xl font-bold text-foreground">
+                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                     {car.year} {car.make} {car.model}
                   </h1>
-                  <div className="flex items-center space-x-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <Button
                       variant="outline"
-                      size="sm"
+                      size="icon"
+                      aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
                       onClick={handleFavoriteToggle}
                       disabled={favoriteLoading}
-                      className={isFavorite ? "text-red-500 border-red-500" : ""}
+                      className={`rounded-full ${isFavorite ? "border-rose-500 text-rose-500" : ""}`}
                     >
                       <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
                     </Button>
-                    <Button variant="outline" size="sm" onClick={handleShare}>
+                    <Button variant="outline" size="icon" aria-label="Share vehicle" className="rounded-full" onClick={handleShare}>
                       <Share2 className="h-4 w-4" />
                     </Button>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-2 mb-4">
-                  <Badge variant="secondary">{car.bodyType}</Badge>
-                  <Badge variant="outline">{car.fuelType}</Badge>
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary" className="rounded-full">{car.bodyType}</Badge>
+                  <Badge variant="outline" className="rounded-full">{car.fuelType}</Badge>
                   {car.isAvailable ? (
-                    <Badge className="bg-green-600">Available</Badge>
+                    <Badge className="rounded-full bg-green-600">Available</Badge>
                   ) : (
-                    <Badge className="bg-red-600">Sold</Badge>
+                    <Badge className="rounded-full bg-red-600">Sold</Badge>
                   )}
-                  <div className="flex items-center text-sm text-muted-foreground ml-auto">
+                  <div className="ml-auto flex items-center text-sm text-muted-foreground">
                     <Eye className="h-4 w-4 mr-1" />
                     {viewCount} views
                   </div>
                 </div>
-                <p className="text-4xl font-bold text-blue-600">{formatPrice(car.price)}</p>
+                <p className="text-3xl font-semibold tracking-tight text-blue-600 sm:text-4xl">{formatPrice(car.price)}</p>
               </div>
 
-              <Card className="mb-6">
+              <Card className="mb-6 rounded-3xl border-border/80 shadow-sm">
                 <CardHeader>
-                  <CardTitle>Key Specifications</CardTitle>
+                  <CardTitle className="text-lg">Vehicle specifications</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-2">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Year: {car.year}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Gauge className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Mileage: {car.mileage.toLocaleString()} miles</span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Fuel className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Fuel: {car.fuelType}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Settings className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Transmission: {car.transmission}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Palette className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Color: {car.color}</span>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <CarIcon className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm">Body: {car.bodyType}</span>
                     </div>
+                    <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
+                      <Calendar className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm">Listed: {new Date(car.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    {car.vin && (
+                      <div className="flex min-w-0 items-center gap-3 rounded-2xl bg-muted/40 p-3 sm:col-span-2">
+                        <CarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                        <span className="min-w-0 break-all text-sm">VIN: {car.vin}</span>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
 
               <div className="space-y-4">
-                <Button size="lg" className="w-full bg-blue-600 hover:bg-blue-500 py-5" asChild>
+                <Button size="lg" className="h-12 w-full rounded-full bg-blue-600 hover:bg-blue-500" asChild>
                   <Link href={`/contact?car=${car.id}`}>
                     <Mail className="h-4 w-4 mr-2" />
                     Request Information
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline" className="w-full bg-transparent" asChild>
+                <Button size="lg" variant="outline" className="h-12 w-full rounded-full bg-transparent" asChild>
                   <Link href="tel:+2348133531046">
                     <Phone className="h-4 w-4 mr-2" />
                     Call (234) 8133531046
@@ -424,7 +447,7 @@ export default function CarDetailPage() {
           </div>
 
           <div className="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card>
+            <Card className="rounded-3xl border-border/80 shadow-sm">
               <CardHeader>
                 <CardTitle>Description</CardTitle>
               </CardHeader>
@@ -435,7 +458,7 @@ export default function CarDetailPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="rounded-3xl border-border/80 shadow-sm">
               <CardHeader>
                 <CardTitle>Features</CardTitle>
               </CardHeader>

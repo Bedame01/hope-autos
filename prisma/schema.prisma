@@ -25,29 +25,29 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   // Relations
-  accounts              Account[]
-  sessions              Session[]
-  preferences           UserPreferences?
-  inquiries             Inquiry[]
-  favoriteCars          FavoriteCar[]
-  passwordResetToken    PasswordResetToken?
+  accounts           Account[]
+  sessions           Session[]
+  preferences        UserPreferences?
+  inquiries          Inquiry[]
+  favoriteCars       FavoriteCar[]
+  passwordResetToken PasswordResetToken?
 
   @@map("users")
 }
 
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? @db.Text
-  access_token       String? @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String? @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -87,39 +87,39 @@ model PasswordResetToken {
 }
 
 model UserPreferences {
-  id                    String   @id @default(cuid())
-  userId                String   @unique
-  maxPrice              Int?
-  preferredMakes        String[] @default([])
-  preferredFuelTypes    String[] @default([])
-  emailNotifications    Boolean  @default(true)
-  smsNotifications      Boolean  @default(false)
-  priceAlerts           Boolean  @default(true)
-  newArrivals           Boolean  @default(true)
-  theme                 String   @default("light")
-  language              String   @default("en")
-  timezone              String   @default("UTC")
-  currency              String   @default("USD")
-  profileVisibility     String   @default("private")
-  showEmail             Boolean  @default(false)
-  showPhone             Boolean  @default(false)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  maxPrice           Int?
+  preferredMakes     String[] @default([])
+  preferredFuelTypes String[] @default([])
+  emailNotifications Boolean  @default(true)
+  smsNotifications   Boolean  @default(false)
+  priceAlerts        Boolean  @default(true)
+  newArrivals        Boolean  @default(true)
+  theme              String   @default("light")
+  language           String   @default("en")
+  timezone           String   @default("UTC")
+  currency           String   @default("USD")
+  profileVisibility  String   @default("private")
+  showEmail          Boolean  @default(false)
+  showPhone          Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   savedSearches SavedSearch[]
 
   @@map("user_preferences")
 }
 
 model SavedSearch {
-  id                   String   @id @default(cuid())
-  name                 String
-  filters              Json
-  alertsEnabled        Boolean  @default(false)
-  userPreferencesId    String
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                String   @id @default(cuid())
+  name              String
+  filters           Json
+  alertsEnabled     Boolean  @default(false)
+  userPreferencesId String
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   userPreferences UserPreferences @relation(fields: [userPreferencesId], references: [id], onDelete: Cascade)
 
@@ -127,26 +127,26 @@ model SavedSearch {
 }
 
 model Car {
-  id           String        @id @default(cuid())
-  make         String
-  model        String
-  year         Int
-  price        Int
-  mileage      Int
-  color        String
-  fuelType     FuelType
-  transmission Transmission
-  bodyType     BodyType
-  images       String[]      @default([])
-  description  String?       @db.Text
-  features     String[]      @default([])
-  isAvailable  Boolean       @default(true)
-  isFeatured   Boolean       @default(false)
-  viewCount    Int           @default(0)
-  vin          String?       @unique
-  creationRequestId String?  @unique
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id                String       @id @default(cuid())
+  make              String
+  model             String
+  year              Int
+  price             Int
+  mileage           Int
+  color             String
+  fuelType          FuelType
+  transmission      Transmission
+  bodyType          BodyType
+  images            String[]     @default([])
+  description       String?      @db.Text
+  features          String[]     @default([])
+  isAvailable       Boolean      @default(true)
+  isFeatured        Boolean      @default(false)
+  viewCount         Int          @default(0)
+  vin               String?      @unique
+  creationRequestId String?      @unique
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
 
   // Relations
   inquiries    Inquiry[]
@@ -207,6 +207,17 @@ model AdminSetting {
   updatedAt DateTime @updatedAt
 
   @@map("admin_settings")
+}
+
+model NewsletterSubscriber {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  subscribedAt         DateTime  @default(now())
+  unsubscribedAt       DateTime?
+  unsubscribeTokenHash String?   @unique
+
+  @@index([unsubscribedAt])
+  @@map("newsletter_subscribers")
 }
 
 enum Role {

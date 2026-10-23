@@ -1,45 +1,53 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useSession, signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { LayoutDashboard, Car, Users, MessageSquare, Menu, X, LogOut, Loader2, Settings } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  ArrowLeft,
+  Car,
+  LayoutDashboard,
+  Loader2,
+  LogOut,
+  Mail,
+  Menu,
+  MessageSquare,
+  Settings,
+  Users,
+  X,
+} from "lucide-react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const navigation = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { name: "Overview", href: "/admin", icon: LayoutDashboard },
   { name: "Cars", href: "/admin/cars", icon: Car },
   { name: "Users", href: "/admin/users", icon: Users },
   { name: "Inquiries", href: "/admin/inquiries", icon: MessageSquare },
-  { name: "Admin Settings", href: "/admin/settings", icon: Settings },
+  { name: "Newsletter", href: "/admin/newsletter", icon: Mail },
+  { name: "Settings", href: "/admin/settings", icon: Settings },
 ]
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { data: session, status } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
 
-  // Show loading state while checking authentication
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
+      <div className="flex min-h-screen items-center justify-center bg-muted/30">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading admin panel...</p>
+          <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-600" />
+          <p className="text-sm text-muted-foreground">Loading admin panel...</p>
         </div>
       </div>
     )
   }
 
-  // Redirect if not authenticated or not admin
   if (status === "unauthenticated" || !session) {
     router.push("/auth/signin?callbackUrl=/admin")
     return null
@@ -51,147 +59,130 @@ export default function AdminLayout({
   }
 
   const handleSignOut = () => {
-    signOut({ callbackUrl: "/" })
+    void signOut({ callbackUrl: "/" })
   }
 
-  const pathname = typeof window !== "undefined" ? window.location.pathname : "/admin"
+  const initials =
+    session.user.name
+      ?.split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase() || "A"
+
+  const renderNavigation = (onNavigate?: () => void) => (
+    <nav aria-label="Admin navigation" className="space-y-1.5">
+      {navigation.map(({ name, href, icon: Icon }) => {
+        const isActive = pathname === href || (href !== "/admin" && pathname.startsWith(`${href}/`))
+
+        return (
+          <Link
+            key={name}
+            href={href}
+            onClick={onNavigate}
+            aria-current={isActive ? "page" : undefined}
+            className={`flex min-h-11 items-center gap-3 rounded-xl px-3.5 text-sm font-medium transition-colors ${
+              isActive
+                ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <Icon className="h-[18px] w-[18px]" />
+            {name}
+          </Link>
+        )
+      })}
+    </nav>
+  )
+
+  const renderProfile = () => (
+    <div className="border-t border-border p-4">
+      <div className="mb-4 flex min-w-0 items-center gap-3">
+        <Avatar className="h-10 w-10 shrink-0">
+          <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
+          <AvatarFallback className="bg-blue-600/10 font-semibold text-blue-700">{initials}</AvatarFallback>
+        </Avatar>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-foreground">{session.user.name}</p>
+          <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+        </div>
+      </div>
+      <Button
+        variant="outline"
+        className="w-full justify-start rounded-xl"
+        onClick={handleSignOut}
+      >
+        <LogOut className="mr-2 h-4 w-4" />
+        Sign out
+      </Button>
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-[var(--background)]">
-      {/* Mobile sidebar */}
-      <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? "block" : "hidden"}`}>
-        <div className="fixed inset-0 bg-[var(--background)] opacity-70" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-[var(--background-secondary)] border-r border-[var(--border-line)]">
-          <div className="flex h-16 items-center justify-between px-4 border-b">
-            <span className="text-xl font-bold text-gray-900">Admin Panel</span>
-            <button onClick={() => setSidebarOpen(false)}>
-              <X className="h-6 w-6" />
-            </button>
-          </div>
-          <nav className="flex-1 px-4 py-4">
-            <ul className="space-y-2">
-              {navigation.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
-                return (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isActive ? "bg-blue-100 text-[#000]" : "text-[var(--text-color)] hover:text-[#000] hover:bg-blue-100"
-                      }`}
-                      onClick={() => setSidebarOpen(false)}
-                    >
-                      <Icon className="h-5 w-5" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
-          <div className="p-4 border-t border-[var(--border-line)]">
-            <div className="flex items-center space-x-3 mb-4">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
-                <AvatarFallback>
-                  {session.user.name
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase() || "A"}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{session.user.name}</p>
-                <p className="text-xs text-gray-500">{session.user.email}</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" className="w-full border border-[var(--border-line)] bg-transparent" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex flex-col flex-grow bg-white border-r">
-          <div className="flex h-16 items-center px-4 border-b">
-            <Link href="/admin" className="text-xl font-bold text-gray-900">
-              Admin Panel
-            </Link>
-          </div>
-          <nav className="flex-1 px-4 py-4">
-            <ul className="space-y-2">
-              {navigation.map((item) => {
-                const Icon = item.icon
-                const isActive = pathname === item.href
-                return (
-                  <li key={item.name}>
-                    <Link
-                      href={item.href}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isActive ? "bg-blue-100 text-[#000]" : "text-[var(--text-color)] hover:text-white hover:bg-blue-100"
-                      }`}
-                    >
-                      <Icon className="h-5 w-5" />
-                      <span>{item.name}</span>
-                    </Link>
-                  </li>
-                )
-              })}
-            </ul>
-          </nav>
-          <div className="p-4 border-t">
-            <div className="flex items-center space-x-3 mb-4">
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
-                <AvatarFallback>
-                  {session.user.name
-                    ?.split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .toUpperCase() || "A"}
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="text-sm font-medium text-gray-900">{session.user.name}</p>
-                <p className="text-xs text-gray-500">{session.user.email}</p>
-              </div>
-            </div>
-            <Button variant="outline" size="sm" className="w-full border border-[var(--border-line)] cursor-pointer bg-transparent" onClick={handleSignOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top bar */}
-        <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-          <button type="button" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={() => setSidebarOpen(true)}>
-            <Menu className="h-6 w-6 text-[var(--foreground)] hover:text-blue-600" />
-          </button>
-
-          <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
-            <div className="flex items-center gap-x-4 lg:gap-x-6">
-              <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" />
-            </div>
-            <div className="flex items-center gap-x-4 lg:gap-x-6 ml-auto">
-              <Link href="/" className="text-sm text-[var(--text-color)] hover:text-gray-400">
-                ← Back to Site
+    <div className="min-h-screen bg-muted/30">
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-[60] lg:hidden">
+          <button
+            type="button"
+            aria-label="Close admin menu"
+            className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+            onClick={() => setSidebarOpen(false)}
+          />
+          <aside className="absolute inset-y-0 left-0 flex w-[min(19rem,85vw)] flex-col border-r border-border bg-background shadow-2xl">
+            <div className="flex h-16 items-center justify-between border-b border-border px-5">
+              <Link href="/admin" className="font-semibold tracking-tight text-foreground" onClick={() => setSidebarOpen(false)}>
+                Hope Autos <span className="font-normal text-muted-foreground">/ Admin</span>
               </Link>
+              <Button variant="ghost" size="icon" aria-label="Close admin menu" onClick={() => setSidebarOpen(false)}>
+                <X className="h-5 w-5" />
+              </Button>
             </div>
-          </div>
+            <div className="flex-1 overflow-y-auto p-4">{renderNavigation(() => setSidebarOpen(false))}</div>
+            {renderProfile()}
+          </aside>
         </div>
+      )}
 
-        {/* Page content */}
-        <main className="py-8">
-          <div className="px-4 sm:px-6 lg:px-8">{children}</div>
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border bg-background lg:flex">
+        <div className="flex h-[4.5rem] items-center border-b border-border px-6">
+          <Link href="/admin" className="font-semibold tracking-tight text-foreground">
+            Hope Autos <span className="font-normal text-muted-foreground">/ Admin</span>
+          </Link>
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 py-6">
+          <p className="mb-3 px-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Workspace
+          </p>
+          {renderNavigation()}
+        </div>
+        {renderProfile()}
+      </aside>
+
+      <div className="lg:pl-64">
+        <header className="sticky top-0 z-40 flex h-[4.5rem] items-center justify-between border-b border-border bg-background/90 px-4 backdrop-blur-xl sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="rounded-xl lg:hidden"
+              aria-label="Open admin menu"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <span className="text-sm lg:text-base font-medium text-muted-foreground">Admin workspace</span>
+          </div>
+          <div className="flex items-center gap-3 md:gap-5">
+            <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground">
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back to site</span>
+              <span className="sm:hidden">Site</span>
+            </Link>
+            <ThemeToggle />
+          </div>
+        </header>
+        <main className="px-4 py-7 sm:px-6 sm:py-9 lg:px-8">
+          <div className="mx-auto w-full max-w-7xl">{children}</div>
         </main>
       </div>
     </div>

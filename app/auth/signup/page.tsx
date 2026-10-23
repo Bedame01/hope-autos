@@ -300,7 +300,7 @@ export default function SignUpPage() {
                 </label>
               </div>
 
-              <Button type="submit" className="w-full py-5 cursor-pointer" disabled={loading}>
+              <Button type="submit" className="w-full py-5.5 rounded-2xl cursor-pointer" disabled={loading}>
                 {loading ? "Creating account..." : "Create account"}
               </Button>
             </form>

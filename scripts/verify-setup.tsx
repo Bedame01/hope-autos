@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { config } from "dotenv"
-import { Resend } from "resend"
 import { PrismaClient } from "@prisma/client"
+import { isEmailServiceConfigured, verifyEmailConnection } from "../lib/email"
 import { fileURLToPath } from "url"
 import { dirname } from "path"
 
@@ -32,26 +32,14 @@ async function verifySetup() {
   console.log("")
   console.log("📧 Testing Email Service...")
 
-  if (!process.env.RESEND_API_KEY) {
-    console.log("⚠️  RESEND_API_KEY not configured")
+  if (!isEmailServiceConfigured()) {
+    console.log("⚠️  SMTP email configuration is incomplete")
   } else {
     try {
-      const resend = new Resend(process.env.RESEND_API_KEY)
-      const result = await resend.emails.send({
-        from: process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev",
-        to: "delivered@resend.dev",
-        subject: "Test Email from Hope Autos",
-        html: "<p>Test email sent successfully!</p>",
-      })
-
-      if (result.error) {
-        console.log("❌ Email service test failed:", result.error)
-      } else {
-        console.log("✅ Email service working correctly")
-        console.log(`   Message ID: ${result.data?.id}`)
-      }
+      await verifyEmailConnection()
+      console.log("✅ SMTP server connection and authentication successful")
     } catch (error) {
-      console.log("❌ Email service error:", error)
+      console.log("❌ SMTP connection failed:", error)
     }
   }
 

@@ -127,31 +127,36 @@ export default function FAQPage() {
     activeCategory === null ? filteredFaqs : filteredFaqs.filter((cat) => cat.category === activeCategory)
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-muted/20 px-4 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-20">
+      <div className="mx-auto max-w-4xl">
         {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-foreground mb-4 heading-text">Frequently Asked Questions</h1>
-          <p className="text-lg md:text-xl text-muted-foreground">Find answers to common questions about Hope Autos</p>
+        <div className="mb-10 text-center sm:mb-12">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-blue-600">Here to help</p>
+          <h1 className="mb-4 text-4xl font-semibold tracking-tight text-foreground sm:text-5xl heading-text">
+            Frequently asked questions
+          </h1>
+          <p className="mx-auto max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
+            Find clear answers about buying, your account, our vehicles, and getting in touch.
+          </p>
         </div>
 
         {/* Search */}
-        <div className="mb-8 relative">
-          <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
+        <div className="relative mb-6 rounded-2xl border border-border bg-card p-2 shadow-sm sm:mb-8">
+          <Search className="absolute left-6 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search FAQs..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 h-12 text-base"
+            className="h-12 rounded-xl border-0 bg-transparent pl-12 text-base shadow-none focus-visible:ring-0"
           />
         </div>
 
         {/* Category Filter */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="-mx-4 mb-8 flex gap-2 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
           <Button
             variant={activeCategory === null ? "default" : "outline"}
             onClick={() => setActiveCategory(null)}
-            className={activeCategory === null ? "bg-blue-600" : "bg-transparent"}
+            className={`shrink-0 rounded-full px-5 ${activeCategory === null ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-card"}`}
           >
             All Categories
           </Button>
@@ -160,7 +165,7 @@ export default function FAQPage() {
               key={category.category}
               variant={activeCategory === category.category ? "default" : "outline"}
               onClick={() => setActiveCategory(category.category)}
-              className={activeCategory === category.category ? "bg-blue-600" : "bg-transparent"}
+              className={`shrink-0 rounded-full px-5 ${activeCategory === category.category ? "bg-blue-600 text-white hover:bg-blue-700" : "bg-card"}`}
             >
               {category.category}
             </Button>
@@ -168,37 +173,42 @@ export default function FAQPage() {
         </div>
 
         {/* FAQ Items */}
-        <div className="space-y-4">
+        <div className="space-y-7 sm:space-y-9">
           {visibleFaqs.map((category) => (
             <div key={category.category}>
               {category.questions.length > 0 && (
                 <>
                   {activeCategory === null && (
-                    <h2 className="text-2xl font-bold text-foreground mb-4 mt-10">{category.category}</h2>
+                    <h2 className="mb-3 text-xl font-semibold tracking-tight text-foreground sm:mb-4 sm:text-2xl">{category.category}</h2>
                   )}
                   <div className="space-y-3">
-                    {category.questions.map((item, index) => {
-                      const id = `${category.category}-${index}`
+                    {category.questions.map((item) => {
+                      const id = `${category.category}-${item.q.replaceAll(" ", "-")}`
                       const isExpanded = expandedQuestion === id
 
                       return (
-                        <Card key={id} className="overflow-hidden py-0">
+                        <Card key={id} className="overflow-hidden rounded-2xl border-border/80 py-0 shadow-sm">
                           <button
+                            type="button"
+                            aria-expanded={isExpanded}
+                            aria-controls={`${id}-answer`}
                             onClick={() => setExpandedQuestion(isExpanded ? null : id)}
-                            className="w-full text-left p-6 hover:bg-muted transition-colors flex items-center justify-between"
+                            className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition-colors hover:bg-muted/50 sm:px-6"
                           >
-                            <h3 className="font-semibold text-foreground text-lg pr-4">{item.q}</h3>
+                            <h3 className="pr-2 text-base font-semibold leading-6 text-foreground sm:text-lg">{item.q}</h3>
                             <ChevronDown
-                              className={`h-5 w-5 text-blue-600 flex-shrink-0 transition-transform ${
+                              className={`h-5 w-5 shrink-0 text-blue-600 transition-transform ${
                                 isExpanded ? "rotate-180" : ""
                               }`}
                             />
                           </button>
-                          {isExpanded && (
-                            <div className="px-6 pb-6 pt-0 border-t">
-                              <p className="text-muted-foreground leading-relaxed">{item.a}</p>
-                            </div>
-                          )}
+                          <div
+                            id={`${id}-answer`}
+                            hidden={!isExpanded}
+                            className="border-t border-border px-5 pb-5 pt-4 sm:px-6 sm:pb-6"
+                          >
+                            <p className="text-sm leading-7 text-muted-foreground sm:text-base">{item.a}</p>
+                          </div>
                         </Card>
                       )
                     })}
@@ -209,7 +219,7 @@ export default function FAQPage() {
           ))}
 
           {visibleFaqs.every((cat) => cat.questions.length === 0) && (
-            <Card>
+            <Card className="rounded-3xl border-dashed shadow-none">
               <CardContent className="pt-6 text-center">
                 <p className="text-muted-foreground text-lg">No FAQs found matching your search.</p>
                 <p className="text-muted-foreground mt-2">Try different keywords or browse all categories.</p>
@@ -219,7 +229,7 @@ export default function FAQPage() {
         </div>
 
         {/* Contact Section */}
-        <Card className="mt-12 bg-blue-50 border-blue-200">
+        <Card className="mt-10 overflow-hidden rounded-3xl border-blue-200 bg-blue-50/70 shadow-sm dark:border-blue-900 dark:bg-blue-950/20 sm:mt-14">
           <CardHeader>
             <CardTitle className="text-foreground">Still have questions?</CardTitle>
           </CardHeader>
@@ -227,11 +237,11 @@ export default function FAQPage() {
             <p className="text-muted-foreground mb-6">
               Can't find the answer you're looking for? Our support team is here to help!
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="bg-blue-600 hover:bg-blue-500" asChild>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button className="rounded-full bg-blue-600 px-6 text-white hover:bg-blue-700" asChild>
                 <a href="/contact">Contact Us</a>
               </Button>
-              <Button variant="outline" asChild>
+              <Button variant="outline" className="rounded-full px-6" asChild>
                 <a href="mailto:support@hopeautos.com">Email Support</a>
               </Button>
             </div>

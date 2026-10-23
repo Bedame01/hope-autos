@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 
 export async function GET() {
   try {
@@ -10,12 +11,15 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Return current currency setting (you can store this in database)
-    const settings = {
-      currency: "USD", // Default currency
-    }
+    const settings = await prisma.adminSetting.findUnique({
+      where: { key: "exchangeRate" },
+      select: { value: true, updatedAt: true },
+    })
 
-    return NextResponse.json(settings)
+    return NextResponse.json({
+      exchangeRate: Number(settings?.value ?? 1650),
+      updatedAt: settings?.updatedAt ?? null,
+    })
   } catch (error) {
     console.error("Error fetching currency settings:", error)
     return NextResponse.json({ error: "Failed to fetch currency settings" }, { status: 500 })
@@ -30,20 +34,28 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const { currency } = await request.json()
+    const { exchangeRate } = await request.json()
 
-    if (!currency || !["USD", "NGN"].includes(currency)) {
-      return NextResponse.json({ error: "Invalid currency" }, { status: 400 })
+    if (
+      typeof exchangeRate !== "number" ||
+      !Number.isFinite(exchangeRate) ||
+      exchangeRate <= 0 ||
+      exchangeRate > 1_000_000_000
+    ) {
+      return NextResponse.json({ error: "Exchange rate must be a positive number" }, { status: 400 })
     }
 
-    // Here you would save to database
-    // For now, we'll just return success
-    const settings = {
-      currency,
-      updatedAt: new Date().toISOString(),
-    }
+    const setting = await prisma.adminSetting.upsert({
+      where: { key: "exchangeRate" },
+      create: { key: "exchangeRate", value: String(exchangeRate) },
+      update: { value: String(exchangeRate) },
+      select: { value: true, updatedAt: true },
+    })
 
-    return NextResponse.json(settings)
+    return NextResponse.json({
+      exchangeRate: Number(setting.value),
+      updatedAt: setting.updatedAt,
+    })
   } catch (error) {
     console.error("Error saving currency settings:", error)
     return NextResponse.json({ error: "Failed to save currency settings" }, { status: 500 })

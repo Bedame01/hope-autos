@@ -55,17 +55,18 @@ async function diagnoseIssues() {
   console.log("📧 EMAIL SERVICE CONFIGURATION")
   console.log("-".repeat(60))
 
-  const resendApiKey = process.env.RESEND_API_KEY
-  const resendFromEmail = process.env.RESEND_FROM_EMAIL
+  const smtpHost = process.env.SMTP_HOST
+  const smtpPort = process.env.SMTP_PORT
+  const smtpUser = process.env.SMTP_USER
+  const smtpPassword = process.env.SMTP_PASSWORD
+  const smtpFromEmail = process.env.SMTP_FROM_EMAIL
   const nextPublicBaseUrl = process.env.NEXT_PUBLIC_BASE_URL
 
-  if (!resendApiKey) {
-    console.log("❌ RESEND_API_KEY: NOT SET")
-  } else {
-    console.log(`✅ RESEND_API_KEY: SET (${resendApiKey.substring(0, 20)}...)`)
-  }
-
-  console.log(`${resendFromEmail ? "✅" : "⚠️ "} RESEND_FROM_EMAIL: ${resendFromEmail || "NOT SET (using default)"}`)
+  console.log(`${smtpHost ? "✅" : "⚠️ "} SMTP_HOST: ${smtpHost || "NOT SET"}`)
+  console.log(`${smtpPort ? "✅" : "⚠️ "} SMTP_PORT: ${smtpPort || "NOT SET (defaults to 587)"}`)
+  console.log(`${smtpUser ? "✅" : "⚠️ "} SMTP_USER: ${smtpUser ? "SET" : "NOT SET"}`)
+  console.log(`${smtpPassword ? "✅" : "⚠️ "} SMTP_PASSWORD: ${smtpPassword ? "SET" : "NOT SET"}`)
+  console.log(`${smtpFromEmail ? "✅" : "⚠️ "} SMTP_FROM_EMAIL: ${smtpFromEmail || "NOT SET"}`)
   console.log(
     `${nextPublicBaseUrl ? "✅" : "⚠️ "} NEXT_PUBLIC_BASE_URL: ${nextPublicBaseUrl || "NOT SET (using localhost)"}`,
   )
@@ -88,21 +89,26 @@ async function diagnoseIssues() {
     console.log("7. Copy Client ID and Secret to .env.local")
   }
 
-  if (!resendApiKey) {
+  if (!smtpHost || !smtpUser || !smtpPassword || !smtpFromEmail) {
     console.log("")
     console.log("Email Service Setup:")
-    console.log("1. Go to https://resend.com")
-    console.log("2. Sign up for a free account")
-    console.log("3. Get your API key from the dashboard")
-    console.log("4. Add to .env.local as RESEND_API_KEY")
-    console.log("5. Set RESEND_FROM_EMAIL (must be verified in Resend)")
+    console.log("1. Get SMTP host, port, username, and password from your email provider")
+    console.log("2. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM_EMAIL in .env.local")
   }
 
   console.log("")
   console.log("=".repeat(60))
   console.log("")
 
-  const allConfigured = !!googleClientId && !!googleClientSecret && !!resendApiKey && !!nextAuthUrl && !!nextAuthSecret
+  const allConfigured =
+    !!googleClientId &&
+    !!googleClientSecret &&
+    !!smtpHost &&
+    !!smtpUser &&
+    !!smtpPassword &&
+    !!smtpFromEmail &&
+    !!nextAuthUrl &&
+    !!nextAuthSecret
 
   if (allConfigured) {
     console.log("✅ All systems are configured!")

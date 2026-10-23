@@ -3,8 +3,9 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
-export async function GET(request: NextRequest, { params }: { params: { carId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ carId: string }> }) {
   try {
+    const { carId } = await params
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest, { params }: { params: { carId: s
       where: {
         userId_carId: {
           userId: session.user.id,
-          carId: params.carId,
+          carId,
         },
       },
     })
@@ -23,6 +24,6 @@ export async function GET(request: NextRequest, { params }: { params: { carId: s
     return NextResponse.json({ isFavorite: !!favorite })
   } catch (error) {
     console.error("Error checking favorite status:", error)
-    return NextResponse.json({ isFavorite: false })
+    return NextResponse.json({ error: "Failed to check favorite status" }, { status: 500 })
   }
 }

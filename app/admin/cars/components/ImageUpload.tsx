@@ -196,24 +196,24 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
 
   return (
     <div className={className}>
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h3 className="text-lg font-medium text-gray-900">Car Photos</h3>
-          <p className="text-sm text-[var(--text-color)]">Upload up to {maxImages} photos. First image will be the main photo.</p>
+          <h3 className="text-lg font-semibold text-foreground">Car photos</h3>
+          <p className="mt-1 text-sm text-muted-foreground">Upload up to {maxImages} photos. The first image will be the main photo.</p>
         </div>
-        <Badge variant="secondary">
+        <Badge variant="secondary" className="w-fit rounded-full px-3">
           {images.length} / {maxImages}
         </Badge>
       </div>
 
       {/* Upload Button */}
       {images.length < maxImages && (
-        <Card className="mb-4">
+        <Card className="mb-4 rounded-2xl border-dashed border-border/80 shadow-none">
           <CardContent className="p-4">
             <Button
               onClick={openCloudinaryWidget}
               disabled={uploading}
-              className="w-full h-24 border-2 border-dashed border-gray-300 hover:border-gray-400 bg-transparent text-gray-600 hover:text-gray-700 hover:bg-gray-50"
+              className="h-24 w-full rounded-xl border-2 border-dashed border-border bg-transparent text-muted-foreground hover:border-blue-500 hover:bg-muted/50 hover:text-foreground"
               variant="outline"
             >
               {uploading ? (
@@ -245,7 +245,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
               onDrop={(e) => handleDrop(e, index)}
             >
               <CardContent className="p-2">
-                <div className="relative aspect-[4/3] rounded-md overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
                   <Image
                     src={getOptimizedImageUrl(imageUrl, 400, 300) || "/placeholder.svg"}
                     alt={`Car image ${index + 1}`}
@@ -273,7 +273,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
                 </div>
 
                 {/* Image Info */}
-                <div className="mt-2 text-xs text-gray-500 text-center">Image {index + 1}</div>
+                <div className="mt-2 text-center text-xs text-muted-foreground">Image {index + 1}</div>
               </CardContent>
             </Card>
           ))}
@@ -282,7 +282,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
         <Card>
           <CardContent className="p-8 text-center">
             <ImageIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500">No images uploaded yet</p>
+            <p className="text-sm text-muted-foreground">No images uploaded yet</p>
             <p className="text-sm text-gray-400">Click the upload button to add car photos</p>
           </CardContent>
         </Card>
@@ -290,7 +290,7 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
 
       {/* Instructions */}
       {images.length > 0 && (
-        <div className="mt-4 text-xs text-gray-500 space-y-1">
+        <div className="mt-4 space-y-1 text-xs text-muted-foreground">
           <p>• Drag and drop images to reorder them</p>
           <p>• The first image will be used as the main photo</p>
           <p>• Images are automatically optimized for web</p>

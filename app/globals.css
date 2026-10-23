@@ -10,20 +10,26 @@
 
 @font-face {
   font-family: 'TestDomaine';
-  src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('truetype');
-  src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('woff');
-  src: url(../public/font/TestDomaineDisplayCondensed-BoldItalic-BF66174a1f76ca5.otf) format('woff2');
+  src: url(../public/font/LubalinGraphStd-Book.ttf) format('truetype');
+  src: url(../public/font/LubalinGraphStd-Book.ttf) format('woff');
+  src: url(../public/font/LubalinGraphStd-Book.ttf) format('woff2');
 }
 
 @font-face {
   font-family: 'ClashDisplay';
-  src: url(../public/font/ClashDisplay-Variable.ttf) format("ttf");
-  src: url(../public/font/ClashDisplay-Variable.ttf) format("woff");
-  src: url(../public/font/ClashDisplay-Variable.ttf) format("woff2");
+  src: url(../public/font/ClashGrotesk-Variable.ttf) format("ttf");
+  src: url(../public/font/ClashGrotesk-Variable.ttf) format("woff");
+  src: url(../public/font/ClashGrotesk-Variable.ttf) format("woff2");
 }
 
 body{
   background-color: var(--background) !important;
+}
+
+#hope-home-hero,
+#hope-cars-hero,
+#hope-home-cta {
+  color: #fff !important;
 }
 
 .vehicle-qr-backdrop {
@@ -200,9 +206,9 @@ body{
   --color-blue-100: var(--color-orange-100);
   --hero-gradient1: #fff;
   --hero-gradient2: #fff0;
-  --color-blue-500: var(--color-orange-600);
-  --color-blue-600: var(--color-orange-500);
-  --color-green-100: var(--color-orange-100);
+  --color-blue-500: #71aa00;
+  --color-blue-600: oklch(61.071% 0.16294 129.441);
+  --color-green-100: #c7ec7b;
   --heading-color: oklch(23.929% 0.00003 271.152);
   --text-color: oklch(0.145 0 0);
   --color-white: oklch(0.985 0 0);
@@ -249,8 +255,9 @@ body{
 .dark {
   --hero-gradient1: #161616;
   --hero-gradient2: rgba(120, 120, 120, 0.168);
-  --color-blue-500: var(--color-green-600);
-  --color-blue-600: var(--color-green-400);
+  --color-blue-500: oklch(67.255% 0.17982 129.585);
+  --color-blue-600: oklch(61.071% 0.16294 129.441);
+  --color-green-100: oklch(89.252% 0.14611 124.263);
   --color-blue-100: oklch(96.2% 0.044 156.743);
   --heading-color: oklch(96.715% 0.00011 271.152);
   --text-color: oklch(77.944% 0.00009 271.152);

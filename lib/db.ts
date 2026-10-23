@@ -309,6 +309,7 @@ export async function getCars(filters?: any, includeUnavailable = false): Promis
       description: car.description || "",
       features: car.features,
       isAvailable: car.isAvailable,
+      vin: car.vin || undefined,
       createdAt: car.createdAt.toISOString(),
       updatedAt: car.updatedAt.toISOString(),
     }))
@@ -412,7 +413,7 @@ export async function getFavoriteCarsByUserId(userId: string): Promise<Car[]> {
     }))
   } catch (error) {
     console.error("Error fetching favorite cars:", error)
-    return []
+    throw error
   }
 }
 

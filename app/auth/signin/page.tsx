@@ -214,7 +214,7 @@ export default function SignInPage() {
                     name="email"
                     type="email"
                     required
-                    className="pl-10"
+                    className="pl-10 py-5.5 font-medium"
                     placeholder="Enter your email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -234,7 +234,7 @@ export default function SignInPage() {
                     name="password"
                     type={showPassword ? "text" : "password"}
                     required
-                    className="pl-10 pr-10"
+                    className="pl-10 pr-10 py-5.5 font-medium"
                     placeholder="Enter your password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
@@ -250,13 +250,13 @@ export default function SignInPage() {
                   </button>
                 </div>
                 <div className="flex justify-end mt-2">
-                  <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:text-blue-500">
+                  <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:text-blue-500 font-medium">
                     Forgot password?
                   </Link>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
+              {/* <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <input
                     id="remember-me"
@@ -269,9 +269,9 @@ export default function SignInPage() {
                     Remember me
                   </label>
                 </div>
-              </div>
+              </div> */}
 
-              <Button type="submit" className="w-full" disabled={loading || googleLoading}>
+              <Button type="submit" className="w-full rounded-2xl py-5.5" disabled={loading || googleLoading}>
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />

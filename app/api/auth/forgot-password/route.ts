@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { resend, FROM_EMAIL } from "@/lib/email"
+import { sendEmail } from "@/lib/email"
 import { ForgotPasswordEmail } from "@/app/emails/forgot-password-email"
 import crypto from "crypto"
 
@@ -47,16 +47,11 @@ export async function POST(request: NextRequest) {
     // Create reset URL
     const resetUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/auth/reset-password?token=${resetToken}`
 
-    // Send email using Resend
     try {
-      await resend.emails.send({
-        from: FROM_EMAIL,
+      await sendEmail({
         to: user.email,
         subject: "Reset Your Hope Autos Password",
-        react: ForgotPasswordEmail({
-          name: user.name || "User",
-          resetUrl,
-        } as any),
+        react: ForgotPasswordEmail({ name: user.name || "User", resetLink: resetUrl }),
       })
 
       console.log(`Password reset email sent to ${user.email}`)

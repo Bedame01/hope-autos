@@ -8,6 +8,8 @@ type Currency = "USD" | "NGN"
 interface CurrencyContextType {
   currency: Currency
   setCurrency: (curr: Currency) => void
+  exchangeRate: number
+  setExchangeRate: (rate: number) => void
   formatPrice: (price: number) => string
   getCurrencySymbol: () => string
   convertPrice: (price: number, fromCurrency?: Currency) => number
@@ -41,19 +43,50 @@ const exchangeRates = {
 
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currency, setCurrency] = useState<Currency>("USD")
+  const [exchangeRate, setExchangeRate] = useState(exchangeRates.NGN)
 
-  // Load saved currency preference from localStorage
   useEffect(() => {
-    const savedCurrency = localStorage.getItem("adminCurrency") as Currency
+    const savedCurrency = (localStorage.getItem("adminCurrency") || localStorage.getItem("currency")) as Currency
     if (savedCurrency && currencySymbols[savedCurrency]) {
       setCurrency(savedCurrency)
     }
+
+    const loadExchangeRate = async () => {
+      try {
+        const response = await fetch("/api/currency")
+        if (!response.ok) throw new Error("Unable to load currency exchange rate")
+
+        const data: { exchangeRate: number } = await response.json()
+        if (!Number.isFinite(data.exchangeRate) || data.exchangeRate <= 0) {
+          throw new Error("Currency exchange rate is invalid")
+        }
+
+        setExchangeRate(data.exchangeRate)
+        localStorage.setItem("hope-autos-exchange-rate", String(data.exchangeRate))
+      } catch (error) {
+        console.error("Error loading currency exchange rate:", error)
+      }
+    }
+
+    const savedRate = Number(localStorage.getItem("hope-autos-exchange-rate"))
+    if (Number.isFinite(savedRate) && savedRate > 0) setExchangeRate(savedRate)
+
+    const onExchangeRateUpdated = () => void loadExchangeRate()
+    window.addEventListener("currency-rate-updated", onExchangeRateUpdated)
+    void loadExchangeRate()
+    return () => window.removeEventListener("currency-rate-updated", onExchangeRateUpdated)
   }, [])
 
-  // Save currency preference to localStorage
   useEffect(() => {
     localStorage.setItem("adminCurrency", currency)
+    localStorage.setItem("currency", currency)
   }, [currency])
+
+  const updateExchangeRate = (rate: number) => {
+    setExchangeRate(rate)
+    localStorage.setItem("hope-autos-exchange-rate", String(rate))
+    window.dispatchEvent(new Event("currency-rate-updated"))
+  }
 
   const getCurrencySymbol = (): string => {
     return currencySymbols[currency]
@@ -63,10 +96,9 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     if (fromCurrency === currency) return price
 
     // Convert to USD first if needed
-    const usdPrice = fromCurrency === "USD" ? price : price / exchangeRates[fromCurrency]
+    const usdPrice = fromCurrency === "USD" ? price : price / exchangeRate
 
-    // Convert from USD to target currency
-    return currency === "USD" ? usdPrice : usdPrice * exchangeRates[currency]
+    return currency === "USD" ? usdPrice : usdPrice * exchangeRate
   }
 
   const formatPrice = (price: number): string => {
@@ -88,6 +120,8 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         currency,
         setCurrency,
+        exchangeRate,
+        setExchangeRate: updateExchangeRate,
         formatPrice,
         getCurrencySymbol,
         convertPrice,

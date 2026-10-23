@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { resend, FROM_EMAIL } from "@/lib/email"
+import { sendEmail } from "@/lib/email"
 import { NewArrivalEmail } from "@/app/emails/new-arrival-email"
 
 export async function POST(request: NextRequest) {
@@ -53,8 +53,7 @@ export async function POST(request: NextRequest) {
     // Send emails to all users
     for (const user of users) {
       try {
-        await resend.emails.send({
-          from: FROM_EMAIL,
+        await sendEmail({
           to: user.email,
           subject: `🚗 New Vehicles Arrived at Hope Autos - ${cars.length} New Cars!`,
           react: NewArrivalEmail({

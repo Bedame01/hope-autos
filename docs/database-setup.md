@@ -176,7 +176,7 @@ Error: Property 'user' does not exist
 After setting up the database:
 
 1. **Add Payment Processing** - Stripe integration
-2. **Email Automation** - Resend for transactional emails
+2. **Email Automation** - SMTP delivery with React Email templates
 3. **Advanced Search** - Algolia for better filtering
 4. **Analytics** - Track user behavior
 5. **Caching** - Redis for performance

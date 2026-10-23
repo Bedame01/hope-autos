@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { resend, FROM_EMAIL } from "@/lib/email"
+import { sendEmail } from "@/lib/email"
 import { PriceAlertEmail } from "@/app/emails/price-alert-email"
 import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
@@ -48,8 +48,7 @@ export async function POST(request: NextRequest) {
 
     // Send email
     try {
-      await resend.emails.send({
-        from: FROM_EMAIL,
+      await sendEmail({
         to: user.email,
         subject: `Price Drop Alert! ${car.year} ${car.make} ${car.model}`,
         react: PriceAlertEmail({

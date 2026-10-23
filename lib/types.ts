@@ -13,6 +13,7 @@ export interface Car {
   description: string
   features: string[]
   isAvailable: boolean
+  vin?: string
   createdAt: string
   updatedAt: string
 }

@@ -2,6 +2,7 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
+import { useCurrency } from "@/app/contexts/CurrencyContext"
 
 type Language = "en" | "es" | "fr" | "de" | "zh"
 type Currency = "USD" | "NGN"
@@ -479,30 +480,16 @@ const translations: Record<Language, TranslationObject> = {
   },
 }
 
-const currencySymbols = {
-  USD: "$",
-  NGN: "₦",
-}
-
-const currencyRates = {
-  USD: 1,
-  NGN: 1650, // 1 USD = 1650 NGN (approximate rate)
-}
-
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>("en")
-  const [currency, setCurrency] = useState<Currency>("USD")
+  const { currency, setCurrency, formatPrice: formatCurrencyPrice } = useCurrency()
 
   // Load saved preferences from localStorage
   useEffect(() => {
     const savedLanguage = localStorage.getItem("language") as Language
-    const savedCurrency = localStorage.getItem("currency") as Currency
 
     if (savedLanguage && translations[savedLanguage]) {
       setLanguage(savedLanguage)
-    }
-    if (savedCurrency && currencySymbols[savedCurrency]) {
-      setCurrency(savedCurrency)
     }
   }, [])
 
@@ -510,10 +497,6 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   useEffect(() => {
     localStorage.setItem("language", language)
   }, [language])
-
-  useEffect(() => {
-    localStorage.setItem("currency", currency)
-  }, [currency])
 
   const t = (key: string): string => {
     if (!language || !translations[language]) {
@@ -524,10 +507,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   }
 
   const formatPrice = (price: number): string => {
-    const convertedPrice = currency === "NGN" ? price * currencyRates.NGN : price
-    const symbol = currencySymbols[currency]
-
-    return `${symbol}${convertedPrice.toLocaleString()}`
+    return formatCurrencyPrice(price)
   }
 
   return (

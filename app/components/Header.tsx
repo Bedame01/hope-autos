@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react"
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
-import { User, LogOut, Settings, Heart } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { Heart, LogOut, Menu, Settings, User, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -13,226 +14,207 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import CustomButton from "@/components/ui/CustomButton"
-import MenuToggle from '@/components/ui/menuToggle'
 import { ThemeToggle } from "@/components/theme-toggle"
-import { ThemeLogo } from '@/components/Theme-logo'
-// import Image from "next/image"
-import { useTheme } from "next-themes"
-import { usePathname } from "next/navigation"
+import { ThemeLogo } from "@/components/Theme-logo"
+
+const navigation = [
+  { name: "Home", href: "/" },
+  { name: "Inventory", href: "/cars" },
+  { name: "FAQ", href: "/faq" },
+  { name: "Contact", href: "/contact" },
+]
 
 export default function Header() {
   const pathname = usePathname()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const { theme, setTheme } = useTheme()
   const { data: session, status } = useSession()
-  const [scrolled, setScrolled] = useState(false);
-  const SCROLL_THRESHOLD = 70; // Adjust the scroll height at which header toggles to black
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY > SCROLL_THRESHOLD);
-    };
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    setIsMenuOpen(false)
+  }, [pathname])
 
-  // Don't render Header on the sign in / sign up pages
-  if (pathname === "/auth/signin" || pathname === "/auth/signup") {
+  if (
+    pathname.startsWith("/admin") ||
+    pathname === "/auth/signin" ||
+    pathname === "/auth/signup"
+  ) {
     return null
   }
 
-  const navigation = [
-    { name: "Home", href: "/" },
-    { name: "Inventory", href: "/cars" },
-    { name: "FAQ", href: "/faq" },
-    // { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ]
-
   const handleSignOut = () => {
-    signOut({ callbackUrl: "/" })
+    void signOut({ callbackUrl: "/" })
+  }
+
+  const initials =
+    session?.user.name
+      ?.split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase() || "U"
+
+  const renderAccountActions = (mobile = false) => {
+    if (status === "loading") {
+      return <div className="h-9 w-9 animate-pulse rounded-full bg-muted" aria-label="Loading account" />
+    }
+
+    if (!session) {
+      return (
+        <div className={mobile ? "grid gap-2" : "flex items-center gap-2"}>
+          <Button variant="outline" className="rounded-full px-5" asChild>
+            <Link href="/auth/signin">Sign in</Link>
+          </Button>
+          <Button className="rounded-full px-5" asChild>
+            <Link href="/auth/signup">Create account</Link>
+          </Button>
+        </div>
+      )
+    }
+
+    if (mobile) {
+      return (
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 rounded-2xl bg-muted/60 p-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
+              <AvatarFallback>{initials}</AvatarFallback>
+            </Avatar>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-foreground">{session.user.name}</p>
+              <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+            </div>
+          </div>
+          <Button variant="outline" className="w-full justify-start rounded-xl" asChild>
+            <Link href="/dashboard"><User className="mr-2 h-4 w-4" />Dashboard</Link>
+          </Button>
+          <Button variant="outline" className="w-full justify-start rounded-xl" asChild>
+            <Link href="/favorites"><Heart className="mr-2 h-4 w-4" />Favorites</Link>
+          </Button>
+          <Button variant="outline" className="w-full justify-start rounded-xl" asChild>
+            <Link href="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link>
+          </Button>
+          {session.user.role === "admin" && (
+            <Button variant="outline" className="w-full justify-start rounded-xl" asChild>
+              <Link href="/admin">Admin panel</Link>
+            </Button>
+          )}
+          <Button variant="outline" className="w-full justify-start rounded-xl" onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />Sign out
+          </Button>
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex items-center gap-3">
+        {session.user.role === "admin" && (
+          <Button variant="outline" size="sm" className="rounded-full px-4" asChild>
+            <Link href="/admin">Admin panel</Link>
+          </Button>
+        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="h-10 w-10 rounded-full p-0" aria-label="Open account menu">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
+                <AvatarFallback>{initials}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="z-[70] w-56 rounded-2xl" align="end" forceMount>
+            <div className="flex min-w-0 flex-col gap-1 p-3">
+              <p className="truncate text-sm font-semibold">{session.user.name}</p>
+              <p className="truncate text-xs text-muted-foreground">{session.user.email}</p>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/dashboard" className="cursor-pointer"><User className="mr-2 h-4 w-4" />Dashboard</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/favorites" className="cursor-pointer"><Heart className="mr-2 h-4 w-4" />Favorites</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/settings" className="cursor-pointer"><Settings className="mr-2 h-4 w-4" />Settings</Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+              <LogOut className="mr-2 h-4 w-4" />Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    )
   }
 
   return (
-    <header className={`bg-white border-b border-[var(--border-line)] sticky top-0 z-50 `}>
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="md:w-1/3! md:mx-auto flex justify-center items-center">
-            <ThemeLogo className="w-16" />
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl">
+      <nav aria-label="Main navigation" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-[4.5rem] items-center justify-between gap-4">
+          <Link href="/" aria-label="Hope Autos home" className="flex shrink-0 items-center">
+            <ThemeLogo className="w-[4.25rem]" />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-5 lg:space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`hover:text-blue-600 px-1 lg:px-3 py-2 text-sm font-medium transition-colors ${pathname === item.href ? 'text-blue-600 text-base' : 'text-[var(--primary)]'}`}
-              >
-                {item.name}
-              </Link>
-            ))}
-
-            {/* Authentication Section */}
-            {status === "loading" ? (
-              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
-            ) : session ? (
-              <div className="flex items-center space-x-4">
-                {session.user.role === "admin" && (
-                  // <Button variant="outline" size="sm" asChild>
-                  //   <Link href="/admin">Admin Panel</Link>
-                  // </Button>
-                  <CustomButton 
-                    containerStyle="btn2 text-black border-white hover:bg-black hover:text-white rounded-full bg-transparent text-sm py-2 px-5 text-nowrap"
-                    contentText="Admin Panel"
-                    onClick=''
-                    href='/admin'
-                  />
-                )}
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
-                        <AvatarFallback>
-                          {session.user.name
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 z-70" align="end" forceMount>
-                    <div className="flex items-center justify-start gap-2 p-2">
-                      <div className="flex flex-col space-y-1 leading-none">
-                        <p className="font-medium">{session.user.name}</p>
-                        <p className="w-[200px] truncate text-sm text-muted-foreground">{session.user.email}</p>
-                      </div>
-                    </div>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/dashboard" className="cursor-pointer">
-                        <User className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/favorites" className="cursor-pointer">
-                        <Heart className="mr-2 h-4 w-4" />
-                        Favorites
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings" className="cursor-pointer">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Button className="btn2" asChild>
-                  <Link href="/auth/signin">Sign In</Link>
-                </Button>
-                <Button className="btn1" asChild>
-                  <Link href="/auth/signup">Sign Up</Link>
-                </Button>
-              </div>
-            )}
-            <ThemeToggle />
-          </div>
-
-          {/* Mobile menu button */}
-          <div className="md:hidden relative z-60 flex items-center space-x-2">
-            {/* <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-[var(--primary)] hover:text-blue-600 cursor-pointer">
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button> */}
-            <ThemeToggle />
-            <MenuToggle isOpen={isMenuOpen} setIsOpen={setIsMenuOpen} />
-          </div>
-        </div>
-
-        {/* Mobile Navigation */}
-        {/* {isMenuOpen && ( */}
-          <div className={`md:hidden shadow-lg w-full min-h-screen bg-[var(--background)]/70 fixed top-15 left-0 z-45 ${isMenuOpen ? 'top-0' : 'top-[-150%]'}`}>
-            <div className={`tranform px-2 pt-5 pb-10 space-y-1 sm:px-3 bg-white border-t border-b border-[var(--border-line)] ${isMenuOpen ? 'translate-y-0' : '-translate-y-[150%]'}`}>
-              {navigation.map((item) => (
+          <div className="hidden items-center gap-1 md:flex">
+            {navigation.map((item) => {
+              const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+              return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`hover:text-blue-600 block px-3 py-2 text-base font-medium ${pathname === item.href ? 'text-blue-600 text-lg' : 'text-[var(--primary)]'}`}
-                  onClick={() => setIsMenuOpen(false)}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    isActive ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"
+                  }`}
                 >
                   {item.name}
                 </Link>
-              ))}
+              )
+            })}
+          </div>
 
-              <Link
-                href='/settings'
-                className="text-[var(--primary)] hover:text-blue-600 block px-3 py-2 text-base font-medium"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Settings
-              </Link>
+          <div className="hidden items-center gap-3 md:flex">
+            {renderAccountActions()}
+            <ThemeToggle />
+          </div>
 
-              {/* Mobile Authentication */}
-              <div className="px-3 py-2 border-t">
-                {session ? (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-center space-x-2 my-3 mb-5">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={session.user.image || ""} alt={session.user.name || ""} />
-                        <AvatarFallback>
-                          {session.user.name
-                            ?.split(" ")
-                            .map((n) => n[0])
-                            .join("")
-                            .toUpperCase() || "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium text-sm">{session.user.name}</p>
-                        <p className="text-xs text-gray-500">{session.user.email}</p>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="w-full rounded-full py-5 mb-2 bg-transparent" asChild>
-                      <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
-                    </Button>
-                    {session.user.role === "admin" && (
-                      <Button variant="outline" size="sm" className="w-full rounded-full py-5 mb-2 bg-transparent" asChild>
-                        <Link href="/admin" onClick={() => setIsMenuOpen(false)}>Admin Panel</Link>
-                      </Button>
-                    )}
-                    <Button variant="outline" size="sm" className="w-full rounded-full py-5 bg-transparent" onClick={handleSignOut}>
-                      Sign Out
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <Button variant="outline" size="sm" className="w-full bg-transparent" asChild>
-                      <Link href="/auth/signin" onClick={() => setIsMenuOpen(false)}>Sign In</Link>
-                    </Button>
-                    <Button size="sm" className="w-full" asChild>
-                      <Link href="/auth/signup" onClick={() => setIsMenuOpen(false)}>Sign Up</Link>
-                    </Button>
-                  </div>
-                )}
-              </div>
+          <div className="flex items-center gap-2 md:hidden">
+            <ThemeToggle />
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMenuOpen}
+              onClick={() => setIsMenuOpen((open) => !open)}
+            >
+              {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <div className="border-t border-border py-4 md:hidden">
+            <div className="space-y-1">
+              {navigation.map((item) => {
+                const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    aria-current={isActive ? "page" : undefined}
+                    className={`block rounded-xl px-4 py-3 text-sm font-medium ${
+                      isActive ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/70"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </div>
+            <div className="mt-4 border-t border-border pt-4">
+              {renderAccountActions(true)}
             </div>
           </div>
-        {/* )} */}
+        )}
       </nav>
     </header>
   )
