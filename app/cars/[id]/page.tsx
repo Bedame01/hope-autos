@@ -393,36 +393,36 @@ export default function CarDetailPage() {
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Year: {car.year}</span>
+                      <span className="text-sm">Year: <span className="font-medium">{car.year}</span></span>
                     </div>
                     <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Gauge className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Mileage: {car.mileage.toLocaleString()} miles</span>
+                      <span className="text-sm">Mileage: <span className="font-medium">{car.mileage.toLocaleString()} miles</span></span>
                     </div>
                     <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Fuel className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Fuel: {car.fuelType}</span>
+                      <span className="text-sm">Fuel: <span className="font-medium">{car.fuelType}</span></span>
                     </div>
                     <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Settings className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Transmission: {car.transmission}</span>
+                      <span className="text-sm">Transmission: <span className="font-medium">{car.transmission}</span></span>
                     </div>
                     <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Palette className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Color: {car.color}</span>
+                      <span className="text-sm">Color: <span className="font-medium">{car.color}</span></span>
                     </div>
                     <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <CarIcon className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Body: {car.bodyType}</span>
+                      <span className="text-sm">Body: <span className="font-medium">{car.bodyType}</span></span>
                     </div>
                     <div className="flex items-center gap-3 rounded-2xl bg-muted/40 p-3">
                       <Calendar className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">Listed: {new Date(car.createdAt).toLocaleDateString()}</span>
+                      <span className="text-sm">Listed: <span className="font-medium">{new Date(car.createdAt).toLocaleDateString()}</span></span>
                     </div>
                     {car.vin && (
                       <div className="flex min-w-0 items-center gap-3 rounded-2xl bg-muted/40 p-3 sm:col-span-2">
                         <CarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-                        <span className="min-w-0 break-all text-sm">VIN: {car.vin}</span>
+                        <span className="min-w-0 break-all text-sm">VIN: <span className="font-medium">{car.vin}</span></span>
                       </div>
                     )}
                   </div>
@@ -437,9 +437,24 @@ export default function CarDetailPage() {
                   </Link>
                 </Button>
                 <Button size="lg" variant="outline" className="h-12 w-full rounded-full bg-transparent" asChild>
-                  <Link href="tel:+2348133531046">
-                    <Phone className="h-4 w-4 mr-2" />
-                    Call (234) 8133531046
+                  <Link href="https://wa.me/2348133531046" target="_blank" rel="noopener noreferrer">
+                    {/* <Phone className="h-4 w-4 mr-2" /> */}
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 96 96" id="Whatsapp-Icon--Streamline-Svg-Logos" height="24" width="24" className="mr-2 h-6! w-6!">
+                      <path fill="url(#a)" d="M3.20676 47.591c-.00237 7.924 2.06817 15.6613 6.00506 22.4808l-6.38174 23.301 23.84542-6.2524c6.5694 3.5806 13.9665 5.4706 21.4944 5.4725h.0199c24.7897 0 44.9692-20.1724 44.9796-44.9664.0048-12.0148-4.6698-23.3123-13.1629-31.812C71.5149 7.3153 60.2212 2.63217 48.1879 2.62695 23.3953 2.62695 3.21718 22.798 3.20676 47.591Z"></path>
+                      <path fill="url(#b)" d="M1.60084 47.5769C1.598 55.7861 3.74293 63.8001 7.82006 70.8637L1.20947 95l24.70063-6.4765c6.8058 3.7109 14.4683 5.6672 22.2657 5.6701h.0199c25.6791 0 46.5836-20.8979 46.5945-46.5793.0042-12.4465-4.8386-24.15-13.6349-32.9544C72.3577 5.85655 60.6598 1.00521 48.1957 1 22.5119 1 1.61126 21.8945 1.60084 47.5769ZM16.3103 69.6474l-.9221-1.4641c-3.8772-6.1647-5.92355-13.2884-5.92071-20.6036C9.47603 26.2337 26.8483 8.86713 48.2104 8.86713 58.5551 8.8714 68.2777 12.904 75.59 20.221c7.3123 7.3175 11.3359 17.0448 11.333 27.3905-.0095 21.3465-17.3822 38.7154-38.7273 38.7154h-.0151c-6.9503-.0038-13.7666-1.8701-19.7114-5.3971l-1.4148-.8392-14.6578 3.8431 3.9137-14.2863Z"></path>
+                      <path fill="#ffffff" d="M36.55 28.1053c-.8723-1.9389-1.79-1.9777-2.6197-2.0118-.6789-.0289-1.4555-.0271-2.2311-.0271-.7766 0-2.0379.2919-3.1044 1.4565-1.0675 1.1651-4.0753 3.9815-4.0753 9.7093 0 5.7284 4.1724 11.2634 4.7538 12.041.5823.7761 8.0542 12.9065 19.8876 17.5731 9.8349 3.8781 11.8363 3.1068 13.9708 2.9125 2.1345-.1938 6.8882-2.8154 7.8581-5.5341.9704-2.7182.9704-5.0484.6795-5.535-.291-.4852-1.0675-.7766-2.2317-1.3585-1.1646-.5823-6.8882-3.3991-7.9552-3.7876-1.0675-.388-1.8436-.5818-2.6202.5837-.7761 1.1642-3.0059 3.7858-3.6853 4.5624-.679.778-1.3584.8751-2.5226.2928-1.1646-.5842-4.9143-1.8123-9.3624-5.7781-3.4612-3.086-5.7976-6.8968-6.477-8.0624-.679-1.1641-.0725-1.7948.5112-2.3752.5231-.5216 1.1647-1.3593 1.747-2.0388.5809-.6799.7746-1.1651 1.1627-1.9417.3885-.777.1943-1.4569-.0967-2.0392-.2914-.5823-2.5538-6.3396-3.5891-8.6418Z"></path>
+                      <defs>
+                        <linearGradient id="a" x1="4519.8" x2="4519.8" y1="9077.23" y2="2.631" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#1faf38"></stop>
+                          <stop offset="1" stop-color="#60d669"></stop>
+                        </linearGradient>
+                        <linearGradient id="b" x1="4680.25" x2="4680.25" y1="9401.01" y2=".988" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#f9f9f9"></stop>
+                          <stop offset="1" stop-color="#ffffff"></stop>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    Whatsapp Contact
                   </Link>
                 </Button>
               </div>

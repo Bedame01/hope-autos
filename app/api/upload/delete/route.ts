@@ -1,7 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { deleteFromCloudinary, extractPublicId } from "@/lib/cloudinary"
+import { deleteFromCloudinary } from "@/lib/cloudinary-server"
+import { extractPublicId } from "@/lib/cloudinary"
+import { isAdminRequest } from "@/lib/admin-auth"
 
 export async function DELETE(request: NextRequest) {
+  if (!(await isAdminRequest())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   try {
     const { imageUrl } = await request.json()
 
@@ -10,6 +16,10 @@ export async function DELETE(request: NextRequest) {
     }
 
     const publicId = extractPublicId(imageUrl)
+    if (!publicId) {
+      return NextResponse.json({ error: "Invalid Cloudinary image URL" }, { status: 400 })
+    }
+
     const success = await deleteFromCloudinary(publicId)
 
     if (success) {

@@ -93,13 +93,13 @@ export default function ContactPage() {
           {/* Contact Form */}
           <Card>
             <CardHeader>
-              <CardTitle>Send us a Message</CardTitle>
+              <CardTitle>Send O'Hope Autos a Message 💼</CardTitle>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium text-[var(--foreground)] mb-1">
-                    Full Name *
+                    Full Name
                   </label>
                   <Input
                     id="name"
@@ -109,13 +109,13 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder="Your full name"
-                    className="text-[var(--text-color)] border border-[var(--border-line)] py-5"
+                    className="text-[var(--text-color)] border border-[var(--border-line)] py-5.5 rounded-full"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium text-[var(--foreground)] mb-1">
-                    Email Address *
+                    Email Address
                   </label>
                   <Input
                     id="email"
@@ -125,7 +125,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="your.email@example.com"
-                    className="text-[var(--text-color)] border border-[var(--border-line)] py-5"
+                    className="text-[var(--text-color)] border border-[var(--border-line)] py-5.5 rounded-full"
                   />
                 </div>
 
@@ -140,13 +140,13 @@ export default function ContactPage() {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="(555) 123-4567"
-                    className="text-[var(--text-color)] border border-[var(--border-line)] py-5"
+                    className="text-[var(--text-color)] border border-[var(--border-line)] py-5.5 rounded-full"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-[var(--foreground)] mb-1">
-                    Message *
+                    Message
                   </label>
                   <Textarea
                     id="message"
@@ -172,7 +172,7 @@ export default function ContactPage() {
                   </div>
                 )}
 
-                <Button type="submit" disabled={isSubmitting} className="w-full btn1 py-6 cursor-pointer">
+                <Button type="submit" disabled={isSubmitting} className="w-full btn1 py-6 rounded-full cursor-pointer">
                   {isSubmitting ? "Sending..." : "Send Message"}
                 </Button>
               </form>

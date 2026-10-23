@@ -103,7 +103,7 @@ export default function ResetPasswordPage() {
 
   if (validating) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-background flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-black flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md">
           <CardContent className="pt-6 text-center">
             <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
@@ -116,7 +116,7 @@ export default function ResetPasswordPage() {
 
   if (!tokenValid) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-background flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen bg-gradient-to-b from-background/70 to-background/80 flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Invalid Reset Link</CardTitle>
@@ -127,7 +127,7 @@ export default function ResetPasswordPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
             <Link href="/auth/forgot-password" className="block">
-              <Button className="w-full">Request New Reset Link</Button>
+              <Button className="w-full rounded-full py-5.5 bg-blue-500">Request New Reset Link</Button>
             </Link>
           </CardContent>
         </Card>
@@ -178,6 +178,7 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   disabled={loading}
                   required
+                  className="rounded-full py-5.5"
                 />
                 <p className="text-xs text-muted-foreground">Minimum 8 characters</p>
               </div>
@@ -194,10 +195,11 @@ export default function ResetPasswordPage() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   disabled={loading}
                   required
+                  className="rounded-full py-5.5"
                 />
               </div>
 
-              <Button type="submit" className="w-full" disabled={loading}>
+              <Button type="submit" className="w-full bg-blue-500 py-5.5" disabled={loading}>
                 {loading ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />

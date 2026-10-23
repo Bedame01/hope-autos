@@ -9,8 +9,8 @@ interface ThemeLogoProps {
 export function ThemeLogo({ className }: ThemeLogoProps) {
   return (
     <>
-      <img src={logoBlack.src} alt="H100 Lounge Logo" className={cn("h-auto dark:hidden", className)} />
-      <img src={logoWhite.src} alt="" aria-hidden="true" className={cn("hidden h-auto dark:block", className)} />
+      <img src={logoBlack.src} alt="H100 Lounge Logo" className={cn("w-18 h-auto dark:hidden", className)} />
+      <img src={logoWhite.src} alt="" aria-hidden="true" className={cn("w-18 hidden h-auto dark:block", className)} />
     </>
   )
 }

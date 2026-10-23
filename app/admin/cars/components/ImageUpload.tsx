@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -32,6 +32,8 @@ declare global {
 export default function ImageUpload({ images, onImagesChange, maxImages = 10, className = "" }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const imagesRef = useRef(images)
+  imagesRef.current = images
 
   const openCloudinaryWidget = useCallback(() => {
     if (!window.cloudinary) {
@@ -85,7 +87,12 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
 
         if (result.event === "success") {
           const newImageUrl = result.info.secure_url
-          onImagesChange([...images, newImageUrl])
+          const currentImages = imagesRef.current
+          if (currentImages.length < maxImages) {
+            const updatedImages = [...currentImages, newImageUrl]
+            imagesRef.current = updatedImages
+            onImagesChange(updatedImages)
+          }
         }
 
         if (result.event === "close") {

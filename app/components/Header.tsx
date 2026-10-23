@@ -60,10 +60,10 @@ export default function Header() {
     if (!session) {
       return (
         <div className={mobile ? "grid gap-2" : "flex items-center gap-2"}>
-          <Button variant="outline" className="rounded-full px-5" asChild>
+          <Button variant="outline" className="rounded-full py-5.5 px-5" asChild>
             <Link href="/auth/signin">Sign in</Link>
           </Button>
-          <Button className="rounded-full px-5" asChild>
+          <Button className="rounded-full py-5.5 px-5 bg-blue-500" asChild>
             <Link href="/auth/signup">Create account</Link>
           </Button>
         </div>
@@ -93,7 +93,7 @@ export default function Header() {
             <Link href="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link>
           </Button>
           {session.user.role === "admin" && (
-            <Button variant="outline" className="w-full justify-start rounded-xl" asChild>
+            <Button variant="default" className="w-full bg-blue-500 justify-start rounded-xl" asChild>
               <Link href="/admin">Admin panel</Link>
             </Button>
           )}
@@ -146,11 +146,12 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl py-2">
       <nav aria-label="Main navigation" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-[4.5rem] items-center justify-between gap-4">
-          <Link href="/" aria-label="Hope Autos home" className="flex shrink-0 items-center">
-            <ThemeLogo className="w-[4.25rem]" />
+          <Link href="/" className="flex items-center space-x-2">
+            <ThemeLogo className="w-13 h-auto"  />
+            <span className="md:hidden lg:inline-block text-2xl font-bold text-gray-900 tracking-[-1px]">O'Hope <span className="text-blue-600">Autos.</span></span>
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">
@@ -192,8 +193,8 @@ export default function Header() {
         </div>
 
         {isMenuOpen && (
-          <div className="border-t border-border py-4 md:hidden">
-            <div className="space-y-1">
+          <div className="border-t border-border py-4 md:hidden min-h-[80vh]">
+            <div className="space-y-1 flex flex-col items-center justify-center">
               {navigation.map((item) => {
                 const isActive = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href)
                 return (
@@ -201,8 +202,8 @@ export default function Header() {
                     key={item.name}
                     href={item.href}
                     aria-current={isActive ? "page" : undefined}
-                    className={`block rounded-xl px-4 py-3 text-sm font-medium ${
-                      isActive ? "bg-muted text-foreground" : "text-muted-foreground hover:bg-muted/70"
+                    className={`block rounded-xl px-4 py-2.5 text-xl uppercase font-medium ${
+                      isActive ? " text-blue-600" : "text-muted-foreground hover:text-blue-600"
                     }`}
                   >
                     {item.name}

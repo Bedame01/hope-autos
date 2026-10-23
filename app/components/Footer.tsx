@@ -4,9 +4,8 @@ import Link from "next/link"
 import { Phone, Mail, MapPin } from "lucide-react"
 import Image from "next/image"
 
-import logoWhite from '@/public/icons/logo-white.png'
-import logoBlack from '@/public/icons/logo-black.png'
 import { useTheme } from "next-themes"
+import { ThemeLogo } from "@/components/Theme-logo"
 
 export default function Footer() {
   const { theme, setTheme } = useTheme()
@@ -19,15 +18,15 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
               <Link href="/" className="flex items-center space-x-2">
-                <Image src={logoBlack} alt='logo' className="w-6 h-auto" />
-                <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">Hope <span className="text-blue-600">Autos.</span></span>
+                <ThemeLogo className="w-16 h-auto"  />
+                <span className="text-2xl font-bold text-gray-900 tracking-[-1px]">O'Hope <span className="text-blue-600">Autos.</span></span>
               </Link>
             </div>
-            <p className="text-[var(--foreground)] mb-4">
+            <p className="text-[var(--foreground)] text-base/5 mb-4">
               Your trusted partner in finding the perfect vehicle. We offer quality cars, exceptional service, and
               competitive prices.
             </p>
-            <div className="space-y-2">
+            <div className="space-y-2 mt-4 border-t pt-4">
               <div className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-blue-600" />
                 <span>(234) 8133531046 | (234) 8122770203</span>
