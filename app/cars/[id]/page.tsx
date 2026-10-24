@@ -23,6 +23,8 @@ import {
   Heart,
   Share2,
   Eye,
+  Download,
+  Loader2,
 } from "lucide-react"
 import { getDetailImageUrl, getThumbnailUrl, isCloudinaryUrl, getHeroImageUrl } from "@/lib/cloudinary"
 import type { Car } from "@/lib/types"
@@ -80,6 +82,9 @@ export default function CarDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
   const [viewCount, setViewCount] = useState(0)
+  const [downloadingPhotos, setDownloadingPhotos] = useState(false)
+  const [photoDownloadError, setPhotoDownloadError] = useState("")
+  const [photoDownloadNotice, setPhotoDownloadNotice] = useState("")
 
   const handleThumbnailClick = (index: number) => {
     setCurrentImageIndex(index)
@@ -138,6 +143,53 @@ export default function CarDetailPage() {
       }
     } else {
       navigator.clipboard.writeText(window.location.href)
+    }
+  }
+
+  const handleDownloadAllPhotos = async () => {
+    if (!car || downloadingPhotos) return
+
+    setDownloadingPhotos(true)
+    setPhotoDownloadError("")
+    setPhotoDownloadNotice("")
+
+    try {
+      const response = await fetch(`/api/cars/${encodeURIComponent(car.id)}/photos`)
+      if (!response.ok) {
+        const result = await response.json().catch(() => null)
+        throw new Error(result?.error || "Unable to prepare these photos. Please try again.")
+      }
+
+      const archive = await response.blob()
+      if (archive.size === 0) {
+        throw new Error("No photos were available to download. Please try again later.")
+      }
+
+      const fileName =
+        response.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/i)?.[1] ||
+        `${car.year}-${car.make}-${car.model}-Photos.zip`
+      const archiveUrl = URL.createObjectURL(archive)
+      const link = document.createElement("a")
+      link.href = archiveUrl
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.setTimeout(() => URL.revokeObjectURL(archiveUrl), 60_000)
+
+      const skippedPhotos = Number(response.headers.get("X-Photos-Skipped") || 0)
+      if (skippedPhotos > 0) {
+        const includedPhotos = Number(response.headers.get("X-Photos-Included") || 0)
+        setPhotoDownloadNotice(
+          `${includedPhotos} photos downloaded. ${skippedPhotos} unavailable ${skippedPhotos === 1 ? "photo was" : "photos were"} skipped.`,
+        )
+      }
+    } catch (error) {
+      setPhotoDownloadError(
+        error instanceof Error ? error.message : "Unable to prepare these photos. Please try again.",
+      )
+    } finally {
+      setDownloadingPhotos(false)
     }
   }
 
@@ -245,6 +297,26 @@ export default function CarDetailPage() {
 
   const images =
     car.images && car.images.length > 0 ? car.images : ["/placeholder.svg?height=600&width=800&text=No+Image"]
+  const configuredCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+  const downloadableImageCount =
+    car.isAvailable && configuredCloudName
+      ? car.images.filter((image) => {
+          try {
+            const url = new URL(image)
+            const path = url.pathname.split("/")
+            return (
+              url.protocol === "https:" &&
+              url.hostname === "res.cloudinary.com" &&
+              path[1]?.toLowerCase() === configuredCloudName.toLowerCase() &&
+              path[2] === "image" &&
+              path[3] === "upload" &&
+              path.length >= 5
+            )
+          } catch {
+            return false
+          }
+        }).length
+      : 0
 
   const getCurrentImageUrl = (index: number) => {
     const image = images[index]
@@ -341,6 +413,44 @@ export default function CarDetailPage() {
                     >
                       <span className="text-sm font-medium text-muted-foreground">+{images.length - 8} more</span>
                     </button>
+                  )}
+                </div>
+              )}
+
+              {car.isAvailable && (
+                <div className="mt-4 space-y-2">
+                  {downloadableImageCount > 0 ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full rounded-xl border-blue-600 text-blue-700 hover:bg-blue-50 hover:text-blue-800 sm:w-auto dark:text-blue-400 dark:hover:bg-blue-950"
+                      onClick={handleDownloadAllPhotos}
+                      disabled={downloadingPhotos}
+                    >
+                      {downloadingPhotos ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Preparing your photos...
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2 h-4 w-4" />
+                          Download All Photos
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Photos are unavailable for download.</p>
+                  )}
+                  {photoDownloadError && (
+                    <p className="text-sm text-destructive" role="alert">
+                      {photoDownloadError}
+                    </p>
+                  )}
+                  {photoDownloadNotice && (
+                    <p className="text-sm text-muted-foreground" role="status">
+                      {photoDownloadNotice}
+                    </p>
                   )}
                 </div>
               )}

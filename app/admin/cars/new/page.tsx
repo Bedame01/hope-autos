@@ -14,6 +14,7 @@ import ImageUpload from "../components/ImageUpload"
 import VehicleQrControls from "../components/VehicleQrControls"
 import { useCurrency } from "@/app/contexts/CurrencyContext"
 import type { Car } from "@/lib/types"
+import { MAX_VEHICLE_IMAGES } from "@/lib/car-images"
 
 export default function NewCarPage() {
   const router = useRouter()
@@ -309,7 +310,7 @@ export default function NewCarPage() {
             <ImageUpload
               images={formData.images}
               onImagesChange={(images) => handleChange("images", images)}
-              maxImages={8}
+              maxImages={MAX_VEHICLE_IMAGES}
               className="col-span-full"
             />
 

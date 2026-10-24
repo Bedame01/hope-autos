@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-// import QRCode from "qrcode"
+import QRCode from "qrcode"
 import { Copy, Download, Loader2, Printer, QrCode, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { Car } from "@/lib/types"
@@ -16,42 +16,41 @@ export default function VehicleQrControls({ car, autoOpen = false }: VehicleQrCo
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [vehicleUrl, setVehicleUrl] = useState("")
-  const [qrImage, setQrImage] = useState("false")
+  const [qrImage, setQrImage] = useState("")
   const [copied, setCopied] = useState(false)
 
-  // const generateQr = useCallback(async () => {
-  //   setLoading(true)
-  //   setError("")
-  //   setQrImage("")
+  const generateQr = useCallback(async () => {
+    setLoading(true)
+    setError("")
+    setQrImage("")
 
-  //   try {
-  //     const response = await fetch(`/api/admin/cars/${encodeURIComponent(car.id)}/qr`)
-  //     const data = await response.json()
-  //     if (!response.ok) {
-  //       throw new Error(data.error || "Unable to get the vehicle URL")
-  //     }
+    try {
+      const response = await fetch(`/api/admin/cars/${encodeURIComponent(car.id)}/qr`)
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to get the vehicle URL")
+      }
 
-  //     setVehicleUrl(data.url)
-  //     const image = await QRCode.toDataURL(data.url, {
-  //       errorCorrectionLevel: "H",
-  //       margin: 4,
-  //       width: 1024,
-  //     })
-  //     setQrImage(image)
-  //   } catch (qrError) {
-  //     console.error("Error generating vehicle QR code:", qrError)
-  //     setError(qrError instanceof Error ? qrError.message : "Unable to generate this QR code")
-  //   } finally {
-  //     setLoading(false)
-  //   }
+      setVehicleUrl(data.url)
+      const image = await QRCode.toDataURL(data.url, {
+        errorCorrectionLevel: "H",
+        margin: 4,
+        width: 1024,
+      })
+      setQrImage(image)
+    } catch (qrError) {
+      console.error("Error generating vehicle QR code:", qrError)
+      setError(qrError instanceof Error ? qrError.message : "Unable to generate this QR code")
+    } finally {
+      setLoading(false)
+    }
+  }, [car.id])
 
-  // }, [car.id])
-
-  // useEffect(() => {
-  //   if (open) {
-  //     void generateQr()
-  //   }
-  // }, [open, generateQr])
+  useEffect(() => {
+    if (open) {
+      void generateQr()
+    }
+  }, [open, generateQr])
 
   const copyVehicleUrl = async () => {
     try {
@@ -101,15 +100,14 @@ export default function VehicleQrControls({ car, autoOpen = false }: VehicleQrCo
                 <p className="text-red-500">QR code Failed to generate, Update Payment</p>
               ) : (
                 <div className="vehicle-qr-image vehicle-qr-image-loading">
-                  {loading ? <Loader2 className="h-10 w-10 animate-spin" /> : "QR code Failed to generate, Update Payment"}
-                  {/* {loading ? <Loader2 className="h-10 w-10 animate-spin" /> : "QR code unavailable"} */}
+                  {loading ? <Loader2 className="h-10 w-10 animate-spin" /> : "QR code unavailable"}
                 </div>
               )}
               {/* <p className="vehicle-qr-instruction">SCAN TO VIEW THIS VEHICLE</p>
               <p className="vehicle-qr-url">{vehicleUrl}</p> */}
             </div>
 
-            <div className="vehicle-qr-screen-actions">
+            {/* <div className="vehicle-qr-screen-actions">
               {error && (
                 <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
                   {error}
@@ -128,7 +126,7 @@ export default function VehicleQrControls({ car, autoOpen = false }: VehicleQrCo
                   />
                 </div>
               )}
-              {/* <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2">
                 {error && (
                   <Button type="button" variant="outline" onClick={() => void generateQr()} disabled={loading}>
                     Retry QR generation
@@ -154,8 +152,8 @@ export default function VehicleQrControls({ car, autoOpen = false }: VehicleQrCo
                     </Button>
                   </>
                 )}
-              </div> */}
-            </div>
+              </div>
+            </div> */}
           </section>
         </div>
       )}

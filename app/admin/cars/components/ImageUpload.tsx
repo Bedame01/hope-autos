@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Upload, X, Move, ImageIcon, Loader2 } from "lucide-react"
+import { extractPublicId } from "@/lib/cloudinary"
+import { MAX_VEHICLE_IMAGES } from "@/lib/car-images"
 
 interface ImageUploadProps {
   images: string[]
@@ -21,6 +23,16 @@ interface CloudinaryWidget {
   destroy: () => void
 }
 
+interface CloudinaryAssetInfo {
+  secure_url?: string
+  public_id?: string
+}
+
+interface CloudinaryWidgetResult {
+  event?: string
+  info?: CloudinaryAssetInfo | CloudinaryAssetInfo[]
+}
+
 declare global {
   interface Window {
     cloudinary: {
@@ -29,9 +41,16 @@ declare global {
   }
 }
 
-export default function ImageUpload({ images, onImagesChange, maxImages = 10, className = "" }: ImageUploadProps) {
+export default function ImageUpload({
+  images,
+  onImagesChange,
+  maxImages = MAX_VEHICLE_IMAGES,
+  className = "",
+}: ImageUploadProps) {
   const [uploading, setUploading] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const uploadHadErrorsRef = useRef(false)
   const imagesRef = useRef(images)
   imagesRef.current = images
 
@@ -41,7 +60,14 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
       return
     }
 
+    const remainingCapacity = Math.max(0, maxImages - imagesRef.current.length)
+    if (remainingCapacity === 0) {
+      return
+    }
+
     setUploading(true)
+    setUploadError(null)
+    uploadHadErrorsRef.current = false
 
     const widget = window.cloudinary.createUploadWidget(
       {
@@ -49,14 +75,12 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
         uploadPreset: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "hope-autos-cars",
         sources: ["local", "url", "camera"],
         multiple: true,
-        maxFiles: maxImages - images.length,
+        maxFiles: remainingCapacity,
         folder: "hope-autos/cars",
         clientAllowedFormats: ["jpg", "jpeg", "png", "webp"],
         maxImageFileSize: 10000000, // 10MB
         maxImageWidth: 2000,
         maxImageHeight: 2000,
-        cropping: true,
-        croppingAspectRatio: 4 / 3,
         showAdvancedOptions: true,
         showInsecurePreview: false,
         showCompletedButton: true,
@@ -78,32 +102,68 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
           },
         },
       },
-      (error: any, result: any) => {
+      (error: unknown, rawResult: unknown) => {
+        const result = rawResult as CloudinaryWidgetResult | undefined
         if (error) {
           console.error("Cloudinary upload error:", error)
-          setUploading(false)
-          return
+          uploadHadErrorsRef.current = true
         }
 
-        if (result.event === "success") {
-          const newImageUrl = result.info.secure_url
+        if (result?.event === "error") {
+          console.error("Cloudinary upload failed:", result.info)
+          uploadHadErrorsRef.current = true
+        }
+
+        if (result?.info) {
+          const uploadedAssets = Array.isArray(result.info) ? result.info : [result.info]
           const currentImages = imagesRef.current
-          if (currentImages.length < maxImages) {
-            const updatedImages = [...currentImages, newImageUrl]
+          const currentUrls = new Set(currentImages)
+          const currentPublicIds = new Set(
+            currentImages.map(extractPublicId).filter((publicId): publicId is string => publicId !== null),
+          )
+          const updatedImages = [...currentImages]
+
+          for (const asset of uploadedAssets) {
+            const secureUrl = asset?.secure_url
+            if (typeof secureUrl !== "string" || !secureUrl) {
+              continue
+            }
+
+            const publicId = asset.public_id || extractPublicId(secureUrl)
+            if (
+              currentUrls.has(secureUrl) ||
+              (publicId && currentPublicIds.has(publicId)) ||
+              updatedImages.length >= maxImages
+            ) {
+              continue
+            }
+
+            updatedImages.push(secureUrl)
+            currentUrls.add(secureUrl)
+            if (publicId) {
+              currentPublicIds.add(publicId)
+            }
+          }
+
+          if (updatedImages.length !== currentImages.length) {
             imagesRef.current = updatedImages
             onImagesChange(updatedImages)
           }
         }
 
-        if (result.event === "close") {
+        if (result?.event === "close") {
           setUploading(false)
+          if (uploadHadErrorsRef.current) {
+            setUploadError("Some photos could not be uploaded. Successful uploads were kept; you can retry the remaining photos.")
+          }
+          uploadHadErrorsRef.current = false
           widget.destroy()
         }
       },
     )
 
     widget.open()
-  }, [images, maxImages, onImagesChange])
+  }, [maxImages, onImagesChange])
 
   const removeImage = async (index: number) => {
     const imageUrl = images[index]
@@ -237,6 +297,12 @@ export default function ImageUpload({ images, onImagesChange, maxImages = 10, cl
             </Button>
           </CardContent>
         </Card>
+      )}
+
+      {uploadError && (
+        <p className="mb-4 text-sm text-destructive" role="alert">
+          {uploadError}
+        </p>
       )}
 
       {/* Image Grid */}

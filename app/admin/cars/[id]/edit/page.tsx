@@ -14,6 +14,7 @@ import type { Car } from "@/lib/types"
 import ImageUpload from "../../components/ImageUpload"
 import VehicleQrControls from "../../components/VehicleQrControls"
 import { useCurrency } from "@/app/contexts/CurrencyContext"
+import { MAX_VEHICLE_IMAGES } from "@/lib/car-images"
 
 export default function EditCarPage() {
   const router = useRouter()
@@ -180,7 +181,7 @@ export default function EditCarPage() {
             <ImageUpload
               images={formData.images}
               onImagesChange={(images) => handleChange("images", images)}
-              maxImages={8}
+              maxImages={MAX_VEHICLE_IMAGES}
             />
 
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
