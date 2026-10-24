@@ -518,7 +518,7 @@ export default function CarDetailPage() {
                                 Opening share sheet...
                               </>
                             ) : (
-                              "Save to Photos/Gallery"
+                              "Save to Photos/Share Images"
                             )}
                           </Button>
                           <Button

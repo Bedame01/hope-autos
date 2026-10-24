@@ -436,7 +436,7 @@ header *{
   bottom: auto;
   left: auto;
   font: 0px / 0 a;
-  transition: 0.5s;
+  transition: 0.4s;
 }
 .header-menu-toggle span::before {
   top: -8px;
@@ -453,7 +453,7 @@ header *{
   background-color: inherit;
   position: absolute;
   left: 0px;
-  transition: 0.5s;
+  transition: 0.4s;
 }
 .header-menu-toggle.is-clicked span::after {
   bottom: 0px !important;
