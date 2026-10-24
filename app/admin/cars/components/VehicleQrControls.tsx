@@ -92,22 +92,21 @@ export default function VehicleQrControls({ car, autoOpen = false }: VehicleQrCo
             </div>
 
             <div className="vehicle-qr-printable">
-              {/* <img className="vehicle-qr-logo" src="/icons/logo-black.png" alt="Hope Autos" />
+              <img className="vehicle-qr-logo" src="/icons/logo-black.png" alt="Hope Autos" />
               <p className="vehicle-qr-brand text-blue-500!">HOPE AUTOS</p>
-              <h1>{car.year} {car.make} {car.model}</h1> */}
+              <h1>{car.year} {car.make} {car.model}</h1>
               {qrImage ? (
-                // <img className="vehicle-qr-image" src={qrImage} alt={`QR code linking to ${vehicleUrl}`} />
-                <p className="text-red-500">QR code Failed to generate, Update Payment</p>
+                <img className="vehicle-qr-image" src={qrImage} alt={`QR code linking to ${vehicleUrl}`} />
               ) : (
                 <div className="vehicle-qr-image vehicle-qr-image-loading">
                   {loading ? <Loader2 className="h-10 w-10 animate-spin" /> : "QR code unavailable"}
                 </div>
               )}
-              {/* <p className="vehicle-qr-instruction">SCAN TO VIEW THIS VEHICLE</p>
-              <p className="vehicle-qr-url">{vehicleUrl}</p> */}
+              <p className="vehicle-qr-instruction">SCAN TO VIEW THIS VEHICLE</p>
+              <p className="vehicle-qr-url">{vehicleUrl}</p>
             </div>
 
-            {/* <div className="vehicle-qr-screen-actions">
+            <div className="vehicle-qr-screen-actions">
               {error && (
                 <div className="mb-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">
                   {error}
@@ -153,7 +152,7 @@ export default function VehicleQrControls({ car, autoOpen = false }: VehicleQrCo
                   </>
                 )}
               </div>
-            </div> */}
+            </div>
           </section>
         </div>
       )}

@@ -8,7 +8,7 @@ import { AuthProvider } from "./components/AuthProvider"
 import { ThemeProvider } from "./components/ThemeProvider"
 import { Toaster } from "@/components/ui/toaster"
 
-import favicon from '@/public/icons/logo-black.png'
+import favicon from '@/public/icons/logo-icon.png'
 import { CurrencyProvider } from "./contexts/CurrencyContext"
 import { LanguageProvider } from "./contexts/LanguageContext"
 

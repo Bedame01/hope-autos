@@ -93,7 +93,7 @@ export default function Header() {
             <Link href="/settings"><Settings className="mr-2 h-4 w-4" />Settings</Link>
           </Button>
           {session.user.role === "admin" && (
-            <Button variant="default" className="w-full bg-blue-500 justify-start rounded-xl" asChild>
+            <Button variant="default" className="w-full bg-foreground justify-start rounded-xl" asChild>
               <Link href="/admin">Admin panel</Link>
             </Button>
           )}
@@ -146,7 +146,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl py-2">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/90 backdrop-blur-xl py-1.5">
       <nav aria-label="Main navigation" className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-[4.5rem] items-center justify-between gap-4">
           <Link href="/" className="flex items-center space-x-2">

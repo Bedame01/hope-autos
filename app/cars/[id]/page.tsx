@@ -542,8 +542,7 @@ export default function CarDetailPage() {
                   )}
                   {downloadableImageIndexes.length > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      Select all photos, then choose Photos or Gallery from your device’s share sheet. No ZIP file is
-                      created.
+                      Select all photos, then choose Photos or Gallery from your device’s share sheet.
                     </p>
                   )}
                   {photoDownloadError && (

@@ -395,7 +395,7 @@ body{
 
 /* #MENU TOGGLE ICON */
 header *{
-  transition: all .3s ease !important;
+  transition: all .4s ease !important;
 }
 
 .s-header{
