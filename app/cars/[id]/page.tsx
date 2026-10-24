@@ -27,6 +27,7 @@ import {
   Loader2,
 } from "lucide-react"
 import { getDetailImageUrl, getThumbnailUrl, isCloudinaryUrl, getHeroImageUrl } from "@/lib/cloudinary"
+import { MAX_VEHICLE_IMAGES } from "@/lib/car-images"
 import type { Car } from "@/lib/types"
 import CarCard from "@/app/components/CarCard"
 import { useCurrency } from "@/app/contexts/CurrencyContext"
@@ -82,7 +83,9 @@ export default function CarDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false)
   const [favoriteLoading, setFavoriteLoading] = useState(false)
   const [viewCount, setViewCount] = useState(0)
-  const [downloadingPhotos, setDownloadingPhotos] = useState(false)
+  const [preparingPhotos, setPreparingPhotos] = useState(false)
+  const [sharingPhotos, setSharingPhotos] = useState(false)
+  const [selectedPhotoFiles, setSelectedPhotoFiles] = useState<File[]>([])
   const [photoDownloadError, setPhotoDownloadError] = useState("")
   const [photoDownloadNotice, setPhotoDownloadNotice] = useState("")
 
@@ -146,50 +149,107 @@ export default function CarDetailPage() {
     }
   }
 
-  const handleDownloadAllPhotos = async () => {
-    if (!car || downloadingPhotos) return
+  const handleSelectAllPhotos = async () => {
+    if (!car || preparingPhotos || selectedPhotoFiles.length > 0) return
 
-    setDownloadingPhotos(true)
+    setPreparingPhotos(true)
     setPhotoDownloadError("")
     setPhotoDownloadNotice("")
 
     try {
-      const response = await fetch(`/api/cars/${encodeURIComponent(car.id)}/photos`)
-      if (!response.ok) {
-        const result = await response.json().catch(() => null)
-        throw new Error(result?.error || "Unable to prepare these photos. Please try again.")
+      const files: File[] = []
+      let totalSize = 0
+      let unavailableCount = 0
+
+      for (const index of downloadableImageIndexes) {
+        let response: Response
+        try {
+          response = await fetch(`/api/cars/${encodeURIComponent(car.id)}/photos?index=${index}`, {
+            cache: "no-store",
+          })
+        } catch {
+          unavailableCount += 1
+          continue
+        }
+
+        if (!response.ok) {
+          unavailableCount += 1
+          continue
+        }
+
+        let image: Blob
+        try {
+          image = await response.blob()
+        } catch {
+          unavailableCount += 1
+          continue
+        }
+
+        totalSize += image.size
+        if (totalSize > 75 * 1024 * 1024) {
+          throw new Error("These photos are too large to prepare together on this device.")
+        }
+
+        const fallbackName = `${String(index + 1).padStart(2, "0")}-vehicle-photo`
+        const filename =
+          response.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/i)?.[1] ||
+          `${fallbackName}.${image.type.split("/")[1] || "jpg"}`
+        files.push(new File([image], filename, { type: image.type }))
       }
 
-      const archive = await response.blob()
-      if (archive.size === 0) {
-        throw new Error("No photos were available to download. Please try again later.")
+      if (files.length === 0) {
+        throw new Error("No photos could be prepared. Please try again later.")
       }
 
-      const fileName =
-        response.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/i)?.[1] ||
-        `${car.year}-${car.make}-${car.model}-Photos.zip`
-      const archiveUrl = URL.createObjectURL(archive)
-      const link = document.createElement("a")
-      link.href = archiveUrl
-      link.download = fileName
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      window.setTimeout(() => URL.revokeObjectURL(archiveUrl), 60_000)
-
-      const skippedPhotos = Number(response.headers.get("X-Photos-Skipped") || 0)
-      if (skippedPhotos > 0) {
-        const includedPhotos = Number(response.headers.get("X-Photos-Included") || 0)
-        setPhotoDownloadNotice(
-          `${includedPhotos} photos downloaded. ${skippedPhotos} unavailable ${skippedPhotos === 1 ? "photo was" : "photos were"} skipped.`,
-        )
-      }
+      setSelectedPhotoFiles(files)
+      setPhotoDownloadNotice(
+        unavailableCount === 0
+          ? `${files.length} photos selected. Tap Save to Photos/Gallery to choose where to save them.`
+          : `${files.length} photos selected. ${unavailableCount} unavailable ${unavailableCount === 1 ? "photo was" : "photos were"} skipped.`,
+      )
     } catch (error) {
       setPhotoDownloadError(
         error instanceof Error ? error.message : "Unable to prepare these photos. Please try again.",
       )
     } finally {
-      setDownloadingPhotos(false)
+      setPreparingPhotos(false)
+    }
+  }
+
+  const handleSavePhotosToDevice = async () => {
+    if (selectedPhotoFiles.length === 0 || sharingPhotos) return
+
+    if (typeof navigator.share !== "function" || typeof navigator.canShare !== "function") {
+      setPhotoDownloadError(
+        "This browser cannot send multiple photos to your device gallery. Try opening this page in Safari on iPhone or Chrome on Android.",
+      )
+      return
+    }
+
+    const shareData: ShareData = {
+      files: selectedPhotoFiles,
+      title: `${car?.year} ${car?.make} ${car?.model} photos`,
+    }
+    if (!navigator.canShare(shareData)) {
+      setPhotoDownloadError(
+        "This browser cannot send multiple photos to your device gallery. Try opening this page in Safari on iPhone or Chrome on Android.",
+      )
+      return
+    }
+
+    setSharingPhotos(true)
+    setPhotoDownloadError("")
+    try {
+      await navigator.share(shareData)
+      setPhotoDownloadNotice("The photos were shared. Choose Photos or Gallery in your device's share sheet to save them.")
+    } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        setPhotoDownloadNotice("Sharing was cancelled. Your selected photos are ready to share again.")
+      } else {
+        setPhotoDownloadError("Unable to open the device share sheet. Please try again.")
+      }
+    } finally {
+      setSharingPhotos(false)
     }
   }
 
@@ -298,25 +358,29 @@ export default function CarDetailPage() {
   const images =
     car.images && car.images.length > 0 ? car.images : ["/placeholder.svg?height=600&width=800&text=No+Image"]
   const configuredCloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
-  const downloadableImageCount =
-    car.isAvailable && configuredCloudName
-      ? car.images.filter((image) => {
-          try {
-            const url = new URL(image)
-            const path = url.pathname.split("/")
-            return (
-              url.protocol === "https:" &&
-              url.hostname === "res.cloudinary.com" &&
-              path[1]?.toLowerCase() === configuredCloudName.toLowerCase() &&
-              path[2] === "image" &&
-              path[3] === "upload" &&
-              path.length >= 5
-            )
-          } catch {
-            return false
-          }
-        }).length
-      : 0
+  const downloadableImageIndexes: number[] = []
+  if (car.isAvailable && configuredCloudName) {
+    const seenImageUrls = new Set<string>()
+    car.images.slice(0, MAX_VEHICLE_IMAGES).forEach((image, index) => {
+      try {
+        const url = new URL(image)
+        const path = url.pathname.split("/")
+        const isDownloadable =
+          url.protocol === "https:" &&
+          url.hostname === "res.cloudinary.com" &&
+          path[1]?.toLowerCase() === configuredCloudName.toLowerCase() &&
+          path[2] === "image" &&
+          path[3] === "upload" &&
+          path.length >= 5
+        if (isDownloadable && !seenImageUrls.has(image)) {
+          seenImageUrls.add(image)
+          downloadableImageIndexes.push(index)
+        }
+      } catch {
+        return
+      }
+    })
+  }
 
   const getCurrentImageUrl = (index: number) => {
     const image = images[index]
@@ -419,28 +483,68 @@ export default function CarDetailPage() {
 
               {car.isAvailable && (
                 <div className="mt-4 space-y-2">
-                  {downloadableImageCount > 0 ? (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="w-full rounded-xl border-blue-600 text-blue-700 hover:bg-blue-50 hover:text-blue-800 sm:w-auto dark:text-blue-400 dark:hover:bg-blue-950"
-                      onClick={handleDownloadAllPhotos}
-                      disabled={downloadingPhotos}
-                    >
-                      {downloadingPhotos ? (
+                  {downloadableImageIndexes.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="rounded-xl border-blue-600 text-blue-700 hover:bg-blue-50 hover:text-blue-800 dark:text-blue-400 dark:hover:bg-blue-950"
+                        onClick={handleSelectAllPhotos}
+                        disabled={preparingPhotos || selectedPhotoFiles.length > 0}
+                      >
+                        {preparingPhotos ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Preparing photos...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="mr-2 h-4 w-4" />
+                            Select all photos
+                          </>
+                        )}
+                      </Button>
+                      {selectedPhotoFiles.length > 0 && (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Preparing your photos...
-                        </>
-                      ) : (
-                        <>
-                          <Download className="mr-2 h-4 w-4" />
-                          Download All Photos
+                          <Button
+                            type="button"
+                            className="rounded-xl"
+                            onClick={handleSavePhotosToDevice}
+                            disabled={sharingPhotos}
+                          >
+                            {sharingPhotos ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Opening share sheet...
+                              </>
+                            ) : (
+                              "Save to Photos/Gallery"
+                            )}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            className="rounded-xl"
+                            onClick={() => {
+                              setSelectedPhotoFiles([])
+                              setPhotoDownloadError("")
+                              setPhotoDownloadNotice("")
+                            }}
+                            disabled={sharingPhotos}
+                          >
+                            Clear selection
+                          </Button>
                         </>
                       )}
-                    </Button>
+                    </div>
                   ) : (
                     <p className="text-sm text-muted-foreground">Photos are unavailable for download.</p>
+                  )}
+                  {downloadableImageIndexes.length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Select all photos, then choose Photos or Gallery from your device’s share sheet. No ZIP file is
+                      created.
+                    </p>
                   )}
                   {photoDownloadError && (
                     <p className="text-sm text-destructive" role="alert">

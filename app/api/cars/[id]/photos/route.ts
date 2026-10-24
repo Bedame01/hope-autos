@@ -1,26 +1,12 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { Readable } from "node:stream"
-import { ZipArchive } from "archiver"
 import { prisma } from "@/lib/prisma"
 import { MAX_VEHICLE_IMAGES } from "@/lib/car-images"
 
 export const runtime = "nodejs"
-export const maxDuration = 180
+export const maxDuration = 30
 
 const MAX_IMAGE_SIZE = 10_000_000
-const MAX_ARCHIVE_IMAGE_SIZE = 75 * 1024 * 1024
 const IMAGE_FETCH_TIMEOUT_MS = 15_000
-const DOWNLOAD_CONCURRENCY = 3
-
-interface DownloadableImage {
-  url: string
-  name: string
-}
-
-interface RetrievedImage extends DownloadableImage {
-  data: Buffer
-  extension: string
-}
 
 function isAllowedCloudinaryUrl(imageUrl: string, cloudName: string): boolean {
   try {
@@ -46,27 +32,31 @@ function isAllowedCloudinaryUrl(imageUrl: string, cloudName: string): boolean {
   }
 }
 
-function getFileExtension(data: Buffer): string | null {
-  if (data.length >= 3 && data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff) return "jpg"
+function identifyImage(data: Buffer): { extension: string; contentType: string } | null {
+  if (data.length >= 3 && data[0] === 0xff && data[1] === 0xd8 && data[2] === 0xff) {
+    return { extension: "jpg", contentType: "image/jpeg" }
+  }
   if (
     data.length >= 8 &&
     data.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
   ) {
-    return "png"
+    return { extension: "png", contentType: "image/png" }
   }
   if (data.length >= 12 && data.toString("ascii", 0, 4) === "RIFF" && data.toString("ascii", 8, 12) === "WEBP") {
-    return "webp"
+    return { extension: "webp", contentType: "image/webp" }
   }
-  if (data.length >= 6 && ["GIF87a", "GIF89a"].includes(data.toString("ascii", 0, 6))) return "gif"
+  if (data.length >= 6 && ["GIF87a", "GIF89a"].includes(data.toString("ascii", 0, 6))) {
+    return { extension: "gif", contentType: "image/gif" }
+  }
   if (data.length >= 12 && data.toString("ascii", 4, 8) === "ftyp") {
     const brand = data.toString("ascii", 8, 12)
-    if (brand === "avif" || brand === "avis") return "avif"
+    if (brand === "avif" || brand === "avis") return { extension: "avif", contentType: "image/avif" }
   }
   return null
 }
 
-function getImageName(url: string, index: number): string {
-  const lastPathPart = new URL(url).pathname.split("/").pop() || ""
+function getImageName(imageUrl: string, index: number): string {
+  const lastPathPart = new URL(imageUrl).pathname.split("/").pop() || ""
   let decodedName = lastPathPart
   try {
     decodedName = decodeURIComponent(lastPathPart)
@@ -86,14 +76,13 @@ function getImageName(url: string, index: number): string {
   return `${String(index + 1).padStart(2, "0")}-${slug || "vehicle-photo"}`
 }
 
-async function retrieveImage(url: string, name: string): Promise<RetrievedImage | null> {
+async function retrieveImage(imageUrl: string): Promise<Buffer | null> {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(imageUrl, {
       headers: { Accept: "image/avif,image/webp,image/png,image/jpeg,image/gif" },
       redirect: "error",
       signal: AbortSignal.timeout(IMAGE_FETCH_TIMEOUT_MS),
     })
-
     if (!response.ok || !response.body) return null
 
     const contentLength = Number(response.headers.get("content-length"))
@@ -116,23 +105,10 @@ async function retrieveImage(url: string, name: string): Promise<RetrievedImage 
       chunks.push(value)
     }
 
-    const data = Buffer.concat(chunks, size)
-    const extension = getFileExtension(data)
-    if (!extension) return null
-    return { url, name, data, extension }
+    return Buffer.concat(chunks, size)
   } catch {
     return null
   }
-}
-
-function getArchiveFileName(year: number, make: string, model: string): string {
-  const safePart = (value: string) =>
-    value
-      .normalize("NFKD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-zA-Z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
-  return `${year}-${safePart(make)}-${safePart(model)}-Photos.zip`
 }
 
 function jsonError(message: string, status: number) {
@@ -145,6 +121,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return jsonError("Invalid vehicle ID.", 400)
   }
 
+  const imageIndexValue = request.nextUrl.searchParams.get("index")
+  const imageIndex = Number(imageIndexValue)
+  if (
+    imageIndexValue === null ||
+    !/^\d+$/.test(imageIndexValue) ||
+    !Number.isInteger(imageIndex) ||
+    imageIndex < 0 ||
+    imageIndex >= MAX_VEHICLE_IMAGES
+  ) {
+    return jsonError("Invalid vehicle photo index.", 400)
+  }
+
   const cloudName = process.env.CLOUDINARY_CLOUD_NAME || process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
   if (!cloudName) {
     return jsonError("Vehicle photos are temporarily unavailable.", 503)
@@ -153,67 +141,40 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const car = await prisma.car.findUnique({
       where: { id },
-      select: { year: true, make: true, model: true, images: true, isAvailable: true },
+      select: { images: true, isAvailable: true },
     })
 
     if (!car || !car.isAvailable) {
       return jsonError("This vehicle is not available for photo download.", 404)
     }
 
-    const seenUrls = new Set<string>()
-    const imageRecords = car.images.slice(0, MAX_VEHICLE_IMAGES)
-    const candidates: DownloadableImage[] = imageRecords
-      .filter((url) => {
-        if (!isAllowedCloudinaryUrl(url, cloudName) || seenUrls.has(url)) return false
-        seenUrls.add(url)
-        return true
-      })
-      .map((url, index) => ({ url, name: getImageName(url, index) }))
-
-    if (candidates.length === 0) {
-      return jsonError("Photos are currently unavailable for this vehicle.", 404)
+    const imageUrl = car.images[imageIndex]
+    if (!imageUrl || !isAllowedCloudinaryUrl(imageUrl, cloudName)) {
+      return jsonError("This photo is unavailable for download.", 404)
     }
 
-    const retrievedImages: RetrievedImage[] = []
-    for (let offset = 0; offset < candidates.length; offset += DOWNLOAD_CONCURRENCY) {
-      const batch = candidates.slice(offset, offset + DOWNLOAD_CONCURRENCY)
-      const batchImages = await Promise.all(batch.map(({ url, name }) => retrieveImage(url, name)))
-      retrievedImages.push(...batchImages.filter((image): image is RetrievedImage => image !== null))
-
-      const totalSize = retrievedImages.reduce((total, image) => total + image.data.length, 0)
-      if (totalSize > MAX_ARCHIVE_IMAGE_SIZE) {
-        return jsonError("These photos are too large to prepare as one download. Please contact us for assistance.", 413)
-      }
+    const image = await retrieveImage(imageUrl)
+    if (!image) {
+      return jsonError("This photo is currently unavailable. Please try again later.", 502)
     }
 
-    if (retrievedImages.length === 0) {
-      return jsonError("Photos are currently unavailable. Please try again later.", 502)
+    const imageType = identifyImage(image)
+    if (!imageType) {
+      return jsonError("This photo is not in a supported image format.", 415)
     }
 
-    const archive = new ZipArchive({ zlib: { level: 0 } })
-    archive.on("warning", () => archive.destroy(new Error("Archive generation warning")))
-    archive.on("error", () => archive.destroy(new Error("Archive generation failed")))
-    for (const image of retrievedImages) {
-      archive.append(image.data, { name: `${image.name}.${image.extension}` })
-    }
-    void archive.finalize().catch(() => {
-      archive.destroy(new Error("Archive generation failed"))
-    })
-
-    const zipStream = Readable.toWeb(archive) as ReadableStream<Uint8Array>
-    const fileName = getArchiveFileName(car.year, car.make, car.model)
-    return new Response(zipStream, {
+    const filename = `${getImageName(imageUrl, imageIndex)}.${imageType.extension}`
+    return new Response(new Uint8Array(image), {
       headers: {
-        "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename="${fileName}"`,
+        "Content-Type": imageType.contentType,
+        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Length": String(image.length),
         "Cache-Control": "no-store",
         "X-Content-Type-Options": "nosniff",
-        "X-Photos-Included": String(retrievedImages.length),
-        "X-Photos-Skipped": String(imageRecords.length - retrievedImages.length),
       },
     })
   } catch {
-    console.error("Failed to generate vehicle photo archive.")
-    return jsonError("Unable to prepare these photos right now. Please try again.", 500)
+    console.error("Failed to download vehicle photo.")
+    return jsonError("Unable to download this photo right now. Please try again.", 500)
   }
 }
