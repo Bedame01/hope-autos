@@ -26,7 +26,7 @@ No WhatsApp service or phone number is configured by this QR feature. It keeps t
 
 ## 3. Environment configuration
 
-Set the following application environment variable for **local development and every deployed environment**:
+Set the following application environment variable for **local development and deployments that use a different canonical domain**:
 
 ```dotenv
 NEXT_PUBLIC_BASE_URL=https://your-canonical-production-domain.example
@@ -34,13 +34,15 @@ NEXT_PUBLIC_BASE_URL=https://your-canonical-production-domain.example
 
 Replace the example with the actual canonical origin serving the site. For example, if customers should use the Vercel domain, set that exact HTTPS origin. If the dealership uses a custom domain, use the custom domain instead. Do not include a path, query string, credentials, or trailing application route.
 
+The production QR endpoint defaults to `https://hope-autos.com` when `NEXT_PUBLIC_BASE_URL` is unset or accidentally points to localhost. Set the variable explicitly when deploying a different canonical domain. A configured non-local production URL must use HTTPS.
+
 Local-only example:
 
 ```dotenv
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-Production requires HTTPS. The implementation intentionally does not fall back to localhost, a temporary preview deployment, or a guessed domain. If the value is unset or invalid, the vehicle is still saved, but QR URL generation reports an error; correct the environment variable and use **Retry QR generation**.
+Production requires HTTPS. The implementation does not use the incoming request host, which could produce incorrect links on preview deployments or behind proxies. Invalid configured origins still cause QR URL generation to report an error; correct the environment variable and use **Retry QR generation**.
 
 Because this variable is read on the server by the QR URL endpoint, configure it in the hosting provider's server environment for the relevant deployment and redeploy/restart as required by that provider.
 
@@ -203,4 +205,3 @@ QR creation, camera scanning, and physical printing require a browser/phone and 
 - `app/api/cars/[id]/route.ts` and `app/cars/[id]/page.tsx` — validated public ID lookup and customer detail loading states.
 - `app/globals.css` — responsive QR dialog and print-only label styles.
 - `prisma/schema.prisma` and `prisma/add-car-creation-request-id.sql` — additive retry-protection field and SQL migration.
-
