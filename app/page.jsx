@@ -65,9 +65,9 @@ export default async function HomePage() {
 
         <div id="hope-home-cta" className="mx-auto mt-12 flex max-w-7xl flex-col justify-between gap-8 overflow-hidden rounded-xl px-3 py-10 sm:px-12 sm:py-14 lg:flex-row lg:items-center" style={{ color: "#fff" }}>
           <div className="max-w-2xl">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] opacity-60">Your next drive is closer</p>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Let’s find the right car for you.</h2>
-            <p className="mt-4 max-w-xl text-sm leading-6 opacity-65 sm:text-base">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-blue-500 opacity-60">Your next drive is closer</p>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl text-foreground">Let’s find the right car for you.</h2>
+            <p className="mt-4 max-w-xl text-sm leading-6 opacity-65 sm:text-base text-muted-foreground">
               Browse the collection or talk with our team about what you’re looking for.
             </p>
           </div>
@@ -75,7 +75,7 @@ export default async function HomePage() {
             <Button asChild style={{ backgroundColor: "#71aa00", color: "#171717" }} className="rounded-full px-6 hover:opacity-90">
               <Link href="/cars">Browse inventory <ArrowRight className="ml-2 h-4 w-4" /></Link>
             </Button>
-            <Button asChild variant="outline" style={{ borderColor: "rgba(255,255,255,.25)" }} className="rounded-full bg-transparent px-6 hover:bg-white/10">
+            <Button asChild variant="outline" style={{ borderColor: "rgba(255,255,255,.25)" }} className="rounded-full bg-transparent text-foreground px-6 hover:bg-white/10">
               <Link href="/contact">Contact us</Link>
             </Button>
           </div>
